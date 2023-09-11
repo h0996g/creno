@@ -1,15 +1,16 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+const ObjectId = mongoose.Types.ObjectId;
 
 
 const responsableSchema = new mongoose.Schema({
     name: {
         type: String,
-        require: true
+        required: true
     },
     email: {
         type: String,
-        require: true
+        required: true
 
     },
     phone: {
@@ -17,12 +18,17 @@ const responsableSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        requre: true
+        required: true
     },
     age: {
         type: Number,
-        requre: true
+        required: true
     },
+    terrainId: {
+        type: ObjectId,
+        ref: "terrain",
+        required: true
+    }
 
 
 })

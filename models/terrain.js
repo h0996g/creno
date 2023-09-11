@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const responsable = require("./responsable");
 
 const terrainSchema = new mongoose.Schema({
     place: {
         latitude: {
             type: Number,
-            require: true
+            required: true
         },
         longitude: {
             type: Number,
-            require: true
+            required: true
         }
     },
     size: {
@@ -27,10 +26,10 @@ const terrainSchema = new mongoose.Schema({
     responsableId: {
         type: ObjectId,
         ref: "responsable",
-        require: true
+        required: true
     }
 })
 
 
-const Terrain = mongoose.model('Terain', terrainSchema)
+const Terrain = mongoose.model('Terrain', terrainSchema)
 module.exports = Terrain   
