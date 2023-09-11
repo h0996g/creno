@@ -6,6 +6,9 @@ router.get('/', async (req, res) => {
     res.json({ message: 'hellow' })
 
 })
+router.get('/responsable', responsableController.loginResponsable)
+router.get('/user', userController.loginUser)
+
 router.post('/user', userController.createUser)
 router.post('/responsable', responsableController.createResponsible)
 

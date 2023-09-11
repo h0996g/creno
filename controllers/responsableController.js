@@ -29,3 +29,36 @@ exports.createResponsible = async (req, res, next) => {
         next(err);
     }
 }
+exports.loginResponsable = async (req, res, next) => {
+    try {
+
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            throw new Error('Parameter are not correct');
+        }
+        let responsable = await ResponsableServices.checkResponsable(email);
+        if (!responsable) {
+            throw new Error('Responsable does not exist');
+        }
+
+        const isPasswordCorrect = await responsable.comparePassword(password);
+
+        if (isPasswordCorrect === false) {
+            throw new Error(`Responsable Name or Password does not match`);
+        }
+
+        // Creating Token
+
+        let tokenData;
+        tokenData = { _id: responsable._id, email: responsable.email };
+
+
+        const token = await ResponsableServices.generateAccessToken(tokenData, "secret", "1h")
+
+        res.status(200).json({ status: true, success: "sendData", token: token, name: responsable.name });
+    } catch (error) {
+        console.log(error, 'err---->');
+        next(error);
+    }
+}
