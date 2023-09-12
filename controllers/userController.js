@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const UserServices = require('../services/user.service')
+const DemandCreno = require('../models/demandCreno')
 
 
 exports.createUser = async (req, res, next) => {
@@ -62,3 +63,13 @@ exports.loginUser = async (req, res, next) => {
     }
 }
 
+exports.demandCreno = async (req, res) => {
+    try {
+        const { userId, terrainId, dateStart, dateEnd, timeStart, timeEnd } = req.body;
+        const demandCreno = new DemandCreno({ userId, terrainId, dateStart, dateEnd, timeStart, timeEnd })
+        await demandCreno.save();
+        res.json({ data: demandCreno });
+    } catch (e) {
+
+    }
+}

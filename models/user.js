@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
         required: false
     },
 
-})
+}, { timestamps: true })
 
 
 userSchema.pre("save", async function () {
