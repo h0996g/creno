@@ -9,16 +9,19 @@ const equipeSchema = new mongoose.Schema({
     },
     players: [{
         userId: {
-            type: ObjectId, required: true
+            type: ObjectId, required: true,
+            ref: "User"
         },
         post: {
             type: String
         },
     }],
     capitan: {
-        type: ObjectId, required: true
+        type: ObjectId, required: true,
+        ref: "User"
+
     }
-})
+}, { timestamps: true })
 
 
 

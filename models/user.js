@@ -48,7 +48,7 @@ userSchema.pre("save", async function () {
     } catch (err) {
         throw err;
     }
-});
+}, { timestamps: true });
 
 
 //used while signIn decrypt

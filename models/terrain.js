@@ -25,7 +25,7 @@ const terrainSchema = new mongoose.Schema({
     },
     responsableId: {
         type: ObjectId,
-        ref: "responsable",
+        ref: "Responsable",
         required: true
     }
 })

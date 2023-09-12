@@ -27,7 +27,7 @@ const responsableSchema = new mongoose.Schema({
 
 
 
-})
+}, { timestamps: true })
 
 
 responsableSchema.pre("save", async function () {
