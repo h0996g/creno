@@ -24,11 +24,7 @@ const responsableSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    terrainId: {
-        type: ObjectId,
-        ref: "terrain",
-        required: true
-    }
+
 
 
 })
