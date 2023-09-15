@@ -4,6 +4,8 @@ const responsableController = require('../controllers/responsableController');
 const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
 const crenoController = require('../controllers/crenoController')
+const { protect } = require('../handler/auth');
+
 const router = express.Router();
 router.get('/', async (req, res) => {
     res.json({ message: 'hellow' })
@@ -15,7 +17,7 @@ router.get('/', async (req, res) => {
 router.get('/user', userController.loginUser)
 
 router.post('/user', userController.createUser)
-router.post('/demandCreno', userController.demandCreno)
+router.post('/demandCreno', protect, userController.demandCreno)
 
 
 // ---------------------Responsable---------------------------------------------

@@ -3,12 +3,16 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const demandCreno = new mongoose.Schema({
     userId: {
-        type: ObjectId, ref: "User"
+        type: ObjectId, ref: "User",
+        required: true
     }, terrainId: {
-        type: ObjectId, ref: "Terrain"
+        type: ObjectId, ref: "Terrain",
+        required: true
+
     },
     dateStart: {
         type: String
+
     },
     dateEnd: {
         type: String
