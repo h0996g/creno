@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
+const ObjectId = mongoose.Types.ObjectId;
+
 
 
 const joueurSchema = new mongoose.Schema({
@@ -39,6 +41,12 @@ const joueurSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    equipes: [{
+        equipes: {
+            type: ObjectId, required: true,
+            ref: "Equipe"
+        }
+    }],
 
 }, { timestamps: true })
 
