@@ -1,6 +1,6 @@
 const express = require('express');
 const joueurController = require('../controllers/joueurController');
-const responsableController = require('../controllers/responsableController');
+const adminController = require('../controllers/adminController');
 const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
 const crenoController = require('../controllers/crenoController')
@@ -14,15 +14,15 @@ router.get('/', async (req, res) => {
 
 // ---------------------User---------------------------------------------
 
-router.get('/user', joueurController.loginJoueur)
+router.get('/joueur', joueurController.loginJoueur)
 
-router.post('/user', joueurController.createJoueur)
+router.post('/joueur', joueurController.createJoueur)
 router.post('/demandCreno', protect, joueurController.demandCreno)
 
 
 // ---------------------Responsable---------------------------------------------
-router.get('/responsable', responsableController.loginResponsable)
-router.post('/responsable', responsableController.createResponsible)
+router.get('/admin', adminController.loginAdmin)
+router.post('/admin', adminController.createAdmin)
 
 // ---------------------Terrain---------------------------------------------
 router.post('/terrain', terrainController.createTerrain)
