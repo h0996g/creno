@@ -1,24 +1,21 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-var results = new Object();
+// var results = new Object();
 
 const equipeSchema = new mongoose.Schema({
-    name: {
+    nom: {
         type: String,
         unique: true
     },
     players: [{
-        userId: {
+        joueurId: {
             type: ObjectId, required: true,
-            ref: "User"
-        },
-        post: {
-            type: String
-        },
+            ref: "Joueur"
+        }
     }],
-    capitan: {
+    capitaine_id: {
         type: ObjectId, required: true,
-        ref: "User"
+        ref: "Joueur"
 
     }
 }, { timestamps: true })
