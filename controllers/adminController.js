@@ -6,7 +6,7 @@ const AdminServices = require('../services/admin.service')
 exports.createAdmin = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
-        const { email, mot_de_passe, nom, prenom, telephone, wilaya } = req.body;
+        const { email, mot_de_passe, nom, prenom, telephone, wilaya, photo } = req.body;
         const duplicate = await AdminServices.getAdminByEmail(email);
         if (duplicate) {
             throw new Error(`Admin Name ${email}, Already Registered`)

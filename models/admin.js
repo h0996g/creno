@@ -29,27 +29,31 @@ const adminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    photo: {
+        type: String,
+        // required: true
+    },
 
 
-    
+
     annonces: [{
-        
-            type: ObjectId, required: false,
-            ref: "Annonce"
-        
+
+        type: ObjectId, required: false,
+        ref: "Annonce"
+
     }],
-        tournois: [{
-           
-                type: ObjectId, required: false,
-                ref: "Tournoi"
-            
-        }],
-        terrains: [{
-            
-                type: ObjectId, required: false,
-                ref: "Terrain"
-         
-        }],
+    tournois: [{
+
+        type: ObjectId, required: false,
+        ref: "Tournoi"
+
+    }],
+    terrains: [{
+
+        type: ObjectId, required: false,
+        ref: "Terrain"
+
+    }],
 
 
 

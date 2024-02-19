@@ -45,27 +45,28 @@ const joueurSchema = new mongoose.Schema({
 
 
     equipes: [{
-        
-            type: ObjectId, required: false,
-            ref: "Equipe"
-        
+
+        type: ObjectId, required: false,
+        ref: "Equipe"
+
     }],
+
     // terrains: [{
-        
+
     //         type: ObjectId, required: true,
     //         ref: "Terrain"
-        
+
     // }],
     annonces: [{
-            type: ObjectId, required: false,
-            ref: "Annonce"
-        
+        type: ObjectId, required: false,
+        ref: "Annonce"
+
     }],
-      creneaus: [{
-        
-            type: ObjectId, required: false,
-            ref: "Creneau"
-        
+    creneaus: [{
+
+        type: ObjectId, required: false,
+        ref: "Creneau"
+
     }],
 
 }, { timestamps: true })

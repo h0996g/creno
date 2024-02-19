@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 const terrainSchema = new mongoose.Schema({
-  
+
     largeur: {
         type: Number,
         required: true
@@ -11,35 +11,43 @@ const terrainSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    superficie: { 
+    superficie: {
         type: Number,
-         required: true 
-        },
-    adresse: { 
+        required: true
+    },
+    adresse: {
         type: String,
-        required: true 
+        required: true
     },
-    terrain_type: {
-         type: String,
-         required: true 
+    description: {
+        type: String,
+        required: true
+    },
+    capacite: {
+        type: String,
+        required: true
+    },
+    etat: {
+        type: String,
+        required: true
     },
 
 
 
 
-  
-      creneaus: [{
-      
-            type: ObjectId, required: false,
-            ref: "creneau"
+
+    creneaus: [{
+
+        type: ObjectId, required: false,
+        ref: "creneau"
     }],
     admin_id: { type: ObjectId, ref: 'Admin' },
     geoposition: { type: ObjectId, ref: 'Geoposition' },
     photos: [{ type: ObjectId, ref: 'Photo' }]
-    
 
-    }, { timestamps: true }
-   
+
+}, { timestamps: true }
+
 )
 
 
