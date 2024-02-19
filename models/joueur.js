@@ -62,7 +62,13 @@ const joueurSchema = new mongoose.Schema({
         ref: "Annonce"
 
     }],
-    creneaus: [{
+    creneaus_reserve: [{
+
+        type: ObjectId, required: false,
+        ref: "Creneau"
+
+    }],
+    creneaus_finale: [{
 
         type: ObjectId, required: false,
         ref: "Creneau"
