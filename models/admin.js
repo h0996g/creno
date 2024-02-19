@@ -31,6 +31,27 @@ const adminSchema = new mongoose.Schema({
     },
 
 
+    
+    annonces: [{
+        
+            type: ObjectId, required: false,
+            ref: "Annonce"
+        
+    }],
+        tournois: [{
+           
+                type: ObjectId, required: false,
+                ref: "Tournoi"
+            
+        }],
+        terrains: [{
+            
+                type: ObjectId, required: false,
+                ref: "Terrain"
+         
+        }],
+
+
 
 
 }, { timestamps: true })

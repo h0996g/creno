@@ -7,17 +7,22 @@ const equipeSchema = new mongoose.Schema({
         type: String,
         unique: true
     },
-    players: [{
-        joueurId: {
+    numero_joueurs: {
+        type: Int16Array,
+        required: true
+    },
+    joueurs: [{
+        
             type: ObjectId, required: true,
             ref: "Joueur"
-        }
+        
     }],
     capitaine_id: {
         type: ObjectId, required: true,
         ref: "Joueur"
 
     }
+
 }, { timestamps: true })
 
 
