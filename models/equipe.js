@@ -8,14 +8,14 @@ const equipeSchema = new mongoose.Schema({
         unique: true
     },
     numero_joueurs: {
-        type: Int16Array,
+        type: Number,
         required: true
     },
     joueurs: [{
-        
-            type: ObjectId, required: true,
-            ref: "Joueur"
-        
+
+        type: ObjectId, required: true,
+        ref: "Joueur"
+
     }],
     capitaine_id: {
         type: ObjectId, required: true,

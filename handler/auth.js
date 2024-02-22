@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 exports.protect = async (req, res, next) => {
-    console.log('gg')
     const bearer = req.headers.authorization
     if (!bearer) {
         res.status(401)

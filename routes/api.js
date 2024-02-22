@@ -28,7 +28,8 @@ router.post('/admin', adminController.createAdmin)
 router.post('/terrain', terrainController.createTerrain)
 
 // ---------------------Equipe---------------------------------------------
-router.post('/equipe', equipeController.createEquipe)
+router.post('/equipe', protect, equipeController.createEquipe)
+router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 
 // ---------------------Creno---------------------------------------------
 router.post('/creno', crenoController.createCreno)
