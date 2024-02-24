@@ -9,7 +9,8 @@ exports.createJoueur = async (req, res, next) => {
         const { email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom } = req.body;
         const duplicate = await JoueurServices.getJoueurByEmail(email);
         if (duplicate) {
-            throw new Error(`Etudient Name ${email}, Already Registered`)
+            // throw new Error(`Etudient Name ${email}, Already Registered`)
+            return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
         }
 
         const response = await JoueurServices.registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom);
@@ -35,17 +36,21 @@ exports.loginJoueur = async (req, res, next) => {
         const { email, mot_de_passe } = req.body;
 
         if (!email || !mot_de_passe) {
-            throw new Error('Parameter are not correct');
+            // throw new Error('Parameter are not correct');
+            return res.status(400).json({ status: false, message: 'Les paramètres ne sont pas corrects' });
         }
         let joueur = await JoueurServices.checkJoueur(email);
         if (!joueur) {
-            throw new Error('Joueur does not exist');
+            // throw new Error('Joueur does not exist');
+            return res.status(404).json({ status: false, message: 'L\'administrateur n\'existe pas' });
         }
 
         const isPasswordCorrect = await joueur.compareMot_de_passe(mot_de_passe);
 
         if (isPasswordCorrect === false) {
-            throw new Error(`Username or Password does not match`);
+            // throw new Error(`Username or Password does not match`);
+            return res.status(401).json({ status: false, message: 'Le nom d\'administrateur ou le mot de passe ne correspond pas' });
+        
         }
 
         // Creating Token
@@ -56,7 +61,7 @@ exports.loginJoueur = async (req, res, next) => {
 
         const token = await JoueurServices.generateAccessToken(tokenData, "secret", "1h")
 
-        res.status(200).json({ status: true, success: "sendData", token: token, name: joueur.nom, email: joueur.email });
+        res.status(200).json({ status: true, success: "Bien connecté", token: token, name: joueur.nom, email: joueur.email });
     } catch (error) {
         console.log(error, 'err---->');
         next(error);

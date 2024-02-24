@@ -8,7 +8,7 @@ const { protect } = require('../handler/auth');
 
 const router = express.Router();
 router.get('/', async (req, res) => {
-    res.json({ message: 'hellow' })
+    res.json({ message: 'hello' })
 
 })
 
@@ -20,7 +20,7 @@ router.post('/joueur', joueurController.createJoueur)
 router.post('/demandCreno', protect, joueurController.demandCreno)
 
 
-// ---------------------Responsable---------------------------------------------
+// ---------------------admin---------------------------------------------
 router.get('/admin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
 

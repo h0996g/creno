@@ -9,7 +9,8 @@ exports.createAdmin = async (req, res, next) => {
         const { email, mot_de_passe, nom, prenom, telephone, wilaya, photo } = req.body;
         const duplicate = await AdminServices.getAdminByEmail(email);
         if (duplicate) {
-            throw new Error(`Admin Name ${email}, Already Registered`)
+            // throw new Error(`this ${email}, Already Registered`)
+            return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
         }
 
         const response = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya);
@@ -21,7 +22,7 @@ exports.createAdmin = async (req, res, next) => {
         const token = await AdminServices.generateAccessToken(tokenData, "secret", "1h")
 
 
-        res.json({ status: true, message: 'Admin registered successfully', token: token, id: response._id });
+        res.json({ status: true, message: 'Admin enregistré avec succès', token: token, id: response._id });
 
 
     } catch (err) {
@@ -35,17 +36,20 @@ exports.loginAdmin = async (req, res, next) => {
         const { email, mot_de_passe } = req.body;
 
         if (!email || !mot_de_passe) {
-            throw new Error('Parameter are not correct');
+            // throw new Error('Parameter are not correct');
+            return res.status(400).json({ status: false, message: 'Les paramètres ne sont pas corrects' });
         }
         let admin = await AdminServices.checkAdmin(email);
         if (!admin) {
-            throw new Error('Admin does not exist');
+            // throw new Error('Admin does not exist');
+            return res.status(404).json({ status: false, message: 'L\'administrateur n\'existe pas' });
         }
 
         const isMot_de_passeCorrect = await admin.compareMot_de_passe(mot_de_passe);
 
         if (isMot_de_passeCorrect === false) {
-            throw new Error(`Admin Name or Password does not match`);
+            // throw new Error(`Admin Name or Password does not match`);
+            return res.status(401).json({ status: false, message: 'Le nom d\'administrateur ou le mot de passe ne correspond pas' });
         }
 
         // Creating Token
@@ -56,7 +60,7 @@ exports.loginAdmin = async (req, res, next) => {
 
         const token = await AdminServices.generateAccessToken(tokenData, "secret", "1h")
 
-        res.status(200).json({ status: true, success: "sendData", token: token, name: admin.nom });
+        res.status(200).json({ status: true, success: "Bien connecté", token: token, name: admin.nom });
     } catch (error) {
         console.log(error, 'err---->');
         next(error);
