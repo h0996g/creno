@@ -70,3 +70,26 @@ exports.deleteTerrain = async (req, res, next) => {
     }
 };
 
+
+exports.findTerrainById = async (req, res, next) => {
+    try {
+        const  id  = req.params.id;
+        // const admin_id = req.user._id; // Extracting admin ID from the authenticated user
+        const terrain = await Terrain.findById(id);
+        if (!terrain) {
+            return res.status(404).json({ message: 'Terrain not found or unauthorized' });
+        }
+        res.json(terrain);
+    } catch (error) {
+        res.json(error);
+    }
+};
+
+exports.findAllTerrains = async (req, res, next) => {
+    try {
+        const terrains = await Terrain.find();
+        res.json(terrains);
+    } catch (error) {
+        res.json(error);
+    }
+};

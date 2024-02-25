@@ -2,40 +2,40 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 var results = new Object();
 
-const equipeSchema = new mongoose.Schema({
+const tournoiSchema = new mongoose.Schema({
     titre: {
         type: String,
-        unique: true
+        required: true
     },
     
     s_date: {
         type: Date,
-        unique: true
+        required: true
 
     },
     e_date: {
         type: Date,
-        unique: true
+        required: true
 
     } ,
     type: {
         type: String,
-        unique: true
+        required: true
 
     }, 
     numero_equipe: {
         type: Number,
-        unique: true
+        required: true
 
     } ,
     frais_inscription: {
         type: Number,
-        unique: true
+        required: true
 
     } ,
     lieu: {
         type: String,
-        unique: true
+        required: true
 
     },
 
@@ -65,5 +65,5 @@ const equipeSchema = new mongoose.Schema({
 
 
 
-const Equipe = mongoose.model('Tournoi', tournoiSchema)
+const Tournoi = mongoose.model('Tournoi', tournoiSchema)
 module.exports = Tournoi   
