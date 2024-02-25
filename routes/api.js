@@ -25,11 +25,18 @@ router.get('/admin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
 
 // ---------------------Terrain---------------------------------------------
-router.post('/terrain', terrainController.createTerrain)
+// router.post('/terrain', terrainController.createTerrain)
+// Route for adding a new terrain
+router.post('/terrain', protect, terrainController.addTerrain);
+// Route for updating a terrain
+router.put('/terrain/:id', protect, terrainController.updateTerrain);
+// Route for deleting a terrain
+router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
 
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
+
 
 // ---------------------Creno---------------------------------------------
 router.post('/creno', crenoController.createCreno)

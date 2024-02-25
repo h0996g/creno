@@ -3,8 +3,8 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const geopositionSchema = new mongoose.Schema({
   
-  latitude: { type: Number, required: true },
-  longitude: { type: Number, required: true },
+  latitude: { type: Number, required: false },
+  longitude: { type: Number, required: false },
 
 
   
