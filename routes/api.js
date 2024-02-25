@@ -36,6 +36,9 @@ router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
+router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
+router.get('/equipe/:id', protect, equipeController.findEquipeById)
+router.get('/equipe', protect, equipeController.findAllEquipes)
 
 
 // ---------------------Creno---------------------------------------------

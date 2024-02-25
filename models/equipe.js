@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-// var results = new Object();
 
 const equipeSchema = new mongoose.Schema({
     nom: {
