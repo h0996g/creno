@@ -13,7 +13,7 @@ exports.createAdmin = async (req, res, next) => {
             return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
         }
 
-        const response = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya);
+        const response = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya, photo);
 
         let tokenData;
         tokenData = { _id: response._id, email: email };
