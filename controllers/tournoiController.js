@@ -3,7 +3,7 @@ const Tournoi = require('../models/tournoi');
 exports.addTournoi = async (req, res) => {
     try {
         const { titre, s_date, e_date, type, numero_equipe, frais_inscription, lieu } = req.body;
-        const admin_id = req.user._id; 
+        const admin_id = req.user._id;
 
         const newTournoiData = {
             titre,
@@ -27,7 +27,7 @@ exports.addTournoi = async (req, res) => {
 
 exports.updateTournoi = async (req, res) => {
     try {
-        const  id  = req.params.id;
+        const id = req.params.id;
         const tournoiData = req.body;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
         const updatedTournoi = await Tournoi.findOneAndUpdate({ _id: id, admin_id: admin_id }, tournoiData, { new: true });
@@ -42,7 +42,7 @@ exports.updateTournoi = async (req, res) => {
 
 exports.deleteTournoi = async (req, res) => {
     try {
-        const  id  = req.params.id;
+        const id = req.params.id;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
         const deletedTournoi = await Tournoi.findOneAndDelete({ _id: id, admin_id: admin_id });
         if (!deletedTournoi) {
@@ -75,5 +75,15 @@ exports.findAllTournois = async (req, res, next) => {
         res.json(tournois);
     } catch (error) {
         next(error);
+    }
+};
+exports.filterTournois = async (req, res) => {
+    try {
+        const filter = req.query;
+
+        const tournois = await Tournoi.find(filter);
+        res.json(tournois);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };
