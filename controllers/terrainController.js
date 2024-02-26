@@ -96,16 +96,7 @@ exports.findAllTerrains = async (req, res, next) => {
 
 exports.filterTerrains = async (req, res) => {
     try {
-        const { largeur, longeur, superficie, adresse, capacite, etat } = req.query;
-
-        const filter = {};
-        if (largeur) filter.largeur = largeur;
-        if (longeur) filter.longeur = longeur;
-        if (superficie) filter.superficie = superficie;
-        if (adresse) filter.adresse = adresse;
-        if (capacite) filter.capacite = capacite;
-        if (etat) filter.etat = etat;
-
+        const filter = { largeur, longeur, superficie, adresse, capacite, etat } = req.query;
         const terrains = await Terrain.find(filter);
 
         res.json(terrains);
