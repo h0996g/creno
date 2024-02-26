@@ -26,17 +26,11 @@ router.get('/admin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
 
 // ---------------------Terrain---------------------------------------------
-// router.post('/terrain', terrainController.createTerrain)
-// Route for adding a new terrain
-router.post('/terrain', protect, terrainController.addTerrain);
-// Route for updating a terrain
-router.put('/terrain/:id', protect, terrainController.updateTerrain);
-// Route for deleting a terrain
-router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
-// Route for finding a terrain by ID
-router.get('/terrain/:id', terrainController.findTerrainById);
 
-// Route for finding all terrains
+router.post('/terrain', protect, terrainController.addTerrain);
+router.put('/terrain/:id', protect, terrainController.updateTerrain);
+router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
+router.get('/terrain/:id', terrainController.findTerrainById);
 router.get('/terrains', terrainController.findAllTerrains);
 
 router.get('/terrains/filter', terrainController.filterTerrains);
@@ -47,22 +41,15 @@ router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', protect, equipeController.findEquipeById)
 router.get('/equipe', equipeController.findAllEquipes)
+router.get('/equipes/filter', equipeController.filterEquipes);
 
 
 // ---------------------Creno---------------------------------------------
 // -------------------------tournoi---------------------------------
-// Route for adding a new tournament
 router.post('/tournoi', protect, tournoiController.addTournoi);
-
-// Route for updating a tournament
 router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
-
 router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
-
-// Route for finding a tournament by ID
 router.get('/tournoi/:id', tournoiController.findTournoiById);
-
-// Route for finding all tournaments
 router.get('/tournois', tournoiController.findAllTournois);
 
 

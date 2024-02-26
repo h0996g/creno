@@ -5,9 +5,9 @@ exports.createEquipe = async (req, res) => {
         const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
         const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id })
         await createEquipe.save();
-        res.json({ data: createEquipe });
+        res.status(201).json({ data: createEquipe });
     } catch (e) {
-        res.json(e);
+        res.status(500).json(e);
     }
 }
 
@@ -38,7 +38,7 @@ exports.supprimerEquipe = async (req, res) => {
         if (!equipe) {
             return res.status(404).json({ error: 'Equipe not found' });
         }
-        res.json({ message: 'Equipe deleted successfully' });
+        res.status(204).json({ message: 'Equipe deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -66,5 +66,15 @@ exports.findAllEquipes = async (req, res) => {
     }
 };
 
+exports.filterEquipes = async (req, res) => {
+    try {
+        const filter = { nom, numero_joueurs, capitaine_id, wilaya } = req.query;
+
+        const equipes = await Equipe.find(filter);
+        res.json(equipes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
