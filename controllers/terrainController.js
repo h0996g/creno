@@ -42,7 +42,7 @@ exports.addTerrain = async (req, res, next) => {
 // Controller for updating a terrain
 exports.updateTerrain = async (req, res) => {
     try {
-        const id  = req.params.id;
+        const id = req.params.id;
         const terrainData = req.body;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
         const updatedTerrain = await Terrain.findOneAndUpdate({ _id: id, admin_id: admin_id }, terrainData, { new: true });
@@ -58,7 +58,7 @@ exports.updateTerrain = async (req, res) => {
 // Controller for deleting a terrain
 exports.deleteTerrain = async (req, res, next) => {
     try {
-        const  id  = req.params.id;
+        const id = req.params.id;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
         const deletedTerrain = await Terrain.findOneAndDelete({ _id: id, admin_id: admin_id });
         if (!deletedTerrain) {
@@ -73,7 +73,7 @@ exports.deleteTerrain = async (req, res, next) => {
 
 exports.findTerrainById = async (req, res, next) => {
     try {
-        const  id  = req.params.id;
+        const id = req.params.id;
         // const admin_id = req.user._id; // Extracting admin ID from the authenticated user
         const terrain = await Terrain.findById(id);
         if (!terrain) {
@@ -91,5 +91,25 @@ exports.findAllTerrains = async (req, res, next) => {
         res.json(terrains);
     } catch (error) {
         res.json(error);
+    }
+};
+
+exports.filterTerrains = async (req, res) => {
+    try {
+        const { largeur, longeur, superficie, adresse, capacite, etat } = req.query;
+
+        const filter = {};
+        if (largeur) filter.largeur = largeur;
+        if (longeur) filter.longeur = longeur;
+        if (superficie) filter.superficie = superficie;
+        if (adresse) filter.adresse = adresse;
+        if (capacite) filter.capacite = capacite;
+        if (etat) filter.etat = etat;
+
+        const terrains = await Terrain.find(filter);
+
+        res.json(terrains);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

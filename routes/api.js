@@ -39,12 +39,14 @@ router.get('/terrain/:id', terrainController.findTerrainById);
 // Route for finding all terrains
 router.get('/terrains', terrainController.findAllTerrains);
 
+router.get('/terrains/filter', terrainController.filterTerrains);
+
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', protect, equipeController.findEquipeById)
-router.get('/equipe', protect, equipeController.findAllEquipes)
+router.get('/equipe', equipeController.findAllEquipes)
 
 
 // ---------------------Creno---------------------------------------------
