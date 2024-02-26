@@ -3,7 +3,6 @@ const joueurController = require('../controllers/joueurController');
 const adminController = require('../controllers/adminController');
 const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
-const crenoController = require('../controllers/crenoController')
 const creneauController = require('../controllers/creneauController')
 const tournoiController = require('../controllers/tournoiController')
 const { protect } = require('../handler/auth');
@@ -49,17 +48,16 @@ router.get('/equipe', protect, equipeController.findAllEquipes)
 
 
 // ---------------------Creno---------------------------------------------
-router.post('/creno', crenoController.createCreno)
 // -------------------------tournoi---------------------------------
 // Route for adding a new tournament
 router.post('/tournoi', protect, tournoiController.addTournoi);
 
 // Route for updating a tournament
- router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
+router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
 
- router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
+router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
 
- // Route for finding a tournament by ID
+// Route for finding a tournament by ID
 router.get('/tournoi/:id', tournoiController.findTournoiById);
 
 // Route for finding all tournaments
