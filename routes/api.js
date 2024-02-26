@@ -45,6 +45,18 @@ router.get('/equipes/filter', equipeController.filterEquipes);
 
 
 // ---------------------Creno---------------------------------------------
+// Route for adding a new creneau
+router.post('/creneau', protect, creneauController.addCreneau);
+// Route for updating a creneau
+router.put('/creneau/:id', protect, creneauController.updateCreneau);
+// Route for deleting a creneau
+router.delete('/creneau/:id',protect, creneauController.deleteCreneau);
+// Route for finding a creneau by ID
+router.get('/creneau/:id', creneauController.findCreneauById);
+// Route for finding all creneaus
+router.get('/creneaus', creneauController.findAllCreneaus);
+
+router.get('/creneaus/filter', creneauController.filterCreneaus);
 // -------------------------tournoi---------------------------------
 router.post('/tournoi', protect, tournoiController.addTournoi);
 router.put('/tournoi/:id', protect, tournoiController.updateTournoi);

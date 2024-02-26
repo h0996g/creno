@@ -30,14 +30,14 @@ const creneauSchema = new mongoose.Schema({
 
 
 
-   joueur_id: { type: ObjectId, ref: 'terrain' },
+   joueur_id: { type: ObjectId, ref: 'terrain' ,required:false },
    joueurs: [{
 
       type: ObjectId, required: false,
       ref: "Joueur"
 
    }],
-   terrain_id: { type: ObjectId, ref: 'terrain' },
+   terrain_id: { type: ObjectId, ref: 'terrain',required:false },
 })
 
 
