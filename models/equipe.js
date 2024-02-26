@@ -20,7 +20,11 @@ const equipeSchema = new mongoose.Schema({
         type: ObjectId, required: true,
         ref: "Joueur"
 
-    }
+    },
+    wilaya: {
+        type: String,
+        required: false
+    },
 
 }, { timestamps: true })
 
