@@ -51,6 +51,7 @@ router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
 router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
 router.get('/tournoi/:id', tournoiController.findTournoiById);
 router.get('/tournois', tournoiController.findAllTournois);
+router.get('/tournois/filter', tournoiController.filterTournois);
 
 
 
