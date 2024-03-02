@@ -13,7 +13,7 @@ const Terrain = require('../models/terrain');
 // Controller for adding a new terrain
 exports.addTerrain = async (req, res, next) => {
     try {
-        const { largeur, longeur, superficie, adresse, description, capacite, etat, creneaus, geoposition, photos } = req.body;
+        const { largeur, longeur, superficie, adresse, description, capacite, etat, creneaus, place, photos } = req.body;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
 
         const newTerrainData = {
@@ -26,7 +26,7 @@ exports.addTerrain = async (req, res, next) => {
             etat,
             creneaus,
             admin_id,
-            geoposition,
+            place,
             photos
         };
 
@@ -34,7 +34,7 @@ exports.addTerrain = async (req, res, next) => {
         await newTerrain.save();
         res.status(201).json(newTerrain);
     } catch (error) {
-        res.json(e);
+        res.json(error);
     }
 };
 
@@ -96,7 +96,7 @@ exports.findAllTerrains = async (req, res, next) => {
 
 exports.filterTerrains = async (req, res) => {
     try {
-        const filter = { largeur, longeur, superficie, adresse, capacite, etat } = req.query;
+        const filter = { largeur, longeur, superficie, adresse, capacite, etat, place } = req.query;
         const terrains = await Terrain.find(filter);
 
         res.json(terrains);

@@ -5,7 +5,7 @@ const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
 const creneauController = require('../controllers/creneauController')
 const tournoiController = require('../controllers/tournoiController')
-const { protect } = require('../handler/auth');
+const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
 router.get('/', async (req, res) => {
@@ -27,7 +27,7 @@ router.post('/admin', adminController.createAdmin)
 
 // ---------------------Terrain---------------------------------------------
 
-router.post('/terrain', protect, terrainController.addTerrain);
+router.post('/terrain', protect, isAdmin, terrainController.addTerrain);
 router.put('/terrain/:id', protect, terrainController.updateTerrain);
 router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
 router.get('/terrain/:id', terrainController.findTerrainById);
@@ -50,7 +50,7 @@ router.post('/creneau', protect, creneauController.addCreneau);
 // Route for updating a creneau
 router.put('/creneau/:id', protect, creneauController.updateCreneau);
 // Route for deleting a creneau
-router.delete('/creneau/:id',protect, creneauController.deleteCreneau);
+router.delete('/creneau/:id', protect, creneauController.deleteCreneau);
 // Route for finding a creneau by ID
 router.get('/creneau/:id', creneauController.findCreneauById);
 // Route for finding all creneaus

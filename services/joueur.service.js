@@ -31,8 +31,8 @@ class JoueurServices {
         }
     }
 
-    static async generateAccessToken(tokenData, JWTSecret_Key, JWT_EXPIRE) {
-        return jwt.sign(tokenData, JWTSecret_Key, { expiresIn: JWT_EXPIRE });
+    static async generateAccessToken(tokenData, JWT_EXPIRE) {
+        return jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRE });
     }
 }
 

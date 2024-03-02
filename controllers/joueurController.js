@@ -16,10 +16,10 @@ exports.createJoueur = async (req, res, next) => {
         const response = await JoueurServices.registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom);
 
         let tokenData;
-        tokenData = { _id: response._id, email: email };
+        tokenData = { _id: response._id, email: email, role: "joueur" };
 
 
-        const token = await JoueurServices.generateAccessToken(tokenData, "secret", "1h")
+        const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
         res.json({ status: true, message: 'Joueur registered successfully', token: token, id: response._id });
 
@@ -50,16 +50,16 @@ exports.loginJoueur = async (req, res, next) => {
         if (isPasswordCorrect === false) {
             // throw new Error(`Username or Password does not match`);
             return res.status(401).json({ status: false, message: 'Le nom d\'administrateur ou le mot de passe ne correspond pas' });
-        
+
         }
 
         // Creating Token
 
         let tokenData;
-        tokenData = { _id: joueur._id, email: joueur.email };
+        tokenData = { _id: joueur._id, email: joueur.email, role: "joueur" };
 
 
-        const token = await JoueurServices.generateAccessToken(tokenData, "secret", "1h")
+        const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
         res.status(200).json({ status: true, success: "Bien connecté", token: token, name: joueur.nom, email: joueur.email });
     } catch (error) {

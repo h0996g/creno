@@ -13,7 +13,7 @@ exports.protect = async (req, res, next) => {
         return
     }
     try {
-        const user = jwt.verify(token, 'secret')
+        const user = jwt.verify(token, process.env.JWT_SECRET)
         req.user = user
 
         next()
@@ -23,4 +23,15 @@ exports.protect = async (req, res, next) => {
         res.json({ message: 'Not Autorized catch' })
         return
     }
+}
+exports.isAdmin = (req, res, next) => {
+    if (req.user.role === "joueur") {
+        res.status(401)
+        res.json({ message: 'Access denied, you must be an admin' })
+        return
+    }
+    console.error(req.user.role)
+
+    next();
+
 }

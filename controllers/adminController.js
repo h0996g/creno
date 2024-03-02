@@ -16,10 +16,10 @@ exports.createAdmin = async (req, res, next) => {
         const response = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya, photo);
 
         let tokenData;
-        tokenData = { _id: response._id, email: email };
+        tokenData = { _id: response._id, email: email, role: "admin" };
 
 
-        const token = await AdminServices.generateAccessToken(tokenData, "secret", "1h")
+        const token = await AdminServices.generateAccessToken(tokenData, "365d")
 
 
         res.json({ status: true, message: 'Admin enregistré avec succès', token: token, id: response._id });
@@ -55,10 +55,10 @@ exports.loginAdmin = async (req, res, next) => {
         // Creating Token
 
         let tokenData;
-        tokenData = { _id: admin._id, email: admin.email };
+        tokenData = { _id: admin._id, email: admin.email, role: "admin" };
 
 
-        const token = await AdminServices.generateAccessToken(tokenData, "secret", "1h")
+        const token = await AdminServices.generateAccessToken(tokenData, "365d")
 
         res.status(200).json({ status: true, success: "Bien connecté", token: token, name: admin.nom });
     } catch (error) {

@@ -31,18 +31,22 @@ const terrainSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-
-
-
-
+    place: {
+        latitude: {
+            type: Number,
+            required: true
+        },
+        longitude: {
+            type: Number,
+            required: true
+        }
+    },
     creneaus: [{
 
         type: ObjectId, required: false,
         ref: "creneau"
     }],
     admin_id: { type: ObjectId, ref: 'Admin' },
-    geoposition: { type: ObjectId, ref: 'Geoposition' },
     photos: [{ type: ObjectId, ref: 'Photo' }]
 
 
