@@ -13,16 +13,16 @@ exports.createAdmin = async (req, res, next) => {
             return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
         }
 
-        const response = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya, photo);
+        const admin = await AdminServices.registerAdmin(email, mot_de_passe, nom, prenom, telephone, wilaya, photo);
 
         let tokenData;
-        tokenData = { _id: response._id, email: email, role: "admin" };
+        tokenData = { _id: admin._id, email: email, role: "admin" };
 
 
         const token = await AdminServices.generateAccessToken(tokenData, "365d")
 
 
-        res.json({ status: true, message: 'Admin enregistré avec succès', token: token, id: response._id });
+        res.json({ status: true, message: 'Admin enregistré avec succès', token: token, id: admin._id, data: admin });
 
 
     } catch (err) {
@@ -60,7 +60,7 @@ exports.loginAdmin = async (req, res, next) => {
 
         const token = await AdminServices.generateAccessToken(tokenData, "365d")
 
-        res.status(200).json({ status: true, success: "Bien connecté", token: token, name: admin.nom });
+        res.status(200).json({ status: true, success: "Bien connecté", token: token, data: admin });
     } catch (error) {
         console.log(error, 'err---->');
         next(error);

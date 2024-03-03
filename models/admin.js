@@ -58,6 +58,12 @@ const adminSchema = new mongoose.Schema({
 
 
 
+}, {
+    toJSON: {
+        transform: function (doc, ret) {
+            delete ret.mot_de_passe;
+        }
+    }
 }, { timestamps: true })
 
 
