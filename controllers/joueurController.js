@@ -68,18 +68,7 @@ exports.loginJoueur = async (req, res, next) => {
     }
 }
 
-exports.demandCreno = async (req, res) => {
-    try {
-        const userId = req.user._id
-        const { terrainId, dateStart, dateEnd, timeStart, timeEnd } = req.body;
-        const demandCreno = new DemandCreno({ userId, terrainId, dateStart, dateEnd, timeStart, timeEnd })
-        await demandCreno.save();
-        res.json({ data: demandCreno });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
 
-    }
-}
 
 
 
