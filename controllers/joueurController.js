@@ -80,3 +80,90 @@ exports.demandCreno = async (req, res) => {
 
     }
 }
+
+
+
+exports.updateJoueur = async (req, res) => {
+    try {
+        // const id = req.params.id;
+        const joueurData = req.body;
+        
+        // Extract admin ID from the token
+        const joueur_id = req.user._id;
+
+        // Update joueur data
+        const updatedJoueur = await Joueur.findByIdAndUpdate( joueur_id , joueurData, { new: true });
+
+        if (!updatedJoueur) {
+            return res.status(404).json({ message: 'Joueur not found or unauthorized' });
+        }
+        res.json(updatedJoueur);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+exports.getJoueurById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const joueur = await Joueur.findById(id);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+        res.json(joueur);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.getAllJoueurs = async (req, res) => {
+    try {
+        const joueurs = await Joueur.find();
+        res.json(joueurs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+exports.filterJoueurs = async (req, res) => {
+    try {
+        const filter = req.query; // Extract the filter from query parameters
+        const joueurs = await Joueur.find(filter);
+        res.json(joueurs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+// Update admin password
+exports.updatePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        
+        // Extract admin ID from the token
+        const joueur_id = req.user._id;
+
+        // Fetch admin by ID
+        const joueur = await Joueur.findById(joueur_id);
+
+      
+        const isMatch = await joueur.compareMot_de_passe(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect' });
+        }
+
+       
+        joueur.mot_de_passe = newPassword;
+        await joueur.save();
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

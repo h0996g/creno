@@ -19,12 +19,42 @@ router.get('/joueur', joueurController.loginJoueur)
 
 router.post('/loginjoueur', joueurController.loginJoueur)
 router.post('/joueur', joueurController.createJoueur)
-router.post('/demandCreno', protect, joueurController.demandCreno)
+
+// Update a joueur
+router.put('/joueur', protect, joueurController.updateJoueur);
+
+// Get a joueur by ID
+router.get('/joueur/:id', joueurController.getJoueurById);
+
+// Get all joueurs
+router.get('/joueurs', joueurController.getAllJoueurs);
+
+// Filter joueurs
+router.get('/joueurs/filter', joueurController.filterJoueurs);
+
+
+router.put('/joueurs/password',protect,  joueurController.updatePassword);
+
 
 
 // ---------------------admin---------------------------------------------
 router.post('/loginadmin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
+
+// Update an admin (with token verification)
+router.put('/admin',protect, adminController.updateAdmin);
+
+// Get an admin by ID
+router.get('/admin/:id', adminController.getAdminById);
+
+// Get all admins
+router.get('/admins', adminController.getAllAdmins);
+
+// Filter admins
+router.get('/admins/filter', adminController.filterAdmins);
+
+// Update admin password
+router.put('/admins/password',protect,  adminController.updatePassword);
 
 // ---------------------Terrain---------------------------------------------
 

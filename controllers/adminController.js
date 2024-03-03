@@ -66,3 +66,87 @@ exports.loginAdmin = async (req, res, next) => {
         next(error);
     }
 }
+
+
+exports.updateAdmin = async (req, res) => {
+    try {
+        const adminData = req.body;
+        
+        // Extract admin ID from the token
+        const admin_id = req.user._id;
+
+        // Update admin data
+        const updatedAdmin = await Admin.findByIdAndUpdate(admin_id, adminData, { new: true });
+
+        if (!updatedAdmin) {
+            return res.status(404).json({ message: 'Admin not found or unauthorized' });
+        }
+        res.json(updatedAdmin);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get an admin by ID
+exports.getAdminById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const admin = await Admin.findById(id);
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.json(admin);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get all admins
+exports.getAllAdmins = async (req, res) => {
+    try {
+        const admins = await Admin.find();
+        res.json(admins);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Filter admins
+exports.filterAdmins = async (req, res) => {
+    try {
+        const filter = req.query; // Extract the filter from query parameters
+        const admins = await Admin.find(filter);
+        res.json(admins);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+// Update admin password
+exports.updatePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword } = req.body;
+        
+        // Extract admin ID from the token
+        const admin_id = req.user._id;
+
+        // Fetch admin by ID
+        const admin = await Admin.findById(admin_id);
+
+      
+        const isMatch = await admin.compareMot_de_passe(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect' });
+        }
+
+       
+        admin.mot_de_passe = newPassword;
+        await admin.save();
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
