@@ -57,7 +57,7 @@ exports.deleteTournoi = async (req, res) => {
 // Controller for finding a tournament by ID
 exports.findTournoiById = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id;
         const tournoi = await Tournoi.findById(id);
         if (!tournoi) {
             return res.status(404).json({ message: 'Tournament not found' });

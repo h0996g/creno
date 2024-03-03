@@ -23,7 +23,7 @@ router.post('/demandCreno', protect, joueurController.demandCreno)
 
 
 // ---------------------admin---------------------------------------------
-router.get('/admin', adminController.loginAdmin)
+router.post('/loginadmin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
 
 // ---------------------Terrain---------------------------------------------
