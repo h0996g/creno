@@ -1,0 +1,1 @@
+const Annonce = require('../models/annonce');

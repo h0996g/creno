@@ -5,6 +5,8 @@ const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
 const creneauController = require('../controllers/creneauController')
 const tournoiController = require('../controllers/tournoiController')
+const photoController = require('../controllers/photocontroller')
+const annonceController = require('../controllers/annonceController')
 const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
