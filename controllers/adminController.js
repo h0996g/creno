@@ -55,6 +55,7 @@ exports.loginAdmin = async (req, res, next) => {
         // Creating Token
 
         let tokenData;
+
         tokenData = { _id: admin._id, email: admin.email, role: "admin" };
 
 
@@ -71,7 +72,7 @@ exports.loginAdmin = async (req, res, next) => {
 exports.updateAdmin = async (req, res) => {
     try {
         const adminData = req.body;
-        
+
         // Extract admin ID from the token
         const admin_id = req.user._id;
 
@@ -128,20 +129,20 @@ exports.filterAdmins = async (req, res) => {
 exports.updatePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
-        
+
         // Extract admin ID from the token
         const admin_id = req.user._id;
 
         // Fetch admin by ID
         const admin = await Admin.findById(admin_id);
 
-      
+
         const isMatch = await admin.compareMot_de_passe(oldPassword);
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect' });
         }
 
-       
+
         admin.mot_de_passe = newPassword;
         await admin.save();
 
