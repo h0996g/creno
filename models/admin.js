@@ -98,5 +98,6 @@ adminSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe)
 
 
 
+
 const Admin = mongoose.model('Admin', adminSchema)
 module.exports = Admin   
