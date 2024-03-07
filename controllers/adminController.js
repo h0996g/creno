@@ -151,3 +151,18 @@ exports.updatePassword = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// Delete admin by ID
+exports.deleteAdmin = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+        const deletedAdmin = await Admin.deleteOne({ _id: adminId });
+        if (!deletedAdmin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+        res.json({ message: 'Admin deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

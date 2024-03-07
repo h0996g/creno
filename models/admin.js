@@ -55,10 +55,6 @@ const adminSchema = new mongoose.Schema({
         ref: "Terrain"
 
     }],
-
-
-
-
 }, {
     toJSON: {
         transform: function (doc, ret) {
@@ -67,28 +63,25 @@ const adminSchema = new mongoose.Schema({
     }
 }, { timestamps: true })
 
-
+// Pre-save hook to hash password
 adminSchema.pre("save", async function () {
+    console.log("sace")
     var admin = this;
     if (!admin.isModified("mot_de_passe")) {
-        return
+        return;
     }
     try {
         const salt = await bcrypt.genSalt(10);
         const hash = await bcrypt.hash(admin.mot_de_passe, salt);
-
         admin.mot_de_passe = hash;
     } catch (err) {
         throw err;
     }
 });
 
-
-//used while signIn decrypt
+// Method to compare passwords during sign -in
 adminSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe) {
     try {
-        console.log('----------------no mot_de_passe', this.mot_de_passe);
-        // @ts-ignore
         const isMatch = await bcrypt.compare(candidateMot_de_passe, this.mot_de_passe);
         return isMatch;
     } catch (error) {
@@ -96,8 +89,14 @@ adminSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe)
     }
 };
 
+adminSchema.pre('deleteOne', async function (next) {
+    try {
+        await mongoose.model('Terrain').deleteMany({ admin_id: this.getQuery()._id })
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 
-
-const Admin = mongoose.model('Admin', adminSchema)
-module.exports = Admin   
+const Admin = mongoose.model('Admin', adminSchema);
+module.exports = Admin;

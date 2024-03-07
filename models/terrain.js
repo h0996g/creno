@@ -53,6 +53,17 @@ const terrainSchema = new mongoose.Schema({
 }, { timestamps: true }
 
 )
+terrainSchema.post('save', async function (doc, next) {
+    try {
+        const admin = await mongoose.model('Admin').findById(doc.admin_id);
+        admin.terrains.push(doc._id);
+
+        await admin.save();
+    } catch (error) {
+        console.error('Error updating admin with new terrain:', error);
+    }
+}
+);
 
 
 const Terrain = mongoose.model('Terrain', terrainSchema)

@@ -35,7 +35,7 @@ router.get('/joueurs', joueurController.getAllJoueurs);
 router.get('/joueurs/filter', joueurController.filterJoueurs);
 
 
-router.put('/joueurs/password',protect,  joueurController.updatePassword);
+router.put('/joueurs/password', protect, joueurController.updatePassword);
 
 
 
@@ -44,7 +44,7 @@ router.post('/loginadmin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
 
 // Update an admin (with token verification)
-router.put('/admin',protect, adminController.updateAdmin);
+router.put('/admin', protect, adminController.updateAdmin);
 
 // Get an admin by ID
 router.get('/admin/:id', adminController.getAdminById);
@@ -56,7 +56,10 @@ router.get('/admins', adminController.getAllAdmins);
 router.get('/admins/filter', adminController.filterAdmins);
 
 // Update admin password
-router.put('/admins/password',protect,  adminController.updatePassword);
+router.put('/admins/password', protect, adminController.updatePassword);
+
+router.delete('/admin/:id', adminController.deleteAdmin);
+
 
 // ---------------------Terrain---------------------------------------------
 
