@@ -68,6 +68,21 @@ exports.loginJoueur = async (req, res, next) => {
     }
 }
 
+exports.getMyInformation = async (req, res) => {
+    try {
+        const joueur_id = req.user._id;
+
+        const joueur = await Joueur.findById(joueur_id);
+
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+
+        res.json(joueur);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 
@@ -76,12 +91,12 @@ exports.updateJoueur = async (req, res) => {
     try {
         // const id = req.params.id;
         const joueurData = req.body;
-        
+
         // Extract admin ID from the token
         const joueur_id = req.user._id;
 
         // Update joueur data
-        const updatedJoueur = await Joueur.findByIdAndUpdate( joueur_id , joueurData, { new: true });
+        const updatedJoueur = await Joueur.findByIdAndUpdate(joueur_id, joueurData, { new: true });
 
         if (!updatedJoueur) {
             return res.status(404).json({ message: 'Joueur not found or unauthorized' });
@@ -134,20 +149,20 @@ exports.filterJoueurs = async (req, res) => {
 exports.updatePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
-        
+
         // Extract admin ID from the token
         const joueur_id = req.user._id;
 
         // Fetch admin by ID
         const joueur = await Joueur.findById(joueur_id);
 
-      
+
         const isMatch = await joueur.compareMot_de_passe(oldPassword);
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect' });
         }
 
-       
+
         joueur.mot_de_passe = newPassword;
         await joueur.save();
 
