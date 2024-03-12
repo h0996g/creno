@@ -51,6 +51,13 @@ const joueurSchema = new mongoose.Schema({
 
     }],
 
+    mes_equipes: [{
+
+        type: ObjectId, required: false,
+        ref: "Equipe"
+
+    }],
+
     // terrains: [{
 
     //         type: ObjectId, required: true,
@@ -112,6 +119,41 @@ joueurSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe
         throw error;
     }
 };
+
+
+
+joueurSchema.pre('deleteOne', async function (next) {
+    try {
+        const joueurId = this.getQuery()._id;
+        // nehi les annonce
+        await mongoose.model('Annonce').deleteMany({ joueur_id: joueurId })
+        // nehi les equipe
+        await mongoose.model('Equipe').deleteMany({ capitaine_id: joueurId })
+        // nehi id mn equipe reni fiha
+        const equipes = await mongoose.model('Equipe').find({ joueurs: joueurId });
+
+        for (const equipe of equipes) {
+            equipe.joueurs.pull(joueurId);
+            await equipe.save();
+        }
+        
+// nehi id mn creno demandi
+        const creneaus = await mongoose.model('Creneau').find({ joueurs: joueurId });
+
+        for (const creneau of creneaus) {
+            creneau.joueurs.pull(joueurId);
+            await creneau.save();
+        }
+        //nehi id mn crenau hekmu
+        await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 
 

@@ -60,7 +60,7 @@ exports.deleteTerrain = async (req, res, next) => {
     try {
         const id = req.params.id;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
-        const deletedTerrain = await Terrain.findOneAndDelete({ _id: id, admin_id: admin_id });
+        const deletedTerrain = await Terrain.deleteOne({ _id: id, admin_id: admin_id });
         if (!deletedTerrain) {
             return res.status(404).json({ message: 'Terrain not found or unauthorized' });
         }

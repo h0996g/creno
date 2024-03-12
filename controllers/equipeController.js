@@ -1,4 +1,5 @@
 const Equipe = require('../models/equipe');
+const Tournoi = require('../models/tournoi');
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
@@ -34,7 +35,7 @@ exports.supprimerEquipe = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
 
-        const equipe = await Equipe.findByIdAndDelete(id_Equipe);
+        const equipe = await Equipe.deleteOne(id_Equipe);
         if (!equipe) {
             return res.status(404).json({ error: 'Equipe not found' });
         }
@@ -78,3 +79,63 @@ exports.filterEquipes = async (req, res) => {
 };
 
 
+
+
+exports.rejoindreTournoi = async (req, res) => {
+    try {
+        const { equipeId, tournoiId } = req.params;
+
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        const tournoi = await Tournoi.findById(tournoiId);
+        if (!tournoi) {
+            return res.status(404).json({ message: 'tournoi not found' });
+        }
+
+
+
+ await Equipe.updateOne({ _id: equipeId }, { $push: { tournois: tournoiId } });
+
+ 
+ await Tournoi.updateOne({ _id: tournoiId }, { $push: { equipes: equipeId } });
+
+       
+
+        res.status(200).json({ message: 'Equipe joined tournoi successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+exports.quitterTournoi = async (req, res) => {
+    try {
+        const { equipeId, tournoiId } = req.params;
+
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        const tournoi = await Tournoi.findById(tournoiId);
+        if (!tournoi) {
+            return res.status(404).json({ message: 'tournoi not found' });
+        }
+
+
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { tournois: tournoiId } });
+
+ 
+        await Tournoi.updateOne({ _id: tournoiId }, { $pull: { equipes: equipeId } });
+
+       
+
+        res.status(200).json({ message: 'Equipe quitted the tournoi successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

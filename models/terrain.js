@@ -65,6 +65,27 @@ terrainSchema.post('save', async function (doc, next) {
 }
 );
 
+terrainSchema.pre('deleteOne',  async function(next) {
+    try {
+
+
+        const terrainId = this.getQuery()._id;
+
+        await mongoose.model('Creneau').deleteMany({ terrain_id: terrainId })
+
+        // Find the admin associated with the terrain being deleted
+        const admin = await mongoose.model('Admin').findOne({ terrains: terrainId });
+        
+        if (admin) {
+            // Remove the terrain ID from the admin's terrains array
+            admin.terrains.pull(terrainId);
+            await admin.save();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
+
 
 const Terrain = mongoose.model('Terrain', terrainSchema)
 module.exports = Terrain   

@@ -43,16 +43,10 @@ const tournoiSchema = new mongoose.Schema({
 
 
     admin_id: { type: ObjectId, ref: 'Admin' },
-    // hedi ay mch heka reni 3dltha chetha flblys bkl bli mch hek 
-    // equipes: [{
-    //     equipeId: {
-    //         type: ObjectId, required: true,
-    //         ref: "Equipe"
-    //     },
-    // }],
+   
 
 
-    // hey teri9a shiha
+   
       equipes: [{
         
             type: ObjectId, required: false,
@@ -61,6 +55,44 @@ const tournoiSchema = new mongoose.Schema({
     }],
 }, { timestamps: true })
 
+
+tournoiSchema.post('save', async function (doc, next) {
+    try {
+        const admin = await mongoose.model('Admin').findById(doc.admin_id);
+        admin.tournois.push(doc._id);
+
+        await admin.save();
+    } catch (error) {
+        console.error('Error updating admin with new tournoi:', error);
+    }
+}
+);
+
+
+tournoiSchema.pre('deleteOne',  async function(next) {
+    try {
+        
+        const tournoiId = this.getQuery()._id;
+        
+        
+        const admin = await mongoose.model('Admin').findOne({ tournois: tournoiId });
+        
+        if (admin) {
+            admin.tournois.pull(tournoiId);
+            await admin.save();
+        }
+
+        
+        const equipes = await mongoose.model('Equipe').find({ tournois: tournoiId });
+
+        for (const equipe of equipes) {
+            equipe.tournois.pull(tournoiId);
+            await equipe.save();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 
 

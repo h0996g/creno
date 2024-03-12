@@ -17,5 +17,72 @@ const annonceSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 
+
+
+annonceSchema.post('save',  async function (doc, next) {
+    try {
+        // Check if the annonce has an admin_id
+        if (doc.admin_id) {
+           
+            const admin =  await mongoose.model('Admin').findById(doc.admin_id);
+            if (admin) {
+                admin.annonces.push(doc._id);
+                await admin.save();
+            } else {
+                console.error('Admin not found for the annonce.');
+            }
+        }
+        // Check if the annonce has a joueur_id
+        if (doc.joueur_id) {
+            
+            const joueur =  await mongoose.model('Joueur').findById(doc.joueur_id);
+            if (joueur) {
+                joueur.annonces.push(doc._id);
+                await joueur.save();
+            } else {
+                console.error('Joueur not found for the annonce.');
+            }
+        }
+
+        
+    } catch (error) {
+        console.error('Error updating admin/joueur with new annonce:', error);
+        next(error);
+    }
+});
+
+
+
+
+annonceSchema.pre('deleteOne', async function (next) {
+    try {
+        const annonceId = this.getQuery()._id;
+
+        // Find the admin associated with the annonce being deleted
+        const admin = await mongoose.model('Admin').findOne({ annonces: annonceId });
+        if (admin) {
+            // Remove the annonce ID from the admin's annonces array
+            admin.annonces.pull(annonceId);
+            await admin.save();
+        }
+
+        // Find the joueur associated with the annonce being deleted
+        const joueur = await mongoose.model('Joueur').findOne({ annonces: annonceId });
+        if (joueur) {
+            // Remove the annonce ID from the joueur's annonces array
+            joueur.annonces.pull(annonceId);
+            await joueur.save();
+        }
+
+        next();
+    } catch (error) {
+        console.error('Error removing annonce from admin/joueur:', error);
+        next(error);
+    }
+});
+
+
+
+
 const Annonce = mongoose.model('Annonce', annonceSchema)
 module.exports = Annonce   

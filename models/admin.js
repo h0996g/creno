@@ -65,7 +65,7 @@ const adminSchema = new mongoose.Schema({
 
 // Pre-save hook to hash password
 adminSchema.pre("save", async function () {
-    console.log("sace")
+    
     var admin = this;
     if (!admin.isModified("mot_de_passe")) {
         return;
@@ -92,6 +92,8 @@ adminSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe)
 adminSchema.pre('deleteOne', async function (next) {
     try {
         await mongoose.model('Terrain').deleteMany({ admin_id: this.getQuery()._id })
+        await mongoose.model('Annonce').deleteMany({ admin_id: this.getQuery()._id })
+        await mongoose.model('Tournoi').deleteMany({ admin_id: this.getQuery()._id })
     } catch (error) {
         console.log(error);
     }

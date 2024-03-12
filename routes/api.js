@@ -39,6 +39,18 @@ router.get('/joueurs/filter', joueurController.filterJoueurs);
 router.put('/joueurs/password', protect, joueurController.updatePassword);
 
 
+router.delete('/joueur/:id', joueurController.deleteJoueur);
+
+
+//rejoindre une equipe
+router.post('/joueur/rejoindre/:equipeId', protect, joueurController.rejoindreEquipe);
+//quitter equipe
+router.post('/joueur/quitter/:equipeId', protect, joueurController.quitterEquipe);
+
+// demander creno
+router.post('/joueur/demandercreno/:creneauId', protect, joueurController.demanderCreneau);
+
+
 
 // ---------------------admin---------------------------------------------
 router.post('/loginadmin', adminController.loginAdmin)
@@ -62,6 +74,9 @@ router.put('/admins/password', protect, adminController.updatePassword);
 router.delete('/admin/:id', adminController.deleteAdmin);
 
 
+router.post('/admin/accepter/:creneauId/:joueurId', protect, adminController.accepterDemande);
+
+
 // ---------------------Terrain---------------------------------------------
 
 router.post('/terrain', protect, isAdmin, terrainController.addTerrain);
@@ -76,14 +91,19 @@ router.get('/terrains/filter', terrainController.filterTerrains);
 router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
-router.get('/equipe/:id', protect, equipeController.findEquipeById)
+router.get('/equipe/:id',  equipeController.findEquipeById)
 router.get('/equipe', equipeController.findAllEquipes)
 router.get('/equipes/filter', equipeController.filterEquipes);
 
 
+router.post('/equipe/rejoindre/:equipeId/:tournoiId', protect, equipeController.rejoindreTournoi);
+
+router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.quitterTournoi);
+
+
 // ---------------------Creno---------------------------------------------
 // Route for adding a new creneau
-router.post('/creneau', protect, creneauController.addCreneau);
+router.post('/creneau/:idterrain', protect, creneauController.addCreneau);
 // Route for updating a creneau
 router.put('/creneau/:id', protect, creneauController.updateCreneau);
 // Route for deleting a creneau
@@ -101,6 +121,30 @@ router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
 router.get('/tournoi/:id', tournoiController.findTournoiById);
 router.get('/tournois', tournoiController.findAllTournois);
 router.get('/tournois/filter', tournoiController.filterTournois);
+
+
+//----------------------annonce----------------------------
+router.post('/annonce',protect, annonceController.addAnnonce);
+router.put('/annonce/:id', protect, annonceController.updateAnnonce);
+// Delete Annonce by ID
+router.delete('/annonce/:id', protect, annonceController.deleteAnnonce);
+
+router.get('/annonces/user',protect, annonceController.getAnnoncesByUserId);
+
+// Get Annonce by ID
+router.get('/annonce/:id',  annonceController.getAnnonceById);
+
+
+// Get all Annonces
+router.get('/annonce',  annonceController.getAllAnnonces);
+
+// Filter Annonces
+router.get('/annonces/filter', annonceController.filterAnnonces);
+
+
+
+
+
 
 
 

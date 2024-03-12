@@ -1,4 +1,6 @@
 const Admin = require('../models/admin')
+const Creneau = require('../models/creneau')
+const Joueur = require('../models/joueur')
 const AdminServices = require('../services/admin.service')
 
 
@@ -162,6 +164,36 @@ exports.deleteAdmin = async (req, res) => {
             return res.status(404).json({ message: 'Admin not found' });
         }
         res.json({ message: 'Admin deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+exports.accepterDemande = async (req, res) => {
+    try {
+        const { creneauId, joueurId } = req.params;
+
+        // Find the creneau by ID
+        const creneau = await Creneau.findById(creneauId);
+        if (!creneau) {
+            return res.status(404).json({ message: 'Creneau not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+
+      // Update the creneau with joueur_id and remove joueurId from joueurs array
+      await Creneau.updateOne( { _id: creneauId },{ $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
+
+    // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
+    await Joueur.updateOne( { _id: joueurId },  { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } } );
+
+        res.status(200).json({ message: 'Demande accepted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

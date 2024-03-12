@@ -1,18 +1,22 @@
 const Creneau = require('../models/creneau')
 
+
 // Controller for adding a new creneau
 exports.addCreneau = async (req, res, next) => {
     try {
+
+        const id_terrain = req.params.idterrain;
         const { jour, s_temps, e_temps, duree, tarif, etat, terrain_id } = req.body;
         const newCreneauData = {
+            
             jour,
             s_temps,
             e_temps,
             duree,
             tarif,
             etat,
-            terrain_id,
-            joueur_id: req.user._id // Extracting joueur ID from the authenticated user
+            terrain_id : id_terrain
+           
         };
         const newCreneau = new Creneau(newCreneauData);
         await newCreneau.save();
@@ -28,7 +32,7 @@ exports.updateCreneau = async (req, res, next) => {
     try {
         const id = req.params.id;
         const creneauDataToUpdate = req.body;
-        const updatedCreneau = await Creneau.findOneAndUpdate({ _id: id, joueur_id: req.user._id }, creneauDataToUpdate, { new: true });
+        const updatedCreneau = await Creneau.findOneAndUpdate({ _id: id }, creneauDataToUpdate, { new: true });
         if (!updatedCreneau) {
             return res.status(404).json({ message: 'Creneau not found or unauthorized' });
         }
@@ -43,7 +47,7 @@ exports.updateCreneau = async (req, res, next) => {
 exports.deleteCreneau = async (req, res) => {
     try {
         const id = req.params.id;
-        const deletedCreneau = await Creneau.findOneAndDelete({ _id: id, joueur_id: req.user._id });
+        const deletedCreneau = await Creneau.deleteOne({ _id: id });
         if (!deletedCreneau) {
             return res.status(404).json({ message: 'Creneau not found or unauthorized' });
         }
@@ -63,7 +67,7 @@ exports.findCreneauById = async (req, res, next) => {
         }
         res.json(creneau);
     } catch (error) {
-        next(error);
+        res.json(error);
     }
 };
 

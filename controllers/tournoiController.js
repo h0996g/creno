@@ -44,7 +44,7 @@ exports.deleteTournoi = async (req, res) => {
     try {
         const id = req.params.id;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
-        const deletedTournoi = await Tournoi.findOneAndDelete({ _id: id, admin_id: admin_id });
+        const deletedTournoi = await Tournoi.deleteOne({ _id: id, admin_id: admin_id });
         if (!deletedTournoi) {
             return res.status(404).json({ message: 'Tournament not found or unauthorized' });
         }
