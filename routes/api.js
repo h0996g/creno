@@ -55,6 +55,7 @@ router.post('/joueur/demandercreno/:creneauId', protect, joueurController.demand
 // ---------------------admin---------------------------------------------
 router.post('/loginadmin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
+router.get('/admin/myinformation', protect, isAdmin, adminController.getMyInformation)
 
 // Update an admin (with token verification)
 router.put('/admin', protect, adminController.updateAdmin);
@@ -91,7 +92,7 @@ router.get('/terrains/filter', terrainController.filterTerrains);
 router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
-router.get('/equipe/:id',  equipeController.findEquipeById)
+router.get('/equipe/:id', equipeController.findEquipeById)
 router.get('/equipe', equipeController.findAllEquipes)
 router.get('/equipes/filter', equipeController.filterEquipes);
 
@@ -124,19 +125,19 @@ router.get('/tournois/filter', tournoiController.filterTournois);
 
 
 //----------------------annonce----------------------------
-router.post('/annonce',protect, annonceController.addAnnonce);
+router.post('/annonce', protect, annonceController.addAnnonce);
 router.put('/annonce/:id', protect, annonceController.updateAnnonce);
 // Delete Annonce by ID
 router.delete('/annonce/:id', protect, annonceController.deleteAnnonce);
 
-router.get('/annonces/user',protect, annonceController.getAnnoncesByUserId);
+router.get('/annonces/user', protect, annonceController.getAnnoncesByUserId);
 
 // Get Annonce by ID
-router.get('/annonce/:id',  annonceController.getAnnonceById);
+router.get('/annonce/:id', annonceController.getAnnonceById);
 
 
 // Get all Annonces
-router.get('/annonce',  annonceController.getAllAnnonces);
+router.get('/annonce', annonceController.getAllAnnonces);
 
 // Filter Annonces
 router.get('/annonces/filter', annonceController.filterAnnonces);

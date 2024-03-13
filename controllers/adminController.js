@@ -69,6 +69,21 @@ exports.loginAdmin = async (req, res, next) => {
         next(error);
     }
 }
+exports.getMyInformation = async (req, res) => {
+    try {
+        const admin_id = req.user._id;
+
+        const admin = await Admin.findById(admin_id);
+
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        res.json(admin);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 exports.updateAdmin = async (req, res) => {
@@ -187,11 +202,11 @@ exports.accepterDemande = async (req, res) => {
             return res.status(404).json({ message: 'Joueur not found' });
         }
 
-      // Update the creneau with joueur_id and remove joueurId from joueurs array
-      await Creneau.updateOne( { _id: creneauId },{ $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
+        // Update the creneau with joueur_id and remove joueurId from joueurs array
+        await Creneau.updateOne({ _id: creneauId }, { $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
 
-    // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
-    await Joueur.updateOne( { _id: joueurId },  { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } } );
+        // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
+        await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } });
 
         res.status(200).json({ message: 'Demande accepted successfully' });
     } catch (error) {
