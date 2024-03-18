@@ -5,7 +5,7 @@ const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
 const creneauController = require('../controllers/creneauController')
 const tournoiController = require('../controllers/tournoiController')
-const photoController = require('../controllers/photocontroller')
+// const photoController = require('../controllers/photocontroller')
 const annonceController = require('../controllers/annonceController')
 const { protect, isAdmin } = require('../handler/auth');
 
@@ -43,12 +43,19 @@ router.delete('/joueur/:id', joueurController.deleteJoueur);
 
 
 //rejoindre une equipe
-router.post('/joueur/rejoindre/:equipeId', protect, joueurController.rejoindreEquipe);
+router.post('/joueur/rejoindre/:equipeId', protect, joueurController.demendeRejoindreEquipe);
 //quitter equipe
-router.post('/joueur/quitter/:equipeId', protect, joueurController.quitterEquipe);
+router.post('/joueur/annuler/:equipeId', protect, joueurController.annulerDemandeEquipe);
 
 // demander creno
 router.post('/joueur/demandercreno/:creneauId', protect, joueurController.demanderCreneau);
+router.post('/joueur/annulerdemande/:creneauId', protect, joueurController.annulerCreneau);
+
+
+router.post('/joueur/accepter/:equipeId/:joueurId', protect, joueurController.accepterRejoindreEquipe);
+router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.supprimerRejoindreEquipe);
+
+
 
 
 
@@ -76,6 +83,16 @@ router.delete('/admin/:id', adminController.deleteAdmin);
 
 
 router.post('/admin/accepter/:creneauId/:joueurId', protect, adminController.accepterDemande);
+router.post('/admin/suprimer/:creneauId/:joueurId', protect, adminController.suprimerReservationCreneau);
+
+
+router.post('/admin/payecreno/:crenoId', protect, adminController.payCreneau);
+router.post('/admin/nonpayecreno/:crenoId', protect, adminController.nonPayeCreneau);
+
+
+
+
+
 
 
 // ---------------------Terrain---------------------------------------------

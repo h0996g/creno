@@ -1,6 +1,7 @@
 const Admin = require('../models/admin')
 const Creneau = require('../models/creneau')
 const Joueur = require('../models/joueur')
+const Equipe = require('../models/equipe')
 const AdminServices = require('../services/admin.service')
 
 
@@ -209,6 +210,73 @@ exports.accepterDemande = async (req, res) => {
         await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } });
 
         res.status(200).json({ message: 'Demande accepted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.suprimerReservationCreneau = async (req, res) => {
+    try {
+        const { creneauId, joueurId } = req.params;
+
+        // Find the creneau by ID
+        const creneau = await Creneau.findById(creneauId);
+        if (!creneau) {
+            return res.status(404).json({ message: 'Creneau not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+
+        // Update the creneau with joueur_id and remove joueurId from joueurs array
+        await Creneau.updateOne({ _id: creneauId }, { $unset: { joueur_id: "" }});
+
+        // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
+        await Joueur.updateOne({ _id: joueurId }, {  $pull: { creneaus_finale: creneauId } });
+
+        res.status(200).json({ message: 'creno libre a nouveau' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.payCreneau = async (req, res) => {
+    try {
+        const { creneauId } = req.params;
+
+        
+        await Creneau.updateOne(
+            { _id: creneauId },
+            { $set: { payment: "paye" } }
+        );
+
+        
+       
+
+        res.status(200).json({ message: 'Payment status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.nonPayeCreneau = async (req, res) => {
+    try {
+        const { creneauId } = req.params;
+
+        // Update the payment field to its default value using updateOne
+        await Creneau.updateOne(
+            { _id: creneauId },
+            { $set: { payment: "non" } }
+        );
+
+        // Check if the update was successful
+       
+
+        res.status(200).json({ message: 'Payment status set to default successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -51,6 +51,13 @@ const joueurSchema = new mongoose.Schema({
 
     }],
 
+    demande_equipes: [{
+
+        type: ObjectId, required: false,
+        ref: "Equipe"
+
+    }],
+
     mes_equipes: [{
 
         type: ObjectId, required: false,
@@ -122,37 +129,76 @@ joueurSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe
 
 
 
-joueurSchema.pre('deleteOne', async function (next) {
+// joueurSchema.pre('deleteOne', async function (next) {
+//     try {
+//         const joueurId = this.getQuery()._id;
+//         // nehi les annonce
+//         await mongoose.model('Annonce').deleteMany({ joueur_id: joueurId })
+//         // nehi les equipe
+//         await mongoose.model('Equipe').deleteMany({ capitaine_id: joueurId })
+//         // nehi id mn equipe reni fiha
+//         const equipes = await mongoose.model('Equipe').find({ joueurs: joueurId });
+
+//         for (const equipe of equipes) {
+//             equipe.joueurs.pull(joueurId);
+//             await equipe.save();
+//         }
+        
+// // nehi id mn creno demandi
+//         const creneaus = await mongoose.model('Creneau').find({ joueurs: joueurId });
+
+//         for (const creneau of creneaus) {
+//             creneau.joueurs.pull(joueurId);
+//             await creneau.save();
+//         }
+//         //nehi id mn crenau hekmu
+//         await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
+
+
+
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
+
+
+joueurSchema.pre('deleteOne', async function(next) {
     try {
         const joueurId = this.getQuery()._id;
-        // nehi les annonce
-        await mongoose.model('Annonce').deleteMany({ joueur_id: joueurId })
-        // nehi les equipe
-        await mongoose.model('Equipe').deleteMany({ capitaine_id: joueurId })
-        // nehi id mn equipe reni fiha
-        const equipes = await mongoose.model('Equipe').find({ joueurs: joueurId });
 
-        for (const equipe of equipes) {
-            equipe.joueurs.pull(joueurId);
-            await equipe.save();
-        }
-        
-// nehi id mn creno demandi
-        const creneaus = await mongoose.model('Creneau').find({ joueurs: joueurId });
+        // Delete all annonces associated with the joueur being deleted
+        await mongoose.model('Annonce').deleteMany({ joueur_id: joueurId });
 
-        for (const creneau of creneaus) {
-            creneau.joueurs.pull(joueurId);
-            await creneau.save();
-        }
-        //nehi id mn crenau hekmu
+        // Delete all equipes where the joueur is the capitaine
+        await mongoose.model('Equipe').deleteMany({ capitaine_id: joueurId });
+
+        // Update all equipes where the joueur is a member to remove the joueur from joueurs array
+        await mongoose.model('Equipe').updateMany(
+            { joueurs: joueurId },
+            { $pull: { joueurs: joueurId } }
+        );
+
+
+        await mongoose.model('Equipe').updateMany(
+            { attente_joueurs: joueurId },
+            { $pull: { attente_joueurs: joueurId } }
+        );
+
+
+        // Update all creneaus where the joueur is a participant to remove the joueur from joueurs array
+        await mongoose.model('Creneau').updateMany(
+            { joueurs: joueurId },
+            { $pull: { joueurs: joueurId } }
+        );
+
+        // Unset the joueur_id field in all creneaus where the joueur is assigned as joueur_id
         await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
-
-
-
     } catch (error) {
         console.log(error);
     }
 });
+
 
 
 

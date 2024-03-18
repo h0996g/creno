@@ -196,7 +196,7 @@ exports.deleteJoueur = async (req, res) => {
 
 
 
-exports.rejoindreEquipe = async (req, res) => {
+exports.demendeRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
         const joueurId = req.user._id; 
@@ -217,12 +217,12 @@ exports.rejoindreEquipe = async (req, res) => {
 
 
         // Update joueur's equipes array
-        await Joueur.updateOne({ _id: joueurId }, { $push: { equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $push: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $push: { joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $push: { attente_joueurs: joueurId } });
 
-        res.status(200).json({ message: 'Joueur added to equipe successfully' });
+        res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -231,7 +231,7 @@ exports.rejoindreEquipe = async (req, res) => {
 
 
 
-exports.quitterEquipe = async (req, res) => {
+exports.annulerDemandeEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
         const joueurId = req.user._id; 
@@ -254,10 +254,10 @@ exports.quitterEquipe = async (req, res) => {
         
 
         // Update joueur's equipes array
-        await Joueur.updateOne({ _id: joueurId }, { $pull: { equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $pull: { joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
 
      
 
@@ -300,6 +300,113 @@ exports.demanderCreneau = async (req, res) => {
        
 
         res.status(200).json({ message: 'Joueur added to creneau successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+
+exports.annulerCreneau = async (req, res) => {
+    try {
+        const { creneauId } = req.params;
+        const joueurId = req.user._id; // Assuming the authenticated user's ID is stored in req.user._id
+
+
+     // Find the creneau by ID
+     const creneau = await Creneau.findById(creneauId);
+     if (!creneau) {
+         return res.status(404).json({ message: 'Creneau not found' });
+     }
+
+     // Find the joueur by ID
+     const joueur = await Joueur.findById(joueurId);
+     if (!joueur) {
+         return res.status(404).json({ message: 'Joueur not found' });
+     }
+
+
+
+
+ await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId } });
+
+ 
+ await Creneau.updateOne({ _id: creneauId }, { $pull: { joueurs: joueurId } });
+
+
+       
+
+        res.status(200).json({ message: 'Joueur deleted demande' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.accepterRejoindreEquipe = async (req, res) => {
+    try {
+        const { equipeId , joueurId } = req.params;
+       
+
+             const equipe = await Equipe.findById(equipeId);
+             if (!equipe) {
+                 return res.status(404).json({ message: 'equipe not found' });
+             }
+     
+             // Find the joueur by ID
+             const joueur = await Joueur.findById(joueurId);
+             if (!joueur) {
+                 return res.status(404).json({ message: 'Joueur not found' });
+             }
+
+
+
+        // Update joueur's equipes array
+        await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
+
+        await Joueur.updateOne({ _id: joueurId }, { $push: { equipes: equipeId } });
+
+        // Update equipe's joueurs array
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $push: { joueurs: joueurId } });
+
+        res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.supprimerRejoindreEquipe = async (req, res) => {
+    try {
+        const { equipeId , joueurId } = req.params;
+       
+
+             const equipe = await Equipe.findById(equipeId);
+             if (!equipe) {
+                 return res.status(404).json({ message: 'equipe not found' });
+             }
+     
+             // Find the joueur by ID
+             const joueur = await Joueur.findById(joueurId);
+             if (!joueur) {
+                 return res.status(404).json({ message: 'Joueur not found' });
+             }
+
+
+
+        // Update joueur's equipes array
+        // await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
+
+        await Joueur.updateOne({ _id: joueurId }, { $pull: { equipes: equipeId } });
+
+        // Update equipe's joueurs array
+        // await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { joueurs: joueurId } });
+
+        res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -1,1 +1,1 @@
-const Photo = require('../models/photo');
+// const Photo = require('../models/photo');

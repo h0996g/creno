@@ -29,7 +29,11 @@ const creneauSchema = new mongoose.Schema({
    },
 
 
-
+   payment: {
+      type: String,
+      
+      default : "non"
+   },
    joueur_id: { type: ObjectId, ref: 'Joueur' ,required:false },
    joueurs: [{
 
@@ -42,54 +46,60 @@ const creneauSchema = new mongoose.Schema({
 
 
 
+// creneauSchema.post('save', async function (doc, next) {
+//    try {
+//        const terrain = await mongoose.model('Terrain').findById(doc.terrain_id);
+//        terrain.creneaus.push(doc._id);
+
+//        await terrain.save();
+//    } catch (error) {
+//        console.error('Error updating admin with new terrain:', error);
+//    }
+// }
+// );
+
 creneauSchema.post('save', async function (doc, next) {
    try {
-       const terrain = await mongoose.model('Terrain').findById(doc.terrain_id);
-       terrain.creneaus.push(doc._id);
-
-       await terrain.save();
+       // Update the terrain document to push the creneau ID to the creneaus array
+       await mongoose.model('Terrain').updateOne(
+           { _id: doc.terrain_id },
+           { $push: { creneaus: doc._id } }
+       );
    } catch (error) {
-       console.error('Error updating admin with new terrain:', error);
+       console.error('Error updating terrain with new creneau:', error);
    }
-}
-);
+});
 
 
 
-creneauSchema.pre('deleteOne',  async function(next) {
+
+creneauSchema.pre('deleteOne', async function(next) {
    try {
-
-
        const creneauId = this.getQuery()._id;
 
-       
-       const terrain = await mongoose.model('Terrain').findOne({ creneaus: creneauId });
-       
-       if (terrain) {
-           terrain.creneaus.pull(creneauId);
-           await terrain.save();
-       }
+       // Update Terrain document
+       await mongoose.model('Terrain').updateOne(
+           { creneaus: creneauId },
+           { $pull: { creneaus: creneauId } }
+       );
 
-       const joueurres = await mongoose.model('Joueur').findOne({ creneaus_finale: creneauId });
-       
-       if (joueurres) {
-           joueurres.creneaus_finale.pull(creneauId);
-           await joueurres.save();
-       }
+       // Update Joueur documents in creneaus_finale array
+       await mongoose.model('Joueur').updateOne(
+           { creneaus_finale: creneauId },
+           { $pull: { creneaus_finale: creneauId } }
+       );
 
-
-       const joueurs = await mongoose.model('Joueur').find({ creneaus_reserve: creneauId });
-
-       for (const joueur of joueurs) {
-           joueur.creneaus_reserve.pull(creneauId);
-           await joueur.save();
-       }
-
+       // Update Joueur documents in creneaus_reserve array
+       await mongoose.model('Joueur').updateMany(
+           { creneaus_reserve: creneauId },
+           { $pull: { creneaus_reserve: creneauId } }
+       );
 
    } catch (error) {
        console.log(error);
    }
 });
+
 
 
 
