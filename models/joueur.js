@@ -65,29 +65,31 @@ const joueurSchema = new mongoose.Schema({
 
     }],
 
-    // terrains: [{
-
-    //         type: ObjectId, required: true,
-    //         ref: "Terrain"
-
-    // }],
+  
     annonces: [{
         type: ObjectId, required: false,
         ref: "Annonce"
 
     }],
-    creneaus_reserve: [{
+
+
+    reservations: [{
 
         type: ObjectId, required: false,
-        ref: "Creneau"
-
+        ref: "reservation"
     }],
-    creneaus_finale: [{
+    // creneaus_reserve: [{
 
-        type: ObjectId, required: false,
-        ref: "Creneau"
+    //     type: ObjectId, required: false,
+    //     ref: "Creneau"
 
-    }],
+    // }],
+    // creneaus_finale: [{
+
+    //     type: ObjectId, required: false,
+    //     ref: "Creneau"
+
+    // }],
 
 
 }, {
@@ -129,37 +131,6 @@ joueurSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe
 
 
 
-// joueurSchema.pre('deleteOne', async function (next) {
-//     try {
-//         const joueurId = this.getQuery()._id;
-//         // nehi les annonce
-//         await mongoose.model('Annonce').deleteMany({ joueur_id: joueurId })
-//         // nehi les equipe
-//         await mongoose.model('Equipe').deleteMany({ capitaine_id: joueurId })
-//         // nehi id mn equipe reni fiha
-//         const equipes = await mongoose.model('Equipe').find({ joueurs: joueurId });
-
-//         for (const equipe of equipes) {
-//             equipe.joueurs.pull(joueurId);
-//             await equipe.save();
-//         }
-        
-// // nehi id mn creno demandi
-//         const creneaus = await mongoose.model('Creneau').find({ joueurs: joueurId });
-
-//         for (const creneau of creneaus) {
-//             creneau.joueurs.pull(joueurId);
-//             await creneau.save();
-//         }
-//         //nehi id mn crenau hekmu
-//         await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
-
-
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// });
 
 
 
@@ -185,15 +156,17 @@ joueurSchema.pre('deleteOne', async function(next) {
             { $pull: { attente_joueurs: joueurId } }
         );
 
+        await mongoose.model('Reservation').deleteMany({ joueur_id: joueurId });
+
 
         // Update all creneaus where the joueur is a participant to remove the joueur from joueurs array
-        await mongoose.model('Creneau').updateMany(
-            { joueurs: joueurId },
-            { $pull: { joueurs: joueurId } }
-        );
+        // await mongoose.model('Creneau').updateMany(
+        //     { joueurs: joueurId },
+        //     { $pull: { joueurs: joueurId } }
+        // );
 
-        // Unset the joueur_id field in all creneaus where the joueur is assigned as joueur_id
-        await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
+        // // Unset the joueur_id field in all creneaus where the joueur is assigned as joueur_id
+        // await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
     } catch (error) {
         console.log(error);
     }

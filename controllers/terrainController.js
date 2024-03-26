@@ -1,19 +1,8 @@
 const Terrain = require('../models/terrain');
-// exports.createTerrain = async (req, res) => {
-//     try {
-//         const { place, size, responsableId } = req.body;
-//         const createTerrain = new Terrain({ place, size, responsableId })
-//         await createTerrain.save();
-//         res.json({ data: createTerrain });
-//     } catch (e) {
 
-//     }
-// }
-// Controller for adding a new terrain
-// Controller for adding a new terrain
 exports.addTerrain = async (req, res, next) => {
     try {
-        const { largeur, longeur, superficie, adresse, description, capacite, etat, creneaus, place, photos } = req.body;
+        const { largeur, longeur, superficie, adresse, s_temps, e_temps, prix, description, capacite, etat, reservations, coordonnee, photos } = req.body;
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
 
         const newTerrainData = {
@@ -21,12 +10,15 @@ exports.addTerrain = async (req, res, next) => {
             longeur,
             superficie,
             adresse,
+            s_temps,
+            e_temps,
+            prix,
             description,
             capacite,
             etat,
-            creneaus,
+            reservations,
             admin_id,
-            place,
+            coordonnee,
             photos
         };
 
@@ -96,7 +88,7 @@ exports.findAllTerrains = async (req, res, next) => {
 
 exports.filterTerrains = async (req, res) => {
     try {
-        const filter = { largeur, longeur, superficie, adresse, capacite, etat, place } = req.query;
+        const filter = { largeur, longeur, superficie, adresse, capacite, etat, place, s_temps, e_temps, prix, reservations, coordonnee } = req.query;
         const terrains = await Terrain.find(filter);
 
         res.json(terrains);

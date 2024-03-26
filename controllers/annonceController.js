@@ -27,7 +27,7 @@ exports.addAnnonce = async (req, res) => {
         await newAnnonce.save();
         res.status(201).json(newAnnonce);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -98,7 +98,7 @@ exports.deleteAnnonce = async (req, res, next) => {
 // Get Annonces by Admin ID or Joueur ID
 exports.getAnnoncesByUserId = async (req, res) => {
     try {
-        const { userId } = req.user._id; // Extract userId from request parameters
+        const userId = req.user._id; // Extract userId from request parameters
         const annonces = await Annonce.find({ $or: [{ admin_id: userId }, { joueur_id: userId }] });
 
         if (!annonces) {

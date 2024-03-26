@@ -3,7 +3,8 @@ const joueurController = require('../controllers/joueurController');
 const adminController = require('../controllers/adminController');
 const terrainController = require('../controllers/terrainController')
 const equipeController = require('../controllers/equipeController')
-const creneauController = require('../controllers/creneauController')
+// const creneauController = require('../controllers/creneauController')
+const reservationController = require('../controllers/reservationController')
 const tournoiController = require('../controllers/tournoiController')
 // const photoController = require('../controllers/photocontroller')
 const annonceController = require('../controllers/annonceController')
@@ -48,8 +49,8 @@ router.post('/joueur/rejoindre/:equipeId', protect, joueurController.demendeRejo
 router.post('/joueur/annuler/:equipeId', protect, joueurController.annulerDemandeEquipe);
 
 // demander creno
-router.post('/joueur/demandercreno/:creneauId', protect, joueurController.demanderCreneau);
-router.post('/joueur/annulerdemande/:creneauId', protect, joueurController.annulerCreneau);
+// router.post('/joueur/demandercreno/:creneauId', protect, joueurController.demanderCreneau);
+// router.post('/joueur/annulerdemande/:creneauId', protect, joueurController.annulerCreneau);
 
 
 router.post('/joueur/accepter/:equipeId/:joueurId', protect, joueurController.accepterRejoindreEquipe);
@@ -82,12 +83,14 @@ router.put('/admins/password', protect, adminController.updatePassword);
 router.delete('/admin/:id', adminController.deleteAdmin);
 
 
-router.post('/admin/accepter/:creneauId/:joueurId', protect, adminController.accepterDemande);
-router.post('/admin/suprimer/:creneauId/:joueurId', protect, adminController.suprimerReservationCreneau);
+ router.post('/admin/accepter/:reservationId', protect, adminController.accepterReservation);
+ router.post('/admin/refuser/:reservationId', protect, adminController.refuserReservation);
 
 
-router.post('/admin/payecreno/:crenoId', protect, adminController.payCreneau);
-router.post('/admin/nonpayecreno/:crenoId', protect, adminController.nonPayeCreneau);
+
+ router.post('/admin/payereservation/:reservationId', protect, adminController.payReservation);
+ router.post('/admin/nonpayereservation/:reservationId', protect, adminController.nonpayReservation);
+
 
 
 
@@ -120,18 +123,31 @@ router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.qu
 
 
 // ---------------------Creno---------------------------------------------
-// Route for adding a new creneau
-router.post('/creneau/:idterrain', protect, creneauController.addCreneau);
-// Route for updating a creneau
-router.put('/creneau/:id', protect, creneauController.updateCreneau);
-// Route for deleting a creneau
-router.delete('/creneau/:id', protect, creneauController.deleteCreneau);
-// Route for finding a creneau by ID
-router.get('/creneau/:id', creneauController.findCreneauById);
-// Route for finding all creneaus
-router.get('/creneaus', creneauController.findAllCreneaus);
+// // Route for adding a new creneau
+// router.post('/creneau/:idterrain', protect, creneauController.addCreneau);
+// // Route for updating a creneau
+// router.put('/creneau/:id', protect, creneauController.updateCreneau);
+// // Route for deleting a creneau
+// router.delete('/creneau/:id', protect, creneauController.deleteCreneau);
+// // Route for finding a creneau by ID
+// router.get('/creneau/:id', creneauController.findCreneauById);
+// // Route for finding all creneaus
+// router.get('/creneaus', creneauController.findAllCreneaus);
 
-router.get('/creneaus/filter', creneauController.filterCreneaus);
+// router.get('/creneaus/filter', creneauController.filterCreneaus);
+
+// Route for adding a new creneau
+router.post('/reservation/:idterrain', protect, reservationController.addReservation);
+// Route for updating a creneau
+router.put('/reservation/:id', protect, reservationController.updateReservation);
+// Route for deleting a creneau
+router.delete('/reservation/:id', protect, reservationController.deleteReservation);
+// Route for finding a creneau by ID
+router.get('/reservation/:id', reservationController.findReservationById);
+// Route for finding all creneaus
+router.get('/reservations', reservationController.findAllReservations);
+
+router.get('/reservations/filter', reservationController.filterReservations);
 // -------------------------tournoi---------------------------------
 router.post('/tournoi', protect, tournoiController.addTournoi);
 router.put('/tournoi/:id', protect, tournoiController.updateTournoi);

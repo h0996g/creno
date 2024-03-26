@@ -1,7 +1,8 @@
 const Admin = require('../models/admin')
-const Creneau = require('../models/creneau')
+// const Creneau = require('../models/creneau')
 const Joueur = require('../models/joueur')
 const Equipe = require('../models/equipe')
+const Reservation = require('../models/reservation')
 const AdminServices = require('../services/admin.service')
 
 
@@ -187,97 +188,176 @@ exports.deleteAdmin = async (req, res) => {
 
 
 
-exports.accepterDemande = async (req, res) => {
+// exports.accepterDemande = async (req, res) => {
+//     try {
+//         const { creneauId, joueurId } = req.params;
+
+//         // Find the creneau by ID
+//         const creneau = await Creneau.findById(creneauId);
+//         if (!creneau) {
+//             return res.status(404).json({ message: 'Creneau not found' });
+//         }
+
+//         // Find the joueur by ID
+//         const joueur = await Joueur.findById(joueurId);
+//         if (!joueur) {
+//             return res.status(404).json({ message: 'Joueur not found' });
+//         }
+
+//         // Update the creneau with joueur_id and remove joueurId from joueurs array
+//         await Creneau.updateOne({ _id: creneauId }, { $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
+
+//         // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
+//         await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } });
+
+//         res.status(200).json({ message: 'Demande accepted successfully' });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
+// exports.suprimerReservationCreneau = async (req, res) => {
+//     try {
+//         const { creneauId, joueurId } = req.params;
+
+//         // Find the creneau by ID
+//         const creneau = await Creneau.findById(creneauId);
+//         if (!creneau) {
+//             return res.status(404).json({ message: 'Creneau not found' });
+//         }
+
+//         // Find the joueur by ID
+//         const joueur = await Joueur.findById(joueurId);
+//         if (!joueur) {
+//             return res.status(404).json({ message: 'Joueur not found' });
+//         }
+
+//         // Update the creneau with joueur_id and remove joueurId from joueurs array
+//         await Creneau.updateOne({ _id: creneauId }, { $unset: { joueur_id: "" }});
+
+//         // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
+//         await Joueur.updateOne({ _id: joueurId }, {  $pull: { creneaus_finale: creneauId } });
+
+//         res.status(200).json({ message: 'creno libre a nouveau' });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+// exports.payCreneau = async (req, res) => {
+//     try {
+//         const { creneauId } = req.params;
+
+        
+//         await Creneau.updateOne(
+//             { _id: creneauId },
+//             { $set: { payment: "paye" } }
+//         );
+
+        
+       
+
+//         res.status(200).json({ message: 'Payment status updated successfully' });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+// exports.nonPayeCreneau = async (req, res) => {
+//     try {
+//         const { creneauId } = req.params;
+
+//         // Update the payment field to its default value using updateOne
+//         await Creneau.updateOne(
+//             { _id: creneauId },
+//             { $set: { payment: "non" } }
+//         );
+
+//         // Check if the update was successful
+       
+
+//         res.status(200).json({ message: 'Payment status set to default successfully' });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
+
+
+exports.accepterReservation = async (req, res) => {
     try {
-        const { creneauId, joueurId } = req.params;
+        const { reservationId } = req.params;
 
         // Find the creneau by ID
-        const creneau = await Creneau.findById(creneauId);
-        if (!creneau) {
-            return res.status(404).json({ message: 'Creneau not found' });
+        const reservation = await Reservation.findById(reservationId);
+        if (!reservation) {
+            return res.status(404).json({ message: 'reservation not found' });
         }
-
-        // Find the joueur by ID
-        const joueur = await Joueur.findById(joueurId);
-        if (!joueur) {
-            return res.status(404).json({ message: 'Joueur not found' });
-        }
-
-        // Update the creneau with joueur_id and remove joueurId from joueurs array
-        await Creneau.updateOne({ _id: creneauId }, { $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
-
-        // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
-        await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } });
-
+        await Reservation.updateOne({ _id: reservationId }, { $set: { etat: "accepter" } });
+      
         res.status(200).json({ message: 'Demande accepted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-
-exports.suprimerReservationCreneau = async (req, res) => {
+exports.refuserReservation = async (req, res) => {
     try {
-        const { creneauId, joueurId } = req.params;
+        const { reservationId } = req.params;
 
         // Find the creneau by ID
-        const creneau = await Creneau.findById(creneauId);
-        if (!creneau) {
-            return res.status(404).json({ message: 'Creneau not found' });
+        const reservation = await Reservation.findById(reservationId);
+        if (!reservation) {
+            return res.status(404).json({ message: 'reservation not found' });
         }
+        await Reservation.updateOne({ _id: reservationId }, { $set: { etat: "refuser" } });
+      
+        res.status(200).json({ message: 'Demande refuser' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-        // Find the joueur by ID
-        const joueur = await Joueur.findById(joueurId);
-        if (!joueur) {
-            return res.status(404).json({ message: 'Joueur not found' });
+
+
+
+exports.payReservation = async (req, res) => {
+        try {
+            const { reservationId } = req.params;
+    
+            
+            await Reservation.updateOne(
+                { _id: reservationId },
+                { $set: { payment: "paye" } }
+            );
+    
+            
+           
+    
+            res.status(200).json({ message: 'Payment status updated successfully' });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
+    };
 
-        // Update the creneau with joueur_id and remove joueurId from joueurs array
-        await Creneau.updateOne({ _id: creneauId }, { $unset: { joueur_id: "" }});
 
-        // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
-        await Joueur.updateOne({ _id: joueurId }, {  $pull: { creneaus_finale: creneauId } });
-
-        res.status(200).json({ message: 'creno libre a nouveau' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.payCreneau = async (req, res) => {
-    try {
-        const { creneauId } = req.params;
-
-        
-        await Creneau.updateOne(
-            { _id: creneauId },
-            { $set: { payment: "paye" } }
-        );
-
-        
-       
-
-        res.status(200).json({ message: 'Payment status updated successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-exports.nonPayeCreneau = async (req, res) => {
-    try {
-        const { creneauId } = req.params;
-
-        // Update the payment field to its default value using updateOne
-        await Creneau.updateOne(
-            { _id: creneauId },
-            { $set: { payment: "non" } }
-        );
-
-        // Check if the update was successful
-       
-
-        res.status(200).json({ message: 'Payment status set to default successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+    exports.nonpayReservation = async (req, res) => {
+        try {
+            const { reservationId } = req.params;
+    
+            
+            await Reservation.updateOne(
+                { _id: reservationId },
+                { $set: { payment: "non" } }
+            );
+    
+            
+           
+    
+            res.status(200).json({ message: 'Payment status updated successfully' });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
