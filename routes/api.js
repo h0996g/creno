@@ -58,7 +58,8 @@ router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.s
 
 
 
-
+router.post('/joueur/recoverpassword',  joueurController.recoverPassword);
+router.post('/joueur/resetpassword',  joueurController.resetPassword);
 
 // ---------------------admin---------------------------------------------
 router.post('/loginadmin', adminController.loginAdmin)
@@ -92,7 +93,11 @@ router.delete('/admin/:id', adminController.deleteAdmin);
  router.post('/admin/nonpayereservation/:reservationId', protect, adminController.nonpayReservation);
 
 
+ router.post('/admin/recoverpassword',  adminController.recoverPassword);
+router.post('/admin/resetpassword',  adminController.resetPassword);
 
+
+ 
 
 
 

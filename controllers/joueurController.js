@@ -2,6 +2,8 @@ const Joueur = require('../models/joueur')
 const Equipe = require('../models/equipe')
 // const Creneau = require('../models/creneau')
 const JoueurServices = require('../services/joueur.service')
+const nodemailer = require('nodemailer');
+const bcrypt = require("bcrypt");
 
 
 
@@ -270,79 +272,6 @@ exports.annulerDemandeEquipe = async (req, res) => {
 
 
 
-// exports.demanderCreneau = async (req, res) => {
-//     try {
-//         const { creneauId } = req.params;
-//         const joueurId = req.user._id; // Assuming the authenticated user's ID is stored in req.user._id
-
-
-//      // Find the creneau by ID
-//      const creneau = await Creneau.findById(creneauId);
-//      if (!creneau) {
-//          return res.status(404).json({ message: 'Creneau not found' });
-//      }
-
-//      // Find the joueur by ID
-//      const joueur = await Joueur.findById(joueurId);
-//      if (!joueur) {
-//          return res.status(404).json({ message: 'Joueur not found' });
-//      }
-
-
-
-
-//  await Joueur.updateOne({ _id: joueurId }, { $push: { creneaus_reserve: creneauId } });
-
- 
-//  await Creneau.updateOne({ _id: creneauId }, { $push: { joueurs: joueurId } });
-
-
-       
-
-//         res.status(200).json({ message: 'Joueur added to creneau successfully' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-
-
-
-
-// exports.annulerCreneau = async (req, res) => {
-//     try {
-//         const { creneauId } = req.params;
-//         const joueurId = req.user._id; // Assuming the authenticated user's ID is stored in req.user._id
-
-
-//      // Find the creneau by ID
-//      const creneau = await Creneau.findById(creneauId);
-//      if (!creneau) {
-//          return res.status(404).json({ message: 'Creneau not found' });
-//      }
-
-//      // Find the joueur by ID
-//      const joueur = await Joueur.findById(joueurId);
-//      if (!joueur) {
-//          return res.status(404).json({ message: 'Joueur not found' });
-//      }
-
-
-
-
-//  await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId } });
-
- 
-//  await Creneau.updateOne({ _id: creneauId }, { $pull: { joueurs: joueurId } });
-
-
-       
-
-//         res.status(200).json({ message: 'Joueur deleted demande' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
 
 
 exports.accepterRejoindreEquipe = async (req, res) => {
@@ -409,5 +338,96 @@ exports.supprimerRejoindreEquipe = async (req, res) => {
         res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+
+
+
+
+
+exports.recoverPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check if the email exists in the database (Mongoose syntax)
+        const joueur = await Joueur.findOne({ email: email });
+        if (!joueur) {
+            return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
+        }
+
+        // Generate a random verification code
+        const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
+
+        // Update the user's verification code in the database (Mongoose syntax)
+        await Joueur.findOneAndUpdate(
+            { email: email },
+            { $set: { verificationCode: verificationCode.toString() } } // Convert to string and use $set for updating
+        );
+
+        // Send an email to the user with the verification code
+        // Note: Replace with your actual email and password, and use environment variables for sensitive data
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER, // Recommended to use environment variables
+                    
+                pass: process.env.EMAIL_PASS,
+                // pass: process.env.EMAIL_PASS,
+                 // Recommended to use environment variables
+            },
+        });
+
+        const mailOptions = {
+             from: process.env.EMAIL_USER,
+           
+            to: email,
+            subject: 'Verification Code for Password Recovery',
+            text: `Your verification code is: ${verificationCode}`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ status: false, message: 'Internal server error' });
+            }
+            console.log('Email sent:', info.response);
+            res.json({ status: true, message: 'Verification code sent successfully', verificationCode: verificationCode.toString() });
+        });
+    } catch (error) {
+        console.error('Error during password recovery:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        // Find the patient by email using Mongoose's findOne
+        const joueur = await Joueur.findOne({ email: email });
+        if (!joueur) {
+            return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt); // Assuming 10 is the salt rounds
+
+     // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
+        await Joueur.findOneAndUpdate(
+            { email: email },
+            { $set: { mot_de_passe: hashedPassword } } // Use $set to specify the fields to update
+        );
+
+        return res.status(200).json({ status: true, message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error during password reset:', error);
+        return res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
