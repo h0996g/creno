@@ -1,4 +1,5 @@
 const Admin = require('../models/admin')
+const Token = require('../models/token')
 // const Creneau = require('../models/creneau')
 const Joueur = require('../models/joueur')
 const Equipe = require('../models/equipe')
@@ -375,15 +376,23 @@ exports.payReservation = async (req, res) => {
             if (!admin) {
                 return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
             }
+
+            const existingToken = await Token.findOne({ admin_id: admin._id });
+        if (existingToken) {
+            // Optional: Delete the existing token before creating a new one
+            await Token.deleteOne({ _id: existingToken._id });
+        }
     
             // Generate a random verification code
             const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
     
             // Update the user's verification code in the database (Mongoose syntax)
-            await Admin.findOneAndUpdate(
-                { email: email },
-                { $set: { verificationCode: verificationCode.toString() } } // Convert to string and use $set for updating
-            );
+             // Create a token document in the database
+        await Token.create({
+            admin_id: admin._id, // Associate the token with the joueur
+            token: verificationCode,
+            // `createdAt` is handled automatically by Mongoose schema
+        });
     
             // Send an email to the user with the verification code
             // Note: Replace with your actual email and password, and use environment variables for sensitive data
@@ -397,6 +406,8 @@ exports.payReservation = async (req, res) => {
                      // Recommended to use environment variables
                 },
             });
+
+
     
             const mailOptions = {
                  from: process.env.EMAIL_USER,
@@ -404,6 +415,8 @@ exports.payReservation = async (req, res) => {
                 subject: 'Verification Code for Password Recovery',
                 text: `Your verification code is: ${verificationCode}`,
             };
+
+
     
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
@@ -413,11 +426,51 @@ exports.payReservation = async (req, res) => {
                 console.log('Email sent:', info.response);
                 res.json({ status: true, message: 'Verification code sent successfully', verificationCode: verificationCode.toString() });
             });
+
+
+
         } catch (error) {
             console.error('Error during password recovery:', error);
             res.status(500).json({ status: false, message: 'Internal server error' });
         }
     };
+
+
+
+
+    exports.verifyToken = async (req, res) => {
+        try {
+            const { email, codeVerification } = req.body;
+    
+            // Find the joueur by email
+            const admin = await Admin.findOne({ email: email });
+            if (!admin) {
+                return res.status(404).json({ status: false, message: 'Email not found.' });
+            }
+    
+            // Find a token for the joueur
+            const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
+            if (!token) {
+                // If no matching token found, respond with an error status
+                return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
+            }
+    
+            // Delete the token after successful verification to ensure it's used only once
+            await Token.deleteOne({ _id: token._id });
+    
+            // Respond with success status if the token matches
+            res.status(200).json({ status: true, message: 'Verification successful.' });
+        } catch (error) {
+            console.error('Error during token verification:', error);
+            res.status(500).json({ status: false, message: 'Internal server error' });
+        }
+    };
+
+
+
+
+
+
     
     
     

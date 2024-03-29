@@ -8,6 +8,7 @@ const reservationController = require('../controllers/reservationController')
 const tournoiController = require('../controllers/tournoiController')
 // const photoController = require('../controllers/photocontroller')
 const annonceController = require('../controllers/annonceController')
+const tokenController = require('../controllers/tokenController')
 const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
@@ -59,6 +60,7 @@ router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.s
 
 
 router.post('/joueur/recoverpassword',  joueurController.recoverPassword);
+router.post('/joueurs/verifytoken',  joueurController.verifyToken);
 router.post('/joueur/resetpassword',  joueurController.resetPassword);
 
 // ---------------------admin---------------------------------------------
@@ -94,10 +96,11 @@ router.delete('/admin/:id', adminController.deleteAdmin);
 
 
  router.post('/admin/recoverpassword',  adminController.recoverPassword);
+ router.post('/admins/verifytoken',  adminController.verifyToken);
 router.post('/admin/resetpassword',  adminController.resetPassword);
 
 
- 
+
 
 
 
