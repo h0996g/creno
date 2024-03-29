@@ -1,5 +1,6 @@
 const Joueur = require('../models/joueur')
 const Equipe = require('../models/equipe')
+const Token = require('../models/token')
 // const Creneau = require('../models/creneau')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
@@ -353,55 +354,99 @@ exports.recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
-        // Check if the email exists in the database (Mongoose syntax)
+        // Check if the email exists in the database
         const joueur = await Joueur.findOne({ email: email });
         if (!joueur) {
             return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
 
+        // Check if a token already exists for this joueur
+        const existingToken = await Token.findOne({ joueur_id: joueur._id });
+        if (existingToken) {
+            // Optional: Delete the existing token before creating a new one
+            await Token.deleteOne({ _id: existingToken._id });
+        }
+
         // Generate a random verification code
         const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
 
-        // Update the user's verification code in the database (Mongoose syntax)
-        await Joueur.findOneAndUpdate(
-            { email: email },
-            { $set: { verificationCode: verificationCode.toString() } } // Convert to string and use $set for updating
-        );
+        // Create a new token document in the database
+        await Token.create({
+            joueur_id: joueur._id, // Associate the token with the joueur
+            token: verificationCode,
+        });
 
-        // Send an email to the user with the verification code
-        // Note: Replace with your actual email and password, and use environment variables for sensitive data
+        // Set up nodemailer transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.EMAIL_USER, // Recommended to use environment variables
-                    
-                pass: process.env.EMAIL_PASS,
-                // pass: process.env.EMAIL_PASS,
-                 // Recommended to use environment variables
+                user: process.env.EMAIL_USER, // Use environment variables
+                pass: process.env.EMAIL_PASS, // Use environment variables
             },
         });
 
+        // Define mail options
         const mailOptions = {
-             from: process.env.EMAIL_USER,
-           
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Verification Code for Password Recovery',
             text: `Your verification code is: ${verificationCode}`,
         };
 
+        // Send an email with the verification code
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.error('Error sending email:', error);
                 return res.status(500).json({ status: false, message: 'Internal server error' });
             }
             console.log('Email sent:', info.response);
-            res.json({ status: true, message: 'Verification code sent successfully', verificationCode: verificationCode.toString() });
+            res.json({ status: true, message: 'Verification code sent successfully' });
         });
     } catch (error) {
         console.error('Error during password recovery:', error);
         res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
+
+
+
+
+
+exports.verifyToken = async (req, res) => {
+    try {
+        const { email, codeVerification } = req.body;
+
+        // Find the joueur by email
+        const joueur = await Joueur.findOne({ email: email });
+        if (!joueur) {
+            return res.status(404).json({ status: false, message: 'Email not found.' });
+        }
+
+        // Find a token for the joueur
+        const token = await Token.findOne({ joueur_id: joueur._id, token: codeVerification });
+        if (!token) {
+            // If no matching token found, respond with an error status
+            return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
+        }
+
+        // Delete the token after successful verification to ensure it's used only once
+        await Token.deleteOne({ _id: token._id });
+
+        // Respond with success status if the token matches
+        res.status(200).json({ status: true, message: 'Verification successful.' });
+    } catch (error) {
+        console.error('Error during token verification:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+
+
+
+
+
+
+
 
 
 
