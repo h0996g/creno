@@ -430,7 +430,7 @@ exports.verifyToken = async (req, res) => {
         }
 
         // Delete the token after successful verification to ensure it's used only once
-        await Token.deleteOne({ _id: token._id });
+        // await Token.deleteOne({ _id: token._id });
 
         // Respond with success status if the token matches
         res.status(200).json({ status: true, message: 'Verification successful.' });
@@ -452,13 +452,23 @@ exports.verifyToken = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
     try {
-        const { email, newPassword } = req.body;
+        const { email, newPassword, codeVerification } = req.body;
 
         // Find the patient by email using Mongoose's findOne
         const joueur = await Joueur.findOne({ email: email });
         if (!joueur) {
             return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
+
+
+        const token = await Token.findOne({ joueur_id: joueur._id, token: codeVerification });
+        if (!token) {
+            // If no matching token found, respond with an error status
+            return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
+        }
+
+        // Delete the token after successful verification to ensure it's used only once
+        await Token.deleteOne({ _id: token._id });
 
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
