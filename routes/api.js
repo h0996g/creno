@@ -59,9 +59,9 @@ router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.s
 
 
 
-router.post('/joueur/recoverpassword',  joueurController.recoverPassword);
-router.post('/joueurs/verifytoken',  joueurController.verifyToken);
-router.post('/joueur/resetpassword',  joueurController.resetPassword);
+router.post('/joueur/recoverpassword', joueurController.recoverPassword);
+router.post('/joueurs/verifytoken', joueurController.verifyToken);
+router.post('/joueur/resetpassword', joueurController.resetPassword);
 
 // ---------------------admin---------------------------------------------
 router.post('/loginadmin', adminController.loginAdmin)
@@ -86,18 +86,18 @@ router.put('/admins/password', protect, adminController.updatePassword);
 router.delete('/admin/:id', adminController.deleteAdmin);
 
 
- router.post('/admin/accepter/:reservationId', protect, adminController.accepterReservation);
- router.post('/admin/refuser/:reservationId', protect, adminController.refuserReservation);
+router.post('/admin/accepter/:reservationId', protect, adminController.accepterReservation);
+router.post('/admin/refuser/:reservationId', protect, adminController.refuserReservation);
 
 
 
- router.post('/admin/payereservation/:reservationId', protect, adminController.payReservation);
- router.post('/admin/nonpayereservation/:reservationId', protect, adminController.nonpayReservation);
+router.post('/admin/payereservation/:reservationId', protect, adminController.payReservation);
+router.post('/admin/nonpayereservation/:reservationId', protect, adminController.nonpayReservation);
 
 
- router.post('/admin/recoverpassword',  adminController.recoverPassword);
- router.post('/admins/verifytoken',  adminController.verifyToken);
-router.post('/admin/resetpassword',  adminController.resetPassword);
+router.post('/admin/recoverpassword', adminController.recoverPassword);
+router.post('/admins/verifytoken', adminController.verifyToken);
+router.post('/admin/resetpassword', adminController.resetPassword);
 
 
 
@@ -113,7 +113,7 @@ router.put('/terrain/:id', protect, terrainController.updateTerrain);
 router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
 router.get('/terrain/:id', terrainController.findTerrainById);
 router.get('/terrains', terrainController.findAllTerrains);
-
+router.get('/myterrains/', protect, terrainController.findMyTerrains);
 router.get('/terrains/filter', terrainController.filterTerrains);
 
 // ---------------------Equipe---------------------------------------------
@@ -171,7 +171,8 @@ router.put('/annonce/:id', protect, annonceController.updateAnnonce);
 // Delete Annonce by ID
 router.delete('/annonce/:id', protect, annonceController.deleteAnnonce);
 
-router.get('/annonces/user', protect, annonceController.getAnnoncesByUserId);
+router.get('/myannonces/joueur', protect, annonceController.getMyAnnoncesJoueur);
+router.get('/myannonces/admin', protect, annonceController.getMyAnnoncesAdmin);
 
 // Get Annonce by ID
 router.get('/annonce/:id', annonceController.getAnnonceById);

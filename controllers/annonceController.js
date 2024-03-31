@@ -1,4 +1,7 @@
 const Annonce = require('../models/annonce');
+const { ObjectId } = require('mongoose').Types;
+
+
 
 
 // Controller for adding a new annonce
@@ -96,16 +99,65 @@ exports.deleteAnnonce = async (req, res, next) => {
 
 
 // Get Annonces by Admin ID or Joueur ID
-exports.getAnnoncesByUserId = async (req, res) => {
+exports.getMyAnnoncesJoueur = async (req, res) => {
     try {
         const userId = req.user._id; // Extract userId from request parameters
-        const annonces = await Annonce.find({ $or: [{ admin_id: userId }, { joueur_id: userId }] });
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 10 documents
+        const query = { joueur_id: userId };
 
-        if (!annonces) {
-            return res.status(404).json({ message: 'Annonces not found' });
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
         }
 
-        res.json(annonces);
+        // Fetch the documents from the database, limited and sorted
+        const annonces = await Annonce.find(query)
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = annonces.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : '';
+
+        res.json({
+            data: annonces,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getMyAnnoncesAdmin = async (req, res) => {
+    try {
+        const userId = req.user._id; // Extract userId from request parameters
+        const limit = parseInt(req.query.limit) || 6; // Default limit to 10 documents
+        const query = { admin_id: userId };
+
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, limited and sorted
+        const annonces = await Annonce.find(query)
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = annonces.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : '';
+
+        res.json({
+            data: annonces,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -131,8 +183,25 @@ exports.getAnnonceById = async (req, res) => {
 // Controller for getting all annonces
 exports.getAllAnnonces = async (req, res) => {
     try {
-        const annonces = await Annonce.find();
-        res.json(annonces);
+        const limit = parseInt(req.query.limit) || 10; // How many documents to return
+        const query = {};
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) }
+        }
+        // Fetch the documents from the database
+        const annonces = await Annonce.find(query).sort({ _id: -1 })
+            .limit(limit);
+        // Determine if there's more data to fetch
+        const moreDataAvailable = annonces.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : null;
+
+        res.json({
+            data: annonces,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -141,7 +210,7 @@ exports.getAllAnnonces = async (req, res) => {
 // Controller for filtering annonces
 exports.filterAnnonces = async (req, res) => {
     try {
-        const filter = { type , description } = req.query;
+        const filter = { type, description } = req.query;
         const annonces = await Annonce.find(filter);
         res.json(annonces);
     } catch (error) {

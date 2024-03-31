@@ -62,6 +62,15 @@ exports.deleteTerrain = async (req, res, next) => {
     }
 };
 
+exports.findMyTerrains = async (req, res, next) => {
+    try {
+        const admin_id = req.user._id; // Extracting admin ID from the authenticated user
+        const terrains = await Terrain.find({ admin_id });
+        res.json(terrains);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
 
 exports.findTerrainById = async (req, res, next) => {
     try {
