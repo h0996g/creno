@@ -1,32 +1,41 @@
 const Terrain = require('../models/terrain');
 
+
 exports.addTerrain = async (req, res, next) => {
     try {
-        const { largeur, longeur, superficie, adresse, s_temps, e_temps, prix, description, capacite, etat, reservations, coordonnee, photos } = req.body;
-        const admin_id = req.user._id; // Extracting admin ID from the authenticated user
+        const {
+            largeur, longeur, superficie, adresse,
+            s_temps, e_temps, prix, description,
+            capacite, etat, coordonnee,
+            photos, nonReservableTimeBlocks
+        } = req.body;
 
-        const newTerrainData = {
+        // Extracting admin ID from the authenticated user
+        const admin_id = req.user._id;
+
+        const newTerrain = new Terrain({
             largeur,
             longeur,
             superficie,
             adresse,
-            s_temps,
-            e_temps,
+            s_temps, // Operational start time
+            e_temps, // Operational end time
             prix,
             description,
             capacite,
             etat,
-            reservations,
-            admin_id,
             coordonnee,
-            photos
-        };
+            photos,
+            nonReservableTimeBlocks, // Directly using the passed non-reservable time blocks
+            admin_id
+        });
 
-        const newTerrain = new Terrain(newTerrainData);
         await newTerrain.save();
         res.status(201).json(newTerrain);
     } catch (error) {
-        res.json(error);
+        // Providing a more informative error response
+        console.error('Error saving new terrain:', error);
+        res.status(400).json({ message: "Failed to add new terrain.", error: error.message });
     }
 };
 

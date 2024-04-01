@@ -1,32 +1,28 @@
 const Reservation = require('../models/reservation')
+const Terrain = require('../models/terrain')
 
+exports.addReservation = async (req, res) => {
+    const joueurId = req.user._id;
+    const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
+    const { jour, s_temps, duree, etat, payment } = req.body;
 
-// Controller for adding a new creneau
-exports.addReservation = async (req, res, next) => {
     try {
-        const joueurId = req.user._id;;
-        const id_terrain = req.params.idterrain;
-        const { jour, s_temps,  duree, tarif, etat, payment ,terrain_id ,joueur_id } = req.body;
-        const newReservationData = {
-            
+        const newReservation = new Reservation({
+            joueur_id: joueurId,
+            terrain_id: id_terrain,
             jour,
             s_temps,
             duree,
-            tarif,
-            etat,
-            payment,
-            terrain_id : id_terrain,
-            joueur_id : joueurId
-           
-        };
-        const newReservation = new Reservation(newReservationData);
+            etat,  // Default to "demander" if not provided
+            payment,  // Default to "non" if not provided
+        });
         await newReservation.save();
         res.status(201).json(newReservation);
     } catch (error) {
-        res.json(error);
+        console.error('Error creating reservation:', error);
+        res.status(500).json({ message: "Failed to create reservation.", error: error.message });
     }
 };
-
 
 // Controller for updating a creneau
 exports.updateReservation = async (req, res, next) => {
@@ -61,7 +57,7 @@ exports.deleteReservation = async (req, res) => {
 // Controller for finding a creneau by ID
 exports.findReservationById = async (req, res, next) => {
     try {
-        const  id = req.params;
+        const id = req.params;
         const reservation = await Reservation.findById(id);
         if (!reservation) {
             return res.status(404).json({ message: 'reservation not found' });
@@ -85,7 +81,7 @@ exports.findAllReservations = async (req, res, next) => {
 
 exports.filterReservations = async (req, res) => {
     try {
-        const filter  ={ tarif , description }= req.query; 
+        const filter = { tarif, description } = req.query;
         const reservations = await Reservation.find(filter);
         res.json(reservations);
     } catch (error) {
