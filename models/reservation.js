@@ -4,7 +4,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const reservationSchema = new mongoose.Schema({
     jour: { type: Date, required: true },
     //  s_temps: "08:00" example to start time of the reservation
-    s_temps: { type: String, required: true },
+    debut_temps: { type: String, required: true },
 
     //  duree de la reservation par semain example 4 semain and jour is dimanche it means this dimanche and the next 3 dimanche
     duree: { type: Number, required: false },

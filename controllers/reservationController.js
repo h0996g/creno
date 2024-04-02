@@ -4,14 +4,14 @@ const Terrain = require('../models/terrain')
 exports.addReservation = async (req, res) => {
     const joueurId = req.user._id;
     const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
-    const { jour, s_temps, duree, etat, payment } = req.body;
+    const { jour, debut_temps, duree, etat, payment } = req.body;
 
     try {
         const newReservation = new Reservation({
             joueur_id: joueurId,
             terrain_id: id_terrain,
             jour,
-            s_temps,
+            debut_temps,
             duree,
             etat,  // Default to "demander" if not provided
             payment,  // Default to "non" if not provided

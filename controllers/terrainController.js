@@ -5,7 +5,7 @@ exports.addTerrain = async (req, res, next) => {
     try {
         const {
             largeur, longeur, superficie, adresse,
-            s_temps, e_temps, prix, description,
+            debut_temps, fin_temps,duree_creneau, prix, description,
             capacite, etat, coordonnee,
             photos, nonReservableTimeBlocks
         } = req.body;
@@ -18,8 +18,9 @@ exports.addTerrain = async (req, res, next) => {
             longeur,
             superficie,
             adresse,
-            s_temps, // Operational start time
-            e_temps, // Operational end time
+            debut_temps, // Operational start time
+            fin_temps, // Operational end time
+            duree_creneau,
             prix,
             description,
             capacite,
