@@ -22,10 +22,9 @@ const terrainSchema = new mongoose.Schema({
         day: {
             type: String,
             enum: ['All', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            default: 'All',
+            required: true,
         },
-        start: { type: String, required: true }, // Non-reservable start time within operational hours
-        end: { type: String, required: true },   // Non-reservable end time within operational hours
+        hours: [{ type: String }] // Array of hours that are non-reservable
     }],
     admin_id: { type: ObjectId, ref: 'Admin' },
     photos: [{ type: String }],

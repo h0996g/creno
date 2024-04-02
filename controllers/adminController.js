@@ -251,14 +251,14 @@ exports.deleteAdmin = async (req, res) => {
 //     try {
 //         const { creneauId } = req.params;
 
-        
+
 //         await Creneau.updateOne(
 //             { _id: creneauId },
 //             { $set: { payment: "paye" } }
 //         );
 
-        
-       
+
+
 
 //         res.status(200).json({ message: 'Payment status updated successfully' });
 //     } catch (error) {
@@ -277,7 +277,7 @@ exports.deleteAdmin = async (req, res) => {
 //         );
 
 //         // Check if the update was successful
-       
+
 
 //         res.status(200).json({ message: 'Payment status set to default successfully' });
 //     } catch (error) {
@@ -298,7 +298,7 @@ exports.accepterReservation = async (req, res) => {
             return res.status(404).json({ message: 'reservation not found' });
         }
         await Reservation.updateOne({ _id: reservationId }, { $set: { etat: "accepter" } });
-      
+
         res.status(200).json({ message: 'Demande accepted successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -315,7 +315,7 @@ exports.refuserReservation = async (req, res) => {
             return res.status(404).json({ message: 'reservation not found' });
         }
         await Reservation.updateOne({ _id: reservationId }, { $set: { etat: "refuser" } });
-      
+
         res.status(200).json({ message: 'Demande refuser' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -326,184 +326,180 @@ exports.refuserReservation = async (req, res) => {
 
 
 exports.payReservation = async (req, res) => {
-        try {
-            const { reservationId } = req.params;
-    
-            
-            await Reservation.updateOne(
-                { _id: reservationId },
-                { $set: { payment: "paye" } }
-            );
-    
-            
-           
-    
-            res.status(200).json({ message: 'Payment status updated successfully' });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+    try {
+        const { reservationId } = req.params;
+
+
+        await Reservation.updateOne(
+            { _id: reservationId },
+            { $set: { payment: "paye" } }
+        );
+        res.status(200).json({ message: 'Payment status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+exports.nonpayReservation = async (req, res) => {
+    try {
+        const { reservationId } = req.params;
+
+
+        await Reservation.updateOne(
+            { _id: reservationId },
+            { $set: { payment: "non" } }
+        );
+
+
+
+
+        res.status(200).json({ message: 'Payment status updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+
+exports.recoverPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check if the email exists in the database (Mongoose syntax)
+        const admin = await Admin.findOne({ email: email });
+        if (!admin) {
+            return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
-    };
 
-
-    exports.nonpayReservation = async (req, res) => {
-        try {
-            const { reservationId } = req.params;
-    
-            
-            await Reservation.updateOne(
-                { _id: reservationId },
-                { $set: { payment: "non" } }
-            );
-    
-            
-           
-    
-            res.status(200).json({ message: 'Payment status updated successfully' });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    };
-
-
-
-
-    exports.recoverPassword = async (req, res) => {
-        try {
-            const { email } = req.body;
-    
-            // Check if the email exists in the database (Mongoose syntax)
-            const admin = await Admin.findOne({ email: email });
-            if (!admin) {
-                return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
-            }
-
-            const existingToken = await Token.findOne({ admin_id: admin._id });
+        const existingToken = await Token.findOne({ admin_id: admin._id });
         if (existingToken) {
             // Optional: Delete the existing token before creating a new one
             await Token.deleteOne({ _id: existingToken._id });
         }
-    
-            // Generate a random verification code
-            const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
-    
-            // Update the user's verification code in the database (Mongoose syntax)
-             // Create a token document in the database
+
+        // Generate a random verification code
+        const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
+
+        // Update the user's verification code in the database (Mongoose syntax)
+        // Create a token document in the database
         await Token.create({
             admin_id: admin._id, // Associate the token with the joueur
             token: verificationCode,
             // `createdAt` is handled automatically by Mongoose schema
         });
-    
-            // Send an email to the user with the verification code
-            // Note: Replace with your actual email and password, and use environment variables for sensitive data
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    
-                    user: process.env.EMAIL_USER, // Recommended to use environment variables
-                    
-                     pass: process.env.EMAIL_PASS,
-                     // Recommended to use environment variables
-                },
-            });
 
+        // Send an email to the user with the verification code
+        // Note: Replace with your actual email and password, and use environment variables for sensitive data
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
 
-    
-            const mailOptions = {
-                 from: process.env.EMAIL_USER,
-                to: email,
-                subject: 'Verification Code for Password Recovery',
-                text: `Your verification code is: ${verificationCode}`,
-            };
+                user: process.env.EMAIL_USER, // Recommended to use environment variables
 
-
-    
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    console.error('Error sending email:', error);
-                    return res.status(500).json({ status: false, message: 'Internal server error' });
-                }
-                console.log('Email sent:', info.response);
-                res.json({ status: true, message: 'Verification code sent successfully', verificationCode: verificationCode.toString() });
-            });
+                pass: process.env.EMAIL_PASS,
+                // Recommended to use environment variables
+            },
+        });
 
 
 
-        } catch (error) {
-            console.error('Error during password recovery:', error);
-            res.status(500).json({ status: false, message: 'Internal server error' });
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Verification Code for Password Recovery',
+            text: `Your verification code is: ${verificationCode}`,
+        };
+
+
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ status: false, message: 'Internal server error' });
+            }
+            console.log('Email sent:', info.response);
+            res.json({ status: true, message: 'Verification code sent successfully', verificationCode: verificationCode.toString() });
+        });
+
+
+
+    } catch (error) {
+        console.error('Error during password recovery:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
+
+
+
+
+exports.verifyToken = async (req, res) => {
+    try {
+        const { email, codeVerification } = req.body;
+
+        // Find the joueur by email
+        const admin = await Admin.findOne({ email: email });
+        if (!admin) {
+            return res.status(404).json({ status: false, message: 'Email not found.' });
         }
-    };
 
-
-
-
-    exports.verifyToken = async (req, res) => {
-        try {
-            const { email, codeVerification } = req.body;
-    
-            // Find the joueur by email
-            const admin = await Admin.findOne({ email: email });
-            if (!admin) {
-                return res.status(404).json({ status: false, message: 'Email not found.' });
-            }
-    
-            // Find a token for the joueur
-            const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
-            if (!token) {
-                // If no matching token found, respond with an error status
-                return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
-            }
-    
-            // Delete the token after successful verification to ensure it's used only once
-            // await Token.deleteOne({ _id: token._id });
-    
-            // Respond with success status if the token matches
-            res.status(200).json({ status: true, message: 'Verification successful.' });
-        } catch (error) {
-            console.error('Error during token verification:', error);
-            res.status(500).json({ status: false, message: 'Internal server error' });
+        // Find a token for the joueur
+        const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
+        if (!token) {
+            // If no matching token found, respond with an error status
+            return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
         }
-    };
+
+        // Delete the token after successful verification to ensure it's used only once
+        // await Token.deleteOne({ _id: token._id });
+
+        // Respond with success status if the token matches
+        res.status(200).json({ status: true, message: 'Verification successful.' });
+    } catch (error) {
+        console.error('Error during token verification:', error);
+        res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};
 
 
 
 
 
 
-    
-    
-    
-    exports.resetPassword = async (req, res) => {
-        try {
-            const { email, newPassword } = req.body;
-    
-            // Find the patient by email using Mongoose's findOne
-            const admin = await Admin.findOne({ email: email });
-            if (!admin) {
-                return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
-            }
-            const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
-            if (!token) {
-                // If no matching token found, respond with an error status
-                return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
-            }
-    
-            // Delete the token after successful verification to ensure it's used only once
-            await Token.deleteOne({ _id: token._id });
-            // Hash the new password
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(newPassword, salt); // Assuming 10 is the salt rounds
-    
-         // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
-            await Admin.findOneAndUpdate(
-                { email: email },
-                { $set: { mot_de_passe: hashedPassword } } // Use $set to specify the fields to update
-            );
-    
-            return res.status(200).json({ status: true, message: 'Password reset successful' });
-        } catch (error) {
-            console.error('Error during password reset:', error);
-            return res.status(500).json({ status: false, message: 'Internal server error' });
+
+
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword, codeVerification } = req.body;
+
+        // Find the patient by email using Mongoose's findOne
+        const admin = await Admin.findOne({ email: email });
+        if (!admin) {
+            return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
-    };
+        const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
+        if (!token) {
+            // If no matching token found, respond with an error status
+            return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
+        }
+
+        // Delete the token after successful verification to ensure it's used only once
+        await Token.deleteOne({ _id: token._id });
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt); // Assuming 10 is the salt rounds
+
+        // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
+        await Admin.findOneAndUpdate(
+            { email: email },
+            { $set: { mot_de_passe: hashedPassword } } // Use $set to specify the fields to update
+        );
+
+        return res.status(200).json({ status: true, message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error during password reset:', error);
+        return res.status(500).json({ status: false, message: 'Internal server error' });
+    }
+};

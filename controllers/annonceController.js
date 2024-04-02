@@ -4,7 +4,6 @@ const { ObjectId } = require('mongoose').Types;
 
 
 
-// Controller for adding a new annonce
 exports.addAnnonce = async (req, res) => {
     try {
         const { type, description } = req.body;
@@ -68,7 +67,6 @@ exports.updateAnnonce = async (req, res) => {
 
 
 
-// Controller for deleting an Annonce
 exports.deleteAnnonce = async (req, res, next) => {
     try {
         const id = req.params.id;
@@ -98,7 +96,6 @@ exports.deleteAnnonce = async (req, res, next) => {
 };
 
 
-// Get Annonces by Admin ID or Joueur ID
 exports.getMyAnnoncesJoueur = async (req, res) => {
     try {
         const userId = req.user._id; // Extract userId from request parameters
@@ -166,7 +163,6 @@ exports.getMyAnnoncesAdmin = async (req, res) => {
 
 
 
-// Controller for getting an annonce by ID
 exports.getAnnonceById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -180,7 +176,6 @@ exports.getAnnonceById = async (req, res) => {
     }
 };
 
-// Controller for getting all annonces
 exports.getAllAnnonces = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10; // How many documents to return
@@ -207,7 +202,7 @@ exports.getAllAnnonces = async (req, res) => {
     }
 };
 
-// Controller for filtering annonces
+
 exports.filterAnnonces = async (req, res) => {
     try {
         const filter = { type, description } = req.query;
