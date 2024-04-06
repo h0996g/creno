@@ -41,10 +41,7 @@ const joueurSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    verificationCode: {
-        type: Number,
-        required: false
-    },
+  
 
 
 

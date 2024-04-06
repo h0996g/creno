@@ -33,10 +33,7 @@ const adminSchema = new mongoose.Schema({
         type: String,
         // required: true
     },
-    verificationCode: {
-        type: Number,
-        required: false
-    },
+ 
 
 
 

@@ -69,20 +69,79 @@ exports.findTournoiById = async (req, res, next) => {
 };
 
 // Controller for finding all tournaments
+// exports.findAllTournois = async (req, res, next) => {
+//     try {
+//         const tournois = await Tournoi.find();
+//         res.json(tournois);
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
+
 exports.findAllTournois = async (req, res, next) => {
     try {
-        const tournois = await Tournoi.find();
-        res.json(tournois);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const tournois = await Tournoi.find(query).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = tournois.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? tournois[tournois.length - 1]._id : null;
+
+        res.json({
+            data: tournois,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         next(error);
     }
 };
+
+
+// exports.filterTournois = async (req, res) => {
+//     try {
+//         const filter = req.query;
+
+//         const tournois = await Tournoi.find(filter);
+//         res.json(tournois);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
 exports.filterTournois = async (req, res) => {
     try {
-        const filter = req.query;
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const tournois = await Tournoi.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = tournois.length === limit;
 
-        const tournois = await Tournoi.find(filter);
-        res.json(tournois);
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? tournois[tournois.length - 1]._id : null;
+
+        res.json({
+            data: tournois,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

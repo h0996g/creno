@@ -96,21 +96,78 @@ exports.findTerrainById = async (req, res, next) => {
     }
 };
 
+// exports.findAllTerrains = async (req, res, next) => {
+//     try {
+//         const terrains = await Terrain.find();
+//         res.json(terrains);
+//     } catch (error) {
+//         res.json(error);
+//     }
+// };
+
 exports.findAllTerrains = async (req, res, next) => {
     try {
-        const terrains = await Terrain.find();
-        res.json(terrains);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const terrains = await Terrain.find(query).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = terrains.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : null;
+
+        res.json({
+            data: terrains,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
-        res.json(error);
+        next(error);
     }
 };
 
+// exports.filterTerrains = async (req, res) => {
+//     try {
+//         const filter = { largeur, longeur, superficie, adresse, capacite, etat, place, s_temps, e_temps, prix, reservations, coordonnee } = req.query;
+//         const terrains = await Terrain.find(filter);
+
+//         res.json(terrains);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
 exports.filterTerrains = async (req, res) => {
     try {
-        const filter = { largeur, longeur, superficie, adresse, capacite, etat, place, s_temps, e_temps, prix, reservations, coordonnee } = req.query;
-        const terrains = await Terrain.find(filter);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const terrains = await Terrain.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = terrains.length === limit;
 
-        res.json(terrains);
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : null;
+
+        res.json({
+            data: terrains,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
