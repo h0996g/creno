@@ -7,8 +7,8 @@ const terrainSchema = new mongoose.Schema({
     longeur: { type: Number, required: true },
     superficie: { type: Number, required: true },
     adresse: { type: String, required: true },
-    debut_temps: { type: String, required: true }, // Operational start time (e.g., "08:00")
-    fin_temps: { type: String, required: true }, // Operational end time (e.g., "23:00")
+    heure_debut_temps: { type: String, required: true }, // Operational start time (e.g., "08:00")
+    heure_fin_temps: { type: String, required: true }, // Operational end time (e.g., "23:00")
     duree_creneau: { type: String, required: true },
     prix: { type: Number, required: true },
     description: { type: String, required: true },
