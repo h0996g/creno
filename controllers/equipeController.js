@@ -58,26 +58,80 @@ exports.findEquipeById = async (req, res) => {
 };
 
 
+// exports.findAllEquipes = async (req, res) => {
+//     try {
+//         const equipes = await Equipe.find();
+//         res.json(equipes);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
 exports.findAllEquipes = async (req, res) => {
     try {
-        const equipes = await Equipe.find();
-        res.json(equipes);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) }
+        }
+        // Fetch the documents from the database
+        const equipes = await Equipe.find(query).sort({ _id: -1 }).limit(limit);
+        // Determine if there's more data to fetch
+        const moreDataAvailable = equipes.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : null;
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// exports.filterEquipes = async (req, res) => {
+//     try {
+//         const filter  = req.query;
+
+//         const equipes = await Equipe.find(filter);
+//         res.json(equipes);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
 
 exports.filterEquipes = async (req, res) => {
     try {
-        const filter = { nom, numero_joueurs, capitaine_id, wilaya } = req.query;
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const equipes = await Equipe.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = equipes.length === limit;
 
-        const equipes = await Equipe.find(filter);
-        res.json(equipes);
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : null;
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-
 
 
 

@@ -128,22 +128,75 @@ exports.getJoueurById = async (req, res) => {
 };
 
 
+// exports.getAllJoueurs = async (req, res) => {
+//     try {
+//         const joueurs = await Joueur.find();
+//         res.json(joueurs);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
 exports.getAllJoueurs = async (req, res) => {
     try {
-        const joueurs = await Joueur.find();
-        res.json(joueurs);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) }
+        }
+        // Fetch the documents from the database
+        const joueurs = await Joueur.find(query).sort({ _id: -1 }).limit(limit);
+        // Determine if there's more data to fetch
+        const moreDataAvailable = joueurs.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? joueurs[joueurs.length - 1]._id : null;
+
+        res.json({
+            data: joueurs,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
 
+// exports.filterJoueurs = async (req, res) => {
+//     try {
+//         const filter = req.query; // Extract the filter from query parameters
+//         const joueurs = await Joueur.find(filter);
+//         res.json(joueurs);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 exports.filterJoueurs = async (req, res) => {
     try {
-        const filter = req.query; // Extract the filter from query parameters
-        const joueurs = await Joueur.find(filter);
-        res.json(joueurs);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const joueurs = await Joueur.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = joueurs.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? joueurs[joueurs.length - 1]._id : null;
+
+        res.json({
+            data: joueurs,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

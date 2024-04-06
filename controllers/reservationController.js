@@ -70,20 +70,77 @@ exports.findReservationById = async (req, res, next) => {
 
 
 // Controller for finding all creneaus
+// exports.findAllReservations = async (req, res, next) => {
+//     try {
+//         const reservations = await Reservation.find();
+//         res.json(reservations);
+//     } catch (error) {
+//         next(error);
+//     }
+// };
+
 exports.findAllReservations = async (req, res, next) => {
     try {
-        const reservations = await Reservation.find();
-        res.json(reservations);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const reservations = await Reservation.find(query).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = reservations.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? reservations[reservations.length - 1]._id : null;
+
+        res.json({
+            data: reservations,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         next(error);
     }
 };
 
+// exports.filterReservations = async (req, res) => {
+//     try {
+//         const filter = { tarif, description } = req.query;
+//         const reservations = await Reservation.find(filter);
+//         res.json(reservations);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
 exports.filterReservations = async (req, res) => {
     try {
-        const filter = { tarif, description } = req.query;
-        const reservations = await Reservation.find(filter);
-        res.json(reservations);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const reservations = await Reservation.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = reservations.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? reservations[reservations.length - 1]._id : null;
+
+        res.json({
+            data: reservations,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -124,21 +124,77 @@ exports.getAdminById = async (req, res) => {
 };
 
 // Get all admins
+// exports.getAllAdmins = async (req, res) => {
+//     try {
+//         const admins = await Admin.find();
+//         res.json(admins);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
 exports.getAllAdmins = async (req, res) => {
     try {
-        const admins = await Admin.find();
-        res.json(admins);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const query = {};
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) }
+        }
+        // Fetch the documents from the database
+        const admins = await Admin.find(query).sort({ _id: -1 }).limit(limit);
+        // Determine if there's more data to fetch
+        const moreDataAvailable = admins.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? admins[admins.length - 1]._id : null;
+
+        res.json({
+            data: admins,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
+
 // Filter admins
+// exports.filterAdmins = async (req, res) => {
+//     try {
+//         const filter =  { nom , prenom , } = req.query; // Extract the filter from query parameters
+//         const admins = await Admin.find(filter);
+//         res.json(admins);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
 exports.filterAdmins = async (req, res) => {
     try {
-        const filter = req.query; // Extract the filter from query parameters
-        const admins = await Admin.find(filter);
-        res.json(admins);
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+        
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        
+        // Fetch the documents from the database, sort by _id
+        const admins = await Admin.find(filter).sort({ _id: -1 }).limit(limit);
+        
+        // Determine if there's more data to fetch
+        const moreDataAvailable = admins.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? admins[admins.length - 1]._id : null;
+
+        res.json({
+            data: admins,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -187,105 +243,6 @@ exports.deleteAdmin = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-
-
-// exports.accepterDemande = async (req, res) => {
-//     try {
-//         const { creneauId, joueurId } = req.params;
-
-//         // Find the creneau by ID
-//         const creneau = await Creneau.findById(creneauId);
-//         if (!creneau) {
-//             return res.status(404).json({ message: 'Creneau not found' });
-//         }
-
-//         // Find the joueur by ID
-//         const joueur = await Joueur.findById(joueurId);
-//         if (!joueur) {
-//             return res.status(404).json({ message: 'Joueur not found' });
-//         }
-
-//         // Update the creneau with joueur_id and remove joueurId from joueurs array
-//         await Creneau.updateOne({ _id: creneauId }, { $set: { joueur_id: joueurId }, $pull: { joueurs: joueurId } });
-
-//         // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
-//         await Joueur.updateOne({ _id: joueurId }, { $pull: { creneaus_reserve: creneauId }, $push: { creneaus_finale: creneauId } });
-
-//         res.status(200).json({ message: 'Demande accepted successfully' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-
-// exports.suprimerReservationCreneau = async (req, res) => {
-//     try {
-//         const { creneauId, joueurId } = req.params;
-
-//         // Find the creneau by ID
-//         const creneau = await Creneau.findById(creneauId);
-//         if (!creneau) {
-//             return res.status(404).json({ message: 'Creneau not found' });
-//         }
-
-//         // Find the joueur by ID
-//         const joueur = await Joueur.findById(joueurId);
-//         if (!joueur) {
-//             return res.status(404).json({ message: 'Joueur not found' });
-//         }
-
-//         // Update the creneau with joueur_id and remove joueurId from joueurs array
-//         await Creneau.updateOne({ _id: creneauId }, { $unset: { joueur_id: "" }});
-
-//         // Remove the creneauId from creneaus_reserve and add it to creneaus_finale in joueur
-//         await Joueur.updateOne({ _id: joueurId }, {  $pull: { creneaus_finale: creneauId } });
-
-//         res.status(200).json({ message: 'creno libre a nouveau' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-// exports.payCreneau = async (req, res) => {
-//     try {
-//         const { creneauId } = req.params;
-
-
-//         await Creneau.updateOne(
-//             { _id: creneauId },
-//             { $set: { payment: "paye" } }
-//         );
-
-
-
-
-//         res.status(200).json({ message: 'Payment status updated successfully' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-// exports.nonPayeCreneau = async (req, res) => {
-//     try {
-//         const { creneauId } = req.params;
-
-//         // Update the payment field to its default value using updateOne
-//         await Creneau.updateOne(
-//             { _id: creneauId },
-//             { $set: { payment: "non" } }
-//         );
-
-//         // Check if the update was successful
-
-
-//         res.status(200).json({ message: 'Payment status set to default successfully' });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-
 
 
 exports.accepterReservation = async (req, res) => {
@@ -382,16 +339,13 @@ exports.recoverPassword = async (req, res) => {
         // Generate a random verification code
         const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
 
-        // Update the user's verification code in the database (Mongoose syntax)
-        // Create a token document in the database
         await Token.create({
             admin_id: admin._id, // Associate the token with the joueur
             token: verificationCode,
             // `createdAt` is handled automatically by Mongoose schema
         });
 
-        // Send an email to the user with the verification code
-        // Note: Replace with your actual email and password, and use environment variables for sensitive data
+       
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -451,10 +405,7 @@ exports.verifyToken = async (req, res) => {
             return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
         }
 
-        // Delete the token after successful verification to ensure it's used only once
-        // await Token.deleteOne({ _id: token._id });
-
-        // Respond with success status if the token matches
+        
         res.status(200).json({ status: true, message: 'Verification successful.' });
     } catch (error) {
         console.error('Error during token verification:', error);
