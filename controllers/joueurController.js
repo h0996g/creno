@@ -5,6 +5,7 @@ const Token = require('../models/token')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
+const { ObjectId } = require('mongoose').Types;
 
 
 
@@ -406,29 +407,24 @@ exports.supprimerRejoindreEquipe = async (req, res) => {
 exports.recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
-
         // Check if the email exists in the database
         const joueur = await Joueur.findOne({ email: email });
         if (!joueur) {
             return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
-
         // Check if a token already exists for this joueur
         const existingToken = await Token.findOne({ joueur_id: joueur._id });
         if (existingToken) {
             // Optional: Delete the existing token before creating a new one
             await Token.deleteOne({ _id: existingToken._id });
         }
-
         // Generate a random verification code
         const verificationCode = Math.floor(10000 + Math.random() * 90000); // Generates a 5-digit code
-
         // Create a new token document in the database
         await Token.create({
             joueur_id: joueur._id, // Associate the token with the joueur
             token: verificationCode,
         });
-
         // Set up nodemailer transporter
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -468,23 +464,17 @@ exports.recoverPassword = async (req, res) => {
 exports.verifyToken = async (req, res) => {
     try {
         const { email, codeVerification } = req.body;
-
         // Find the joueur by email
         const joueur = await Joueur.findOne({ email: email });
         if (!joueur) {
             return res.status(404).json({ status: false, message: 'Email not found.' });
         }
-
         // Find a token for the joueur
         const token = await Token.findOne({ joueur_id: joueur._id, token: codeVerification });
         if (!token) {
             // If no matching token found, respond with an error status
             return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
         }
-
-        // Delete the token after successful verification to ensure it's used only once
-        // await Token.deleteOne({ _id: token._id });
-
         // Respond with success status if the token matches
         res.status(200).json({ status: true, message: 'Verification successful.' });
     } catch (error) {
@@ -506,33 +496,26 @@ exports.verifyToken = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     try {
         const { email, newPassword, codeVerification } = req.body;
-
         // Find the patient by email using Mongoose's findOne
         const joueur = await Joueur.findOne({ email: email });
         if (!joueur) {
             return res.status(404).json({ status: false, message: 'Email not found. Please enter a registered email address.' });
         }
-
-
         const token = await Token.findOne({ joueur_id: joueur._id, token: codeVerification });
         if (!token) {
             // If no matching token found, respond with an error status
             return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
         }
-
         // Delete the token after successful verification to ensure it's used only once
         await Token.deleteOne({ _id: token._id });
-
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt); // Assuming 10 is the salt rounds
-
      // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
         await Joueur.findOneAndUpdate(
             { email: email },
             { $set: { mot_de_passe: hashedPassword } } // Use $set to specify the fields to update
         );
-
         return res.status(200).json({ status: true, message: 'Password reset successful' });
     } catch (error) {
         console.error('Error during password reset:', error);

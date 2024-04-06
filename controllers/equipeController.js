@@ -1,5 +1,6 @@
 const Equipe = require('../models/equipe');
 const Tournoi = require('../models/tournoi');
+const { ObjectId } = require('mongoose').Types;
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
