@@ -3,13 +3,13 @@ const { ObjectId } = require('mongoose').Types;
 
 exports.addTournoi = async (req, res) => {
     try {
-        const { titre, s_date, e_date, type, numero_equipe, frais_inscription, lieu } = req.body;
+        const { titre, debut_date, fin_date, type, numero_equipe, frais_inscription, lieu } = req.body;
         const admin_id = req.user._id;
 
         const newTournoiData = {
             titre,
-            s_date,
-            e_date,
+            debut_date,
+            fin_date,
             type,
             numero_equipe,
             frais_inscription,

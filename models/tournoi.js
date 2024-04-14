@@ -8,12 +8,12 @@ const tournoiSchema = new mongoose.Schema({
         required: true
     },
     
-    s_date: {
+    debut_date: {
         type: Date,
         required: true
 
     },
-    e_date: {
+    fin_date: {
         type: Date,
         required: true
 

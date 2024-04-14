@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');//installer le module mongoose (avant vous devez installer et configurer Mongodb)
 const apiRouter = require('./routes/api');
+require('./jobs/jobs.js');
 require('dotenv').config()
 
 const app = express();
