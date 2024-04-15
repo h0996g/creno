@@ -11,7 +11,7 @@ const joueurSchema = new mongoose.Schema({
     },
     prenom: {
         type: String,
-        required: true
+        
     },
     email: {
         type: String,
@@ -34,6 +34,10 @@ const joueurSchema = new mongoose.Schema({
         // required: false
     },
     wilaya: {
+        type: String,
+        required: false
+    },
+    commune: {
         type: String,
         required: false
     },

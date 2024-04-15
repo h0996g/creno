@@ -6,6 +6,8 @@ const terrainSchema = new mongoose.Schema({
     largeur: { type: Number, required: true },
     longeur: { type: Number, required: true },
     superficie: { type: Number, required: true },
+    wilaya: { type: String, required: false },
+    commune: { type: String, required: false },
     adresse: { type: String, required: true },
     heure_debut_temps: { type: String, required: true }, // Operational start time (e.g., "08:00")
     heure_fin_temps: { type: String, required: true }, // Operational end time (e.g., "23:00")
@@ -22,8 +24,8 @@ const terrainSchema = new mongoose.Schema({
     nonReservableTimeBlocks: [{
         day: {
             type: String,
-            enum: ['All', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            required: true,
+            enum: ['All', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+           
         },
         hours: [{ type: String }] // Array of hours that are non-reservable
     }],
