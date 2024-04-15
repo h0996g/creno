@@ -25,7 +25,7 @@ exports.addTournoi = async (req, res) => {
     }
 };
 
-
+//----------------------------
 exports.updateTournoi = async (req, res) => {
     try {
         const id = req.params.id;
@@ -40,7 +40,7 @@ exports.updateTournoi = async (req, res) => {
         res.json(error);
     }
 };
-
+//----------------------------
 exports.deleteTournoi = async (req, res) => {
     try {
         const id = req.params.id;
@@ -54,7 +54,7 @@ exports.deleteTournoi = async (req, res) => {
         res.json(error);
     }
 };
-
+//----------------------------
 // Controller for finding a tournament by ID
 exports.findTournoiById = async (req, res, next) => {
     try {
@@ -69,16 +69,7 @@ exports.findTournoiById = async (req, res, next) => {
     }
 };
 
-// Controller for finding all tournaments
-// exports.findAllTournois = async (req, res, next) => {
-//     try {
-//         const tournois = await Tournoi.find();
-//         res.json(tournois);
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
+//----------------------------
 
 exports.findAllTournois = async (req, res, next) => {
     try {
@@ -109,16 +100,7 @@ exports.findAllTournois = async (req, res, next) => {
 };
 
 
-// exports.filterTournois = async (req, res) => {
-//     try {
-//         const filter = req.query;
-
-//         const tournois = await Tournoi.find(filter);
-//         res.json(tournois);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
+//----------------------------
 
 exports.filterTournois = async (req, res) => {
     try {

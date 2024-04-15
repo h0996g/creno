@@ -1,6 +1,8 @@
 const Equipe = require('../models/equipe');
 const Tournoi = require('../models/tournoi');
 const { ObjectId } = require('mongoose').Types;
+
+//----------------------------
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
@@ -12,7 +14,7 @@ exports.createEquipe = async (req, res) => {
         res.status(500).json(e);
     }
 }
-
+//----------------------------
 exports.modifierEquipe = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
@@ -31,7 +33,7 @@ exports.modifierEquipe = async (req, res) => {
         res.json(e);
     }
 }
-
+//----------------------------
 exports.supprimerEquipe = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
@@ -45,6 +47,7 @@ exports.supprimerEquipe = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+//----------------------------
 exports.findEquipeById = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
@@ -58,16 +61,7 @@ exports.findEquipeById = async (req, res) => {
     }
 };
 
-
-// exports.findAllEquipes = async (req, res) => {
-//     try {
-//         const equipes = await Equipe.find();
-//         res.json(equipes);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
+//----------------------------
 exports.findAllEquipes = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
@@ -94,18 +88,7 @@ exports.findAllEquipes = async (req, res) => {
 };
 
 
-// exports.filterEquipes = async (req, res) => {
-//     try {
-//         const filter  = req.query;
-
-//         const equipes = await Equipe.find(filter);
-//         res.json(equipes);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-
+//----------------------------
 exports.filterEquipes = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
@@ -134,7 +117,7 @@ exports.filterEquipes = async (req, res) => {
     }
 };
 
-
+//----------------------------
 
 exports.rejoindreTournoi = async (req, res) => {
     try {
@@ -149,16 +132,8 @@ exports.rejoindreTournoi = async (req, res) => {
         if (!tournoi) {
             return res.status(404).json({ message: 'tournoi not found' });
         }
-
-
-
  await Equipe.updateOne({ _id: equipeId }, { $push: { tournois: tournoiId } });
-
- 
  await Tournoi.updateOne({ _id: tournoiId }, { $push: { equipes: equipeId } });
-
-       
-
         res.status(200).json({ message: 'Equipe joined tournoi successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -166,7 +141,7 @@ exports.rejoindreTournoi = async (req, res) => {
 };
 
 
-
+//----------------------------
 exports.quitterTournoi = async (req, res) => {
     try {
         const { equipeId, tournoiId } = req.params;
@@ -180,15 +155,8 @@ exports.quitterTournoi = async (req, res) => {
         if (!tournoi) {
             return res.status(404).json({ message: 'tournoi not found' });
         }
-
-
         await Equipe.updateOne({ _id: equipeId }, { $pull: { tournois: tournoiId } });
-
- 
         await Tournoi.updateOne({ _id: tournoiId }, { $pull: { equipes: equipeId } });
-
-       
-
         res.status(200).json({ message: 'Equipe quitted the tournoi successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });

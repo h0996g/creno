@@ -3,7 +3,7 @@ const { ObjectId } = require('mongoose').Types;
 
 
 
-
+//----------------------------
 exports.addAnnonce = async (req, res) => {
     try {
         const { type, description } = req.body;
@@ -35,7 +35,7 @@ exports.addAnnonce = async (req, res) => {
 
 
 
-
+//----------------------------
 exports.updateAnnonce = async (req, res) => {
     try {
         const id = req.params.id;
@@ -66,7 +66,7 @@ exports.updateAnnonce = async (req, res) => {
 };
 
 
-
+//----------------------------
 exports.deleteAnnonce = async (req, res, next) => {
     try {
         const id = req.params.id;
@@ -95,7 +95,7 @@ exports.deleteAnnonce = async (req, res, next) => {
     }
 };
 
-
+//----------------------------
 exports.getMyAnnoncesJoueur = async (req, res) => {
     try {
         const userId = req.user._id; // Extract userId from request parameters
@@ -127,7 +127,7 @@ exports.getMyAnnoncesJoueur = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
+//----------------------------
 exports.getMyAnnoncesAdmin = async (req, res) => {
     try {
         const userId = req.user._id; // Extract userId from request parameters
@@ -162,7 +162,7 @@ exports.getMyAnnoncesAdmin = async (req, res) => {
 
 
 
-
+//----------------------------
 exports.getAnnonceById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -175,7 +175,7 @@ exports.getAnnonceById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
+//----------------------------
 exports.getAllAnnonces = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10; // How many documents to return
@@ -203,17 +203,7 @@ exports.getAllAnnonces = async (req, res) => {
 };
 
 
-// exports.filterAnnonces = async (req, res) => {
-//     try {
-//         const filter = { type, description } = req.query;
-//         const annonces = await Annonce.find(filter);
-//         res.json(annonces);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
-
+//----------------------------
 exports.filterAnnonces = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 6; // How many documents to return

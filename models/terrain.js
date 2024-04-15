@@ -43,7 +43,6 @@ terrainSchema.post('save', async function (doc, next) {
     }
 });
 
-
 terrainSchema.pre('deleteOne', async function (next) {
     try {
         const terrainId = this.getQuery()._id;
@@ -59,8 +58,6 @@ terrainSchema.pre('deleteOne', async function (next) {
         console.log(error);
     }
 });
-
-
 
 const Terrain = mongoose.model('Terrain', terrainSchema)
 module.exports = Terrain   

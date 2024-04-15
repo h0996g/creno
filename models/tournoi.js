@@ -73,9 +73,6 @@ tournoiSchema.post('save', async function (doc, next) {
 });
 
 
-
-
-
 tournoiSchema.pre('deleteOne', async function(next) {
     try {
         const tournoiId = this.getQuery()._id;

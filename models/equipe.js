@@ -91,11 +91,6 @@ equipeSchema.pre('deleteOne', async function(next) {
             { $pull: { demande_equipes: equipeId } }
         );
 
-       
-            // await mongoose.model('Joueur').updateOne(
-            //     { _id: joueur._id },
-            //     { $pull: { mes_equipes: equipeId } }
-            // );
             await mongoose.model('Joueur').updateOne(
                 { _id: this.getQuery.capitaine_id },
                 { $pull: { mes_equipes: equipeId } }

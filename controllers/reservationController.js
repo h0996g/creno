@@ -24,7 +24,7 @@ exports.addReservation = async (req, res) => {
         res.status(500).json({ message: "Failed to create reservation.", error: error.message });
     }
 };
-
+//----------------------------
 // Controller for updating a creneau
 exports.updateReservation = async (req, res, next) => {
     try {
@@ -40,7 +40,7 @@ exports.updateReservation = async (req, res, next) => {
     }
 };
 
-
+//----------------------------
 // Controller for deleting a creneau
 exports.deleteReservation = async (req, res) => {
     try {
@@ -54,7 +54,7 @@ exports.deleteReservation = async (req, res) => {
         res.json(error);
     }
 };
-
+//----------------------------
 // Controller for finding a creneau by ID
 exports.findReservationById = async (req, res, next) => {
     try {
@@ -69,16 +69,7 @@ exports.findReservationById = async (req, res, next) => {
     }
 };
 
-
-// Controller for finding all creneaus
-// exports.findAllReservations = async (req, res, next) => {
-//     try {
-//         const reservations = await Reservation.find();
-//         res.json(reservations);
-//     } catch (error) {
-//         next(error);
-//     }
-// };
+//----------------------------
 
 exports.findAllReservations = async (req, res, next) => {
     try {
@@ -108,16 +99,7 @@ exports.findAllReservations = async (req, res, next) => {
     }
 };
 
-// exports.filterReservations = async (req, res) => {
-//     try {
-//         const filter = { tarif, description } = req.query;
-//         const reservations = await Reservation.find(filter);
-//         res.json(reservations);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
+//----------------------------
 
 exports.filterReservations = async (req, res) => {
     try {

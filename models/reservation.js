@@ -20,10 +20,6 @@ const reservationSchema = new mongoose.Schema({
     terrain_id: { type: ObjectId, ref: 'Terrain', required: false },
 })
 
-
-
-
-
 reservationSchema.post('save', async function (doc, next) {
     try {
         // Update the terrain document to push the creneau ID to the creneaus array
@@ -42,9 +38,6 @@ reservationSchema.post('save', async function (doc, next) {
         console.error('Error updating terrain with new reservation:', error);
     }
 });
-
-
-
 
 reservationSchema.pre('deleteOne', async function (next) {
     try {
@@ -68,12 +61,6 @@ reservationSchema.pre('deleteOne', async function (next) {
         console.log(error);
     }
 });
-
-
-
-
-
-
 
 
 const Reservation = mongoose.model('Reservation', reservationSchema)

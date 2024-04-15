@@ -41,7 +41,7 @@ exports.addTerrain = async (req, res, next) => {
     }
 };
 
-
+//----------------------------
 // Controller for updating a terrain
 exports.updateTerrain = async (req, res) => {
     try {
@@ -57,7 +57,7 @@ exports.updateTerrain = async (req, res) => {
         res.json(error);
     }
 };
-
+//----------------------------
 // Controller for deleting a terrain
 exports.deleteTerrain = async (req, res, next) => {
     try {
@@ -72,7 +72,7 @@ exports.deleteTerrain = async (req, res, next) => {
         next(error);
     }
 };
-
+//----------------------------
 exports.findMyTerrains = async (req, res, next) => {
     try {
         const admin_id = req.user._id; // Extracting admin ID from the authenticated user
@@ -82,7 +82,7 @@ exports.findMyTerrains = async (req, res, next) => {
         res.json({ message: error.message });
     }
 }
-
+//----------------------------
 exports.findTerrainById = async (req, res, next) => {
     try {
         const id = req.params.id;
@@ -97,14 +97,7 @@ exports.findTerrainById = async (req, res, next) => {
     }
 };
 
-// exports.findAllTerrains = async (req, res, next) => {
-//     try {
-//         const terrains = await Terrain.find();
-//         res.json(terrains);
-//     } catch (error) {
-//         res.json(error);
-//     }
-// };
+//----------------------------
 
 exports.findAllTerrains = async (req, res, next) => {
     try {
@@ -134,16 +127,7 @@ exports.findAllTerrains = async (req, res, next) => {
     }
 };
 
-// exports.filterTerrains = async (req, res) => {
-//     try {
-//         const filter = { largeur, longeur, superficie, adresse, capacite, etat, place, s_temps, e_temps, prix, reservations, coordonnee } = req.query;
-//         const terrains = await Terrain.find(filter);
-
-//         res.json(terrains);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
+//----------------------------
 
 
 exports.filterTerrains = async (req, res) => {

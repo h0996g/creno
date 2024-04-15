@@ -79,19 +79,7 @@ const joueurSchema = new mongoose.Schema({
         type: ObjectId, required: false,
         ref: "reservation"
     }],
-    // creneaus_reserve: [{
-
-    //     type: ObjectId, required: false,
-    //     ref: "Creneau"
-
-    // }],
-    // creneaus_finale: [{
-
-    //     type: ObjectId, required: false,
-    //     ref: "Creneau"
-
-    // }],
-
+ 
 
 }, {
     toJSON: {
@@ -160,14 +148,7 @@ joueurSchema.pre('deleteOne', async function(next) {
         await mongoose.model('Reservation').deleteMany({ joueur_id: joueurId });
 
 
-        // Update all creneaus where the joueur is a participant to remove the joueur from joueurs array
-        // await mongoose.model('Creneau').updateMany(
-        //     { joueurs: joueurId },
-        //     { $pull: { joueurs: joueurId } }
-        // );
-
-        // // Unset the joueur_id field in all creneaus where the joueur is assigned as joueur_id
-        // await mongoose.model('Creneau').updateMany({ joueur_id: joueurId }, { $unset: { joueur_id: "" } });
+       
     } catch (error) {
         console.log(error);
     }

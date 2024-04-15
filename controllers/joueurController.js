@@ -1,14 +1,13 @@
 const Joueur = require('../models/joueur')
 const Equipe = require('../models/equipe')
 const Token = require('../models/token')
-// const Creneau = require('../models/creneau')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
 const { ObjectId } = require('mongoose').Types;
 
 
-
+//----------------------------
 exports.createJoueur = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
@@ -35,7 +34,7 @@ exports.createJoueur = async (req, res, next) => {
         next(err);
     }
 }
-
+//----------------------------
 exports.loginJoueur = async (req, res, next) => {
     try {
 
@@ -73,7 +72,7 @@ exports.loginJoueur = async (req, res, next) => {
         next(error);
     }
 }
-
+//----------------------------
 exports.getMyInformation = async (req, res) => {
     try {
         const joueur_id = req.user._id;
@@ -91,8 +90,7 @@ exports.getMyInformation = async (req, res) => {
 };
 
 
-
-
+//----------------------------
 exports.updateJoueur = async (req, res) => {
     try {
         // const id = req.params.id;
@@ -114,7 +112,7 @@ exports.updateJoueur = async (req, res) => {
 };
 
 
-
+//----------------------------
 exports.getJoueurById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -128,16 +126,7 @@ exports.getJoueurById = async (req, res) => {
     }
 };
 
-
-// exports.getAllJoueurs = async (req, res) => {
-//     try {
-//         const joueurs = await Joueur.find();
-//         res.json(joueurs);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
+//----------------------------
 
 exports.getAllJoueurs = async (req, res) => {
     try {
@@ -165,15 +154,7 @@ exports.getAllJoueurs = async (req, res) => {
 };
 
 
-// exports.filterJoueurs = async (req, res) => {
-//     try {
-//         const filter = req.query; // Extract the filter from query parameters
-//         const joueurs = await Joueur.find(filter);
-//         res.json(joueurs);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
+//----------------------------
 
 exports.filterJoueurs = async (req, res) => {
     try {
@@ -232,12 +213,7 @@ exports.updatePassword = async (req, res) => {
 };
 
 
-
-
-
-
-
-
+//----------------------------
 exports.deleteJoueur = async (req, res) => {
     try {
         const joueurId = req.params.id;
@@ -252,7 +228,7 @@ exports.deleteJoueur = async (req, res) => {
 };
 
 
-
+//----------------------------
 exports.demendeRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
@@ -285,9 +261,7 @@ exports.demendeRejoindreEquipe = async (req, res) => {
     }
 };
 
-
-
-
+//----------------------------
 exports.annulerDemandeEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
@@ -324,11 +298,7 @@ exports.annulerDemandeEquipe = async (req, res) => {
     }
 };
 
-
-
-
-
-
+//----------------------------
 exports.accepterRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId , joueurId } = req.params;
@@ -362,7 +332,7 @@ exports.accepterRejoindreEquipe = async (req, res) => {
     }
 };
 
-
+//----------------------------
 exports.supprimerRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId , joueurId } = req.params;
@@ -380,10 +350,6 @@ exports.supprimerRejoindreEquipe = async (req, res) => {
              }
 
 
-
-        // Update joueur's equipes array
-        // await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
-
         await Joueur.updateOne({ _id: joueurId }, { $pull: { equipes: equipeId } });
 
         // Update equipe's joueurs array
@@ -396,14 +362,7 @@ exports.supprimerRejoindreEquipe = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
+//----------------------------
 exports.recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -457,10 +416,7 @@ exports.recoverPassword = async (req, res) => {
     }
 };
 
-
-
-
-
+//----------------------------
 exports.verifyToken = async (req, res) => {
     try {
         const { email, codeVerification } = req.body;
@@ -483,16 +439,7 @@ exports.verifyToken = async (req, res) => {
     }
 };
 
-
-
-
-
-
-
-
-
-
-
+//----------------------------
 exports.resetPassword = async (req, res) => {
     try {
         const { email, newPassword, codeVerification } = req.body;
