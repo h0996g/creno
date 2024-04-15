@@ -4,11 +4,11 @@ const jwt = require("jsonwebtoken");
 
 class JoueurServices {
 
-    static async registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom) {
+    static async registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune,prenom) {
         try {
-            console.log("-----Email --- Password-----", email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom);
+            console.log("-----Email --- Password-----", email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune,prenom);
 
-            const createJoueur = new joueur({ email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom });
+            const createJoueur = new joueur({ email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune,prenom });
             return await createJoueur.save();
         } catch (err) {
             throw err;

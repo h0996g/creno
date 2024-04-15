@@ -11,14 +11,14 @@ const { ObjectId } = require('mongoose').Types;
 exports.createJoueur = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
-        const { email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom } = req.body;
+        const { email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom } = req.body;
         const duplicate = await JoueurServices.getJoueurByEmail(email);
         if (duplicate) {
             // throw new Error(`Etudient Name ${email}, Already Registered`)
             return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
         }
 
-        const joueur = await JoueurServices.registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, prenom);
+        const joueur = await JoueurServices.registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom);
 
         let tokenData;
         tokenData = { _id: joueur._id, email: email, role: "joueur" };

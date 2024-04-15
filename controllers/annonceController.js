@@ -6,7 +6,8 @@ const { ObjectId } = require('mongoose').Types;
 //----------------------------
 exports.addAnnonce = async (req, res) => {
     try {
-        const { type, description } = req.body;
+       
+        const { type, description, wilaya, commune,terrain_id } = req.body;
         const { role } = req.user; // Extracting user role from the authenticated user
 
         let admin_id;
@@ -21,6 +22,9 @@ exports.addAnnonce = async (req, res) => {
         const newAnnonceData = {
             type,
             description,
+            wilaya,
+            commune,
+            terrain_id,
             admin_id,
             joueur_id
         };
@@ -39,19 +43,19 @@ exports.addAnnonce = async (req, res) => {
 exports.updateAnnonce = async (req, res) => {
     try {
         const id = req.params.id;
-        const { type, description } = req.body;
+        const { type, description, wilaya, commune, terrain_id } = req.body;
         const { role, _id } = req.user; // Extract user role and ID from the authenticated user
 
         if (role === 'admin') {
             // Update Annonce if the user is an admin
-            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, admin_id: _id }, { type, description }, { new: true });
+            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, admin_id: _id }, { type, description, wilaya, commune, terrain_id }, { new: true });
             if (!updatedAnnonce) {
                 return res.status(404).json({ message: 'Annonce not found or unauthorized' });
             }
             res.json(updatedAnnonce);
         } else if (role === 'joueur') {
             // Update Annonce if the user is a joueur
-            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, joueur_id: _id }, { type, description }, { new: true });
+            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, joueur_id: _id }, { type, description, wilaya, commune, terrain_id }, { new: true });
             if (!updatedAnnonce) {
                 return res.status(404).json({ message: 'Annonce not found or unauthorized' });
             }
