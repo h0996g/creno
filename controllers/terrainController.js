@@ -5,7 +5,7 @@ const { ObjectId } = require('mongoose').Types;
 exports.addTerrain = async (req, res, next) => {
     try {
         const {
-            largeur, longeur, superficie, wilaya, commune, adresse,
+            nom, largeur, longeur, superficie, wilaya, commune, adresse,
             heure_debut_temps, heure_fin_temps,duree_creneau, prix, description,
             capacite, etat, coordonnee,
             photos, nonReservableTimeBlocks
@@ -15,6 +15,7 @@ exports.addTerrain = async (req, res, next) => {
         const admin_id = req.user._id;
 
         const newTerrain = new Terrain({
+            nom,
             largeur,
             longeur,
             superficie,
