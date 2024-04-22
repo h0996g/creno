@@ -5,14 +5,36 @@ const { ObjectId } = require('mongoose').Types;
 exports.addReservation = async (req, res) => {
     const joueurId = req.user._id;
     const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
-    const { jour, debut_temps, duree, etat, payment } = req.body;
+    const { jour, heure_debut_temps, duree, etat, payment } = req.body;
 
     try {
         const newReservation = new Reservation({
             joueur_id: joueurId,
             terrain_id: id_terrain,
             jour,
-            debut_temps,
+            heure_debut_temps,
+            duree,
+            etat,  // Default to "demander" if not provided
+            payment,  // Default to "non" if not provided
+        });
+        await newReservation.save();
+        res.status(201).json(newReservation);
+    } catch (error) {
+        console.error('Error creating reservation:', error);
+        res.status(500).json({ message: "Failed to create reservation.", error: error.message });
+    }
+};
+exports.adminAddReservation = async (req, res) => {
+    // const joueurId = req.user._id; //! rj3to fl body bh admin li yb3to
+    const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
+    const { jour, heure_debut_temps, duree, etat, payment, joueur_id } = req.body;
+
+    try {
+        const newReservation = new Reservation({
+            joueur_id,
+            terrain_id: id_terrain,
+            jour,
+            heure_debut_temps,
             duree,
             etat,  // Default to "demander" if not provided
             payment,  // Default to "non" if not provided
@@ -75,14 +97,14 @@ exports.findAllReservations = async (req, res, next) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
         const query = {};
-        
+
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) };
         }
-        
+
         // Fetch the documents from the database, sort by _id
         const reservations = await Reservation.find(query).sort({ _id: -1 }).limit(limit);
-        
+
         // Determine if there's more data to fetch
         const moreDataAvailable = reservations.length === limit;
 
@@ -103,28 +125,11 @@ exports.findAllReservations = async (req, res, next) => {
 
 exports.filterReservations = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 3; // How many documents to return
-        const filter = req.query; // Use the entire query object as the filter
-        
-        if (req.query.cursor) {
-            filter._id = { $lt: new ObjectId(req.query.cursor) };
-        }
-        
-        // Fetch the documents from the database, sort by _id
-        const reservations = await Reservation.find(filter).sort({ _id: -1 }).limit(limit);
-        
-        // Determine if there's more data to fetch
-        const moreDataAvailable = reservations.length === limit;
-
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? reservations[reservations.length - 1]._id : null;
-
-        res.json({
-            data: reservations,
-            moreDataAvailable,
-            nextCursor,
-        });
+        const filter = req.query;
+        const reservations = await Reservation.find(filter);
+        res.json(reservations);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+
 };

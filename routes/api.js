@@ -78,6 +78,7 @@ router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.qu
 // ---------------------Reservation---------------------------------------------
 
 router.post('/reservation/:idterrain', protect, reservationController.addReservation);
+router.post('/reservationadmin/:idterrain', protect, isAdmin, reservationController.adminAddReservation);
 router.put('/reservation/:id', protect, reservationController.updateReservation);
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
 router.get('/reservation/:id', reservationController.findReservationById);

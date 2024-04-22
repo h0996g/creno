@@ -132,13 +132,13 @@ exports.filterAdmins = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
         const filter = req.query; // Use the entire query object as the filter
-        
+
         if (req.query.cursor) {
             filter._id = { $lt: new ObjectId(req.query.cursor) };
         }
- 
+
         const admins = await Admin.find(filter).sort({ _id: -1 }).limit(limit);
-   
+
         const moreDataAvailable = admins.length === limit;
 
         const nextCursor = moreDataAvailable ? admins[admins.length - 1]._id : null;
@@ -239,7 +239,7 @@ exports.payReservation = async (req, res) => {
 
         await Reservation.updateOne(
             { _id: reservationId },
-            { $set: { payment: "paye" } }
+            { $set: { payment: true } }
         );
         res.status(200).json({ message: 'Payment status updated successfully' });
     } catch (error) {
@@ -255,7 +255,7 @@ exports.nonpayReservation = async (req, res) => {
 
         await Reservation.updateOne(
             { _id: reservationId },
-            { $set: { payment: "non" } }
+            { $set: { payment: false } }
         );
 
 
@@ -289,7 +289,7 @@ exports.recoverPassword = async (req, res) => {
         await Token.create({
             admin_id: admin._id, // Associate the token with the joueur
             token: verificationCode,
-          
+
         });
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -355,7 +355,7 @@ exports.resetPassword = async (req, res) => {
         }
         const token = await Token.findOne({ admin_id: admin._id, token: codeVerification });
         if (!token) {
- 
+
             return res.status(404).json({ status: false, message: 'Verification code does not match or has expired.' });
         }
         await Token.deleteOne({ _id: token._id });
