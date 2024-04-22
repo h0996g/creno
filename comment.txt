@@ -1,6 +1,6 @@
 //---------------------ala-----------------
 joueur willaya w controllers
-terrain kifkfi
+terrain kifkfi + nom 
 annonce kifkif
 
 

@@ -3,6 +3,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 const terrainSchema = new mongoose.Schema({
+    nom: { type: String, required: false },
     largeur: { type: Number, required: true },
     longeur: { type: Number, required: true },
     superficie: { type: Number, required: true },
