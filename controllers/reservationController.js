@@ -40,6 +40,25 @@ exports.adminAddReservation = async (req, res) => {
             payment,  // Default to "non" if not provided
         });
         await newReservation.save();
+        const startDay = new Date(jour);
+        for (let i = 1; i <= duree-1; i++) {
+            const newDay = new Date(startDay);
+            newDay.setDate(newDay.getDate() + 7 * i);
+
+            const newReservation = new Reservation({
+                jour: newDay,
+                heure_debut_temps: heure_debut_temps,
+                duree: duree,
+                etat: etat,
+                payment: true,
+                joueur_id: joueur_id,
+                terrain_id: id_terrain
+            });
+
+            await newReservation.save();
+        }
+
+
         res.status(201).json(newReservation);
     } catch (error) {
         console.error('Error creating reservation:', error);
