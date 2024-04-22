@@ -11,29 +11,38 @@ const { ObjectId } = require('mongoose').Types;
 exports.createJoueur = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
-        const { email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom } = req.body;
-        const duplicate = await JoueurServices.getJoueurByEmail(email);
+        const { username, email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom } = req.body;
+        
+        // Check for duplicate email or username
+        const duplicate = await Joueur.findOne({
+            $or: [{ email: email }, { username: username }]
+        });
+
         if (duplicate) {
-            // throw new Error(`Etudient Name ${email}, Already Registered`)
-            return res.status(400).json({ status: false, message: `L'email ${email} est déjà enregistré` });
+            let message = "L'email ou le nom d'utilisateur est déjà enregistré";
+            if (duplicate.email === email) {
+                message = `L'email ${email} est déjà enregistré`;
+            } else if (duplicate.username === username) {
+                message = `Le nom d'utilisateur ${username} est déjà utilisé`;
+            }
+            return res.status(400).json({ status: false, message: message });
         }
 
-        const joueur = await JoueurServices.registerJoueur(email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom);
+        const joueur = await JoueurServices.registerJoueur(username, email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom);
 
         let tokenData;
         tokenData = { _id: joueur._id, email: email, role: "joueur" };
-
 
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
         res.json({ status: true, message: 'Joueur registered successfully', token: token, data: joueur });
 
-
     } catch (err) {
         console.log("---> err -->", err);
         next(err);
     }
-}
+};
+
 //----------------------------
 exports.loginJoueur = async (req, res, next) => {
     try {
@@ -93,11 +102,20 @@ exports.getMyInformation = async (req, res) => {
 //----------------------------
 exports.updateJoueur = async (req, res) => {
     try {
-        // const id = req.params.id;
         const joueurData = req.body;
+        const joueur_id = req.user._id; // Extract admin ID from the token
 
-        // Extract admin ID from the token
-        const joueur_id = req.user._id;
+        // Check if username is being updated and if it exists elsewhere
+        if (joueurData.username) {
+            const existingJoueur = await Joueur.findOne({
+                username: joueurData.username,
+                _id: { $ne: joueur_id } // Exclude this joueur's ID
+            });
+
+            if (existingJoueur) {
+                return res.status(400).json({ message: 'Username already in use by another joueur' });
+            }
+        }
 
         // Update joueur data
         const updatedJoueur = await Joueur.findByIdAndUpdate(joueur_id, joueurData, { new: true });
@@ -105,11 +123,32 @@ exports.updateJoueur = async (req, res) => {
         if (!updatedJoueur) {
             return res.status(404).json({ message: 'Joueur not found or unauthorized' });
         }
+
         res.json(updatedJoueur);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
+// exports.updateJoueur = async (req, res) => {
+//     try {
+//         // const id = req.params.id;
+//         const joueurData = req.body;
+
+//         // Extract admin ID from the token
+//         const joueur_id = req.user._id;
+
+//         // Update joueur data
+//         const updatedJoueur = await Joueur.findByIdAndUpdate(joueur_id, joueurData, { new: true });
+
+//         if (!updatedJoueur) {
+//             return res.status(404).json({ message: 'Joueur not found or unauthorized' });
+//         }
+//         res.json(updatedJoueur);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 
 //----------------------------
@@ -117,6 +156,19 @@ exports.getJoueurById = async (req, res) => {
     try {
         const id = req.params.id;
         const joueur = await Joueur.findById(id);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+        res.json(joueur);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+//-------------------------------------
+exports.getJoueurByUsername = async (req, res) => {
+    try {
+        const username = req.params.username; // Get username from the request parameters
+        const joueur = await Joueur.findOne({ username: username });
         if (!joueur) {
             return res.status(404).json({ message: 'Joueur not found' });
         }

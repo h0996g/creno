@@ -23,6 +23,7 @@ router.post('/loginjoueur', joueurController.loginJoueur)
 router.post('/joueur', joueurController.createJoueur)
 router.put('/joueur', protect, joueurController.updateJoueur);
 router.get('/joueur/:id', joueurController.getJoueurById);
+router.get('/joueur/username/:username', joueurController.getJoueurByUsername);
 router.get('/joueurs', joueurController.getAllJoueurs);
 router.get('/joueurs/filter', joueurController.filterJoueurs);
 router.put('/joueurs/password', protect, joueurController.updatePassword);

@@ -5,6 +5,11 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 const joueurSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        unique: true
+        
+    },
     nom: {
         type: String,
         required: true
