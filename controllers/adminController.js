@@ -235,17 +235,56 @@ exports.refuserReservation = async (req, res) => {
 exports.payReservation = async (req, res) => {
     try {
         const { reservationId } = req.params;
+        const reservation = await Reservation.findById(reservationId);
 
+        if (!reservation) {
+            return res.status(404).json({ message: "Reservation not found" });
+        }
 
+        // Update the original reservation to mark as paid
         await Reservation.updateOne(
             { _id: reservationId },
             { $set: { payment: true } }
         );
-        res.status(200).json({ message: 'Payment status updated successfully' });
+
+        // Creating multiple reservations based on the 'duree'
+        const startDay = new Date(reservation.jour);
+        for (let i = 1; i <= reservation.duree-1; i++) {
+            const newDay = new Date(startDay);
+            newDay.setDate(newDay.getDate() + 7 * i);
+
+            const newReservation = new Reservation({
+                jour: newDay,
+                heure_debut_temps: reservation.heure_debut_temps,
+                duree: reservation.duree,
+                etat: reservation.etat,
+                payment: true,
+                joueur_id: reservation.joueur_id,
+                terrain_id: reservation.terrain_id
+            });
+
+            await newReservation.save();
+        }
+
+        res.status(200).json({ message: 'Payment status updated and additional reservations created successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+// exports.payReservation = async (req, res) => {
+//     try {
+//         const { reservationId } = req.params;
+
+
+//         await Reservation.updateOne(
+//             { _id: reservationId },
+//             { $set: { payment: true } }
+//         );
+//         res.status(200).json({ message: 'Payment status updated successfully' });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 
 exports.nonpayReservation = async (req, res) => {
