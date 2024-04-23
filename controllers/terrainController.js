@@ -6,7 +6,7 @@ exports.addTerrain = async (req, res, next) => {
     try {
         const {
             nom, largeur, longeur, superficie, wilaya, commune, adresse,
-            heure_debut_temps, heure_fin_temps,duree_creneau, prix, description,
+            heure_debut_temps, heure_fin_temps, duree_creneau, prix, description,
             capacite, etat, coordonnee,
             photos, nonReservableTimeBlocks
         } = req.body;
@@ -102,31 +102,43 @@ exports.findTerrainById = async (req, res, next) => {
 
 //----------------------------
 
+// exports.findAllTerrains = async (req, res, next) => {
+//     try {
+//         const limit = parseInt(req.query.limit) || 3; // How many documents to return
+//         const query = {};
+
+//         if (req.query.cursor) {
+//             query._id = { $lt: new ObjectId(req.query.cursor) };
+//         }
+
+//         // Fetch the documents from the database, sort by _id
+//         const terrains = await Terrain.find(query).sort({ _id: -1 }).limit(limit);
+
+//         // Determine if there's more data to fetch
+//         const moreDataAvailable = terrains.length === limit;
+
+//         // Optionally, you can fetch the next cursor by extracting the _id of the last document
+//         const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : null;
+
+//         res.json({
+//             data: terrains,
+//             moreDataAvailable,
+//             nextCursor,
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 exports.findAllTerrains = async (req, res, next) => {
     try {
-        const limit = parseInt(req.query.limit) || 3; // How many documents to return
-        const query = {};
-        
-        if (req.query.cursor) {
-            query._id = { $lt: new ObjectId(req.query.cursor) };
-        }
-        
-        // Fetch the documents from the database, sort by _id
-        const terrains = await Terrain.find(query).sort({ _id: -1 }).limit(limit);
-        
-        // Determine if there's more data to fetch
-        const moreDataAvailable = terrains.length === limit;
-
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : null;
-
-        res.json({
-            data: terrains,
-            moreDataAvailable,
-            nextCursor,
-        });
+        const terrains = await Terrain.find()
+            .populate({
+                path: 'admin_id',
+                select: 'nom wilaya telephone'
+            });
+        res.json(terrains);
     } catch (error) {
-        next(error);
+        res.json(error);
     }
 };
 
@@ -137,14 +149,14 @@ exports.filterTerrains = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
         const filter = req.query; // Use the entire query object as the filter
-        
+
         if (req.query.cursor) {
             filter._id = { $lt: new ObjectId(req.query.cursor) };
         }
-        
+
         // Fetch the documents from the database, sort by _id
         const terrains = await Terrain.find(filter).sort({ _id: -1 }).limit(limit);
-        
+
         // Determine if there's more data to fetch
         const moreDataAvailable = terrains.length === limit;
 
