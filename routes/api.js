@@ -7,6 +7,8 @@ const reservationController = require('../controllers/reservationController')
 const tournoiController = require('../controllers/tournoiController')
 const annonceController = require('../controllers/annonceController')
 const tokenController = require('../controllers/tokenController')
+const pushNottificationController = require('../controllers/pushNottificationController')
+
 const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
@@ -83,8 +85,12 @@ router.post('/reservationadmin/:idterrain', protect, isAdmin, reservationControl
 router.put('/reservation/:id', protect, reservationController.updateReservation);
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
 router.get('/reservation/:id', reservationController.findReservationById);
+router.get('/myreservations/', protect, reservationController.getMyReservationJoueur);
+router.get('/myreservationswithother/:idterrain/:jour', protect, reservationController.getReservationsWithConditions);
 router.get('/reservations', reservationController.findAllReservations);
+
 router.get('/reservations/filter', reservationController.filterReservations);
+router.get('/reservationspagination/filter', reservationController.filterReservationsPagination);
 
 // -------------------------tournoi---------------------------------
 
@@ -105,5 +111,8 @@ router.get('/myannonces/admin', protect, annonceController.getMyAnnoncesAdmin);
 router.get('/annonce/:id', annonceController.getAnnonceById);
 router.get('/annonce', annonceController.getAllAnnonces);
 router.get('/annonces/filter', annonceController.filterAnnonces);
+
+// -------------------------notification---------------------------------
+router.post('/notification', pushNottificationController.sendNotification);
 
 module.exports = router;

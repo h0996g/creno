@@ -12,7 +12,7 @@ exports.createJoueur = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
         const { username, email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom } = req.body;
-        
+
         // Check for duplicate email or username
         const duplicate = await Joueur.findOne({
             $or: [{ email: email }, { username: username }]
@@ -212,14 +212,14 @@ exports.filterJoueurs = async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 3; // How many documents to return
         const filter = req.query; // Use the entire query object as the filter
-        
+
         if (req.query.cursor) {
             filter._id = { $lt: new ObjectId(req.query.cursor) };
         }
-        
+
         // Fetch the documents from the database, sort by _id
         const joueurs = await Joueur.find(filter).sort({ _id: -1 }).limit(limit);
-        
+
         // Determine if there's more data to fetch
         const moreDataAvailable = joueurs.length === limit;
 
@@ -284,20 +284,20 @@ exports.deleteJoueur = async (req, res) => {
 exports.demendeRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
-        const joueurId = req.user._id; 
+        const joueurId = req.user._id;
 
 
- 
-             const equipe = await Equipe.findById(equipeId);
-             if (!equipe) {
-                 return res.status(404).json({ message: 'equipe not found' });
-             }
-     
-             // Find the joueur by ID
-             const joueur = await Joueur.findById(joueurId);
-             if (!joueur) {
-                 return res.status(404).json({ message: 'Joueur not found' });
-             }
+
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
 
 
 
@@ -317,24 +317,24 @@ exports.demendeRejoindreEquipe = async (req, res) => {
 exports.annulerDemandeEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
-        const joueurId = req.user._id; 
-        
-        
-             // Find the creneau by ID
-             const equipe = await Equipe.findById(equipeId);
-             if (!equipe) {
-                 return res.status(404).json({ message: 'equipe not found' });
-             }
-     
-             // Find the joueur by ID
-             const joueur = await Joueur.findById(joueurId);
-             if (!joueur) {
-                 return res.status(404).json({ message: 'Joueur not found' });
-             }
-        
-        
-        
-        
+        const joueurId = req.user._id;
+
+
+        // Find the creneau by ID
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+
+
+
+
 
         // Update joueur's equipes array
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
@@ -342,7 +342,7 @@ exports.annulerDemandeEquipe = async (req, res) => {
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
 
-     
+
 
         res.status(200).json({ message: 'Joueur removed from equipe successfully' });
     } catch (error) {
@@ -353,19 +353,19 @@ exports.annulerDemandeEquipe = async (req, res) => {
 //----------------------------
 exports.accepterRejoindreEquipe = async (req, res) => {
     try {
-        const { equipeId , joueurId } = req.params;
-       
+        const { equipeId, joueurId } = req.params;
 
-             const equipe = await Equipe.findById(equipeId);
-             if (!equipe) {
-                 return res.status(404).json({ message: 'equipe not found' });
-             }
-     
-             // Find the joueur by ID
-             const joueur = await Joueur.findById(joueurId);
-             if (!joueur) {
-                 return res.status(404).json({ message: 'Joueur not found' });
-             }
+
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
 
 
 
@@ -387,19 +387,19 @@ exports.accepterRejoindreEquipe = async (req, res) => {
 //----------------------------
 exports.supprimerRejoindreEquipe = async (req, res) => {
     try {
-        const { equipeId , joueurId } = req.params;
-       
+        const { equipeId, joueurId } = req.params;
 
-             const equipe = await Equipe.findById(equipeId);
-             if (!equipe) {
-                 return res.status(404).json({ message: 'equipe not found' });
-             }
-     
-             // Find the joueur by ID
-             const joueur = await Joueur.findById(joueurId);
-             if (!joueur) {
-                 return res.status(404).json({ message: 'Joueur not found' });
-             }
+
+        const equipe = await Equipe.findById(equipeId);
+        if (!equipe) {
+            return res.status(404).json({ message: 'equipe not found' });
+        }
+
+        // Find the joueur by ID
+        const joueur = await Joueur.findById(joueurId);
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
 
 
         await Joueur.updateOne({ _id: joueurId }, { $pull: { equipes: equipeId } });
@@ -510,7 +510,7 @@ exports.resetPassword = async (req, res) => {
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt); // Assuming 10 is the salt rounds
-     // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
+        // Update the joueur's password with the hashed new password using Mongoose's findOneAndUpdate
         await Joueur.findOneAndUpdate(
             { email: email },
             { $set: { mot_de_passe: hashedPassword } } // Use $set to specify the fields to update

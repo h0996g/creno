@@ -8,7 +8,7 @@ const joueurSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true
-        
+
     },
     nom: {
         type: String,
@@ -16,7 +16,7 @@ const joueurSchema = new mongoose.Schema({
     },
     prenom: {
         type: String,
-        
+
     },
     email: {
         type: String,
@@ -50,7 +50,7 @@ const joueurSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-  
+
 
 
 
@@ -75,7 +75,7 @@ const joueurSchema = new mongoose.Schema({
 
     }],
 
-  
+
     annonces: [{
         type: ObjectId, required: false,
         ref: "Annonce"
@@ -88,7 +88,7 @@ const joueurSchema = new mongoose.Schema({
         type: ObjectId, required: false,
         ref: "reservation"
     }],
- 
+
 
 }, {
     toJSON: {
@@ -132,7 +132,7 @@ joueurSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe
 
 
 
-joueurSchema.pre('deleteOne', async function(next) {
+joueurSchema.pre('deleteOne', async function (next) {
     try {
         const joueurId = this.getQuery()._id;
 
@@ -157,7 +157,7 @@ joueurSchema.pre('deleteOne', async function(next) {
         await mongoose.model('Reservation').deleteMany({ joueur_id: joueurId });
 
 
-       
+
     } catch (error) {
         console.log(error);
     }

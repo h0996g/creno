@@ -7,3 +7,6 @@ annonce kifkif
 
 
 //--------------------houssem----------------
+
+
+fl foreign key joueur_id n9dro nradoha tol userName mdm unique  

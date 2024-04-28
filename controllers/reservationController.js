@@ -5,7 +5,7 @@ const { ObjectId } = require('mongoose').Types;
 exports.addReservation = async (req, res) => {
     const joueurId = req.user._id;
     const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
-    const { jour, heure_debut_temps, duree, etat, payment } = req.body;
+    const { jour, heure_debut_temps, duree } = req.body;
 
     try {
         const newReservation = new Reservation({
@@ -14,8 +14,7 @@ exports.addReservation = async (req, res) => {
             jour,
             heure_debut_temps,
             duree,
-            etat,  // Default to "demander" if not provided
-            payment,  // Default to "non" if not provided
+
         });
         await newReservation.save();
         res.status(201).json(newReservation);
@@ -27,7 +26,9 @@ exports.addReservation = async (req, res) => {
 exports.adminAddReservation = async (req, res) => {
     // const joueurId = req.user._id; //! rj3to fl body bh admin li yb3to
     const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
-    const { jour, heure_debut_temps, duree, etat, payment, joueur_id } = req.body;
+    const etat = 'reserver';
+    const payement = true;
+    const { jour, heure_debut_temps, duree, joueur_id } = req.body;
 
     try {
         const newReservation = new Reservation({
@@ -36,12 +37,12 @@ exports.adminAddReservation = async (req, res) => {
             jour,
             heure_debut_temps,
             duree,
-            etat,  // Default to "demander" if not provided
-            payment,  // Default to "non" if not provided
+            etat: etat, // is always reserver
+            payment: payement,  // is always true
         });
         await newReservation.save();
         const startDay = new Date(jour);
-        for (let i = 1; i <= duree-1; i++) {
+        for (let i = 1; i <= duree - 1; i++) {
             const newDay = new Date(startDay);
             newDay.setDate(newDay.getDate() + 7 * i);
 
@@ -50,7 +51,7 @@ exports.adminAddReservation = async (req, res) => {
                 heure_debut_temps: heure_debut_temps,
                 duree: duree,
                 etat: etat,
-                payment: true,
+                payment: payement,
                 joueur_id: joueur_id,
                 terrain_id: id_terrain
             });
@@ -151,4 +152,77 @@ exports.filterReservations = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 
+
+
+};
+exports.getMyReservationJoueur = async (req, res) => {
+    try {
+        const joueur_id = req.user._id;
+        const filter = req.query;
+        const reservation = await Reservation.find({ joueur_id: joueur_id, ...filter });
+        res.json(reservation);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+};
+exports.getReservationsWithConditions = async (req, res) => {
+    try {
+        const joueur_id = req.user._id;
+
+        const filter = {};
+        filter.terrain_id = req.params.idterrain;
+        filter.jour = req.params.jour;
+
+        // Fetching all reservations for the current joueur (payment true or false)
+        // and all reservations for other joueurs but only where payment is true
+        const reservations = await Reservation.find({
+            $and: [
+                filter,
+                {
+                    $or: [
+                        { joueur_id: joueur_id }, // All reservations of the logged-in joueur
+                        { payment: true } // All reservations of other joueurs with payment true
+                    ]
+                }
+            ]
+        });
+        res.json(reservations);
+    } catch (error) {
+        console.error('Error fetching reservations:', error);
+        res.status(500).json({ message: "Failed to fetch reservations.", error: error.message });
+    }
+};
+
+exports.filterReservationsPagination = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 20; // How many documents to return
+        const filter = req.query; // Use the entire query object as the filter
+
+        if (req.query.cursor) {
+            filter._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, sort by _id
+        const reservations = await Reservation.find(filter).sort({ _id: -1 }).limit(limit).populate([{
+            path: 'joueur_id',
+            select: 'username telephone'
+        }, {
+            path: 'terrain_id',
+            select: 'nom'
+        }]);
+
+        // Determine if there's more data to fetch
+        const moreDataAvailable = reservations.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? reservations[reservations.length - 1]._id : '';
+
+        res.json({
+            data: reservations,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };

@@ -12,7 +12,6 @@ const equipeSchema = new mongoose.Schema({
         required: true
     },
     joueurs: [{
-
         type: ObjectId, required: false,
         ref: "Joueur"
 
@@ -75,7 +74,7 @@ equipeSchema.post('save', async function (doc, next) {
 
 
 
-equipeSchema.pre('deleteOne', async function(next) {
+equipeSchema.pre('deleteOne', async function (next) {
     try {
         const equipeId = this.getQuery()._id;
 
@@ -85,19 +84,19 @@ equipeSchema.pre('deleteOne', async function(next) {
             { $pull: { equipes: equipeId } }
         );
 
-     
+
         await mongoose.model('Joueur').updateMany(
             { demande_equipes: equipeId },
             { $pull: { demande_equipes: equipeId } }
         );
 
-            await mongoose.model('Joueur').updateOne(
-                { _id: this.getQuery.capitaine_id },
-                { $pull: { mes_equipes: equipeId } }
-            );
-        
+        await mongoose.model('Joueur').updateOne(
+            { _id: this.getQuery.capitaine_id },
+            { $pull: { mes_equipes: equipeId } }
+        );
 
-     
+
+
         await mongoose.model('Tournoi').updateMany(
             { equipes: equipeId },
             { $pull: { equipes: equipeId } }
