@@ -180,16 +180,66 @@ exports.getAnnonceById = async (req, res) => {
     }
 };
 //----------------------------
+// exports.getAllAnnonces = async (req, res) => {
+//     try {
+//         const limit = parseInt(req.query.limit) || 10; // How many documents to return
+//         const query = {};
+//         if (req.query.cursor) {
+//             query._id = { $lt: new ObjectId(req.query.cursor) }
+//         }
+//         // Fetch the documents from the database
+//         const annonces = await Annonce.find(query).sort({ _id: -1 })
+//             .limit(limit);
+//         // Determine if there's more data to fetch
+//         const moreDataAvailable = annonces.length === limit;
+
+//         // Optionally, you can fetch the next cursor by extracting the _id of the last document
+//         const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : null;
+
+//         res.json({
+//             data: annonces,
+//             moreDataAvailable,
+//             nextCursor,
+//         });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
+
+
+
+// exports.getAllAnnonces = async (req, res, next) => {
+//     try {
+//         const annonces = await Annonce.find()
+//             .populate({
+//                 path: 'admin_id joueur_id',
+//                 select: 'nom prenom telephone'
+//             });
+//         res.json(annonces);
+//     } catch (error) {
+//         res.json(error);
+//     }
+// };
+
+
+
 exports.getAllAnnonces = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10; // How many documents to return
+        const limit = parseInt(req.query.limit) || 6; // How many documents to return
         const query = {};
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) }
         }
-        // Fetch the documents from the database
-        const annonces = await Annonce.find(query).sort({ _id: -1 })
+
+        // Fetch the documents from the database with population of related fields
+        const annonces = await Annonce.find(query)
+            .populate({
+                path: 'admin_id joueur_id', // Adjust this line according to your schema fields
+                select: 'nom telephone'    // Fields to retrieve
+            })
+            .sort({ _id: -1 })
             .limit(limit);
+
         // Determine if there's more data to fetch
         const moreDataAvailable = annonces.length === limit;
 
@@ -205,6 +255,7 @@ exports.getAllAnnonces = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 //----------------------------
