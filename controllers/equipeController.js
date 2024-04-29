@@ -3,17 +3,37 @@ const Tournoi = require('../models/tournoi');
 const { ObjectId } = require('mongoose').Types;
 
 //----------------------------
+// exports.createEquipe = async (req, res) => {
+//     try {
+//         const id = req.user._id;
+//         const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
+//         const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id })
+//         await createEquipe.save();
+//         res.status(201).json({ data: createEquipe });
+//     } catch (e) {
+//         res.status(500).json(e);
+//     }
+// }
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
         const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
-        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id })
+
+        // Check if a team with the same name already exists
+        const existingEquipe = await Equipe.findOne({ nom });
+        if (existingEquipe) {
+            return res.status(409).json({ message: 'A team with this name already exists.' });
+        }
+
+        // If the team name does not exist, create the new team
+        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id });
         await createEquipe.save();
         res.status(201).json({ data: createEquipe });
     } catch (e) {
         res.status(500).json(e);
     }
 }
+
 //----------------------------
 exports.modifierEquipe = async (req, res) => {
     try {
@@ -60,22 +80,100 @@ exports.findEquipeById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+//-------------------------------------
+exports.getMyEquipes = async (req, res) => {
+    try {
+        // Debug: Print user info to console
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        const userId = req.user._id; // Extract userId from request parameters
+        
+        const limit = parseInt(req.query.limit) || 4; // Default limit to 10 documents
+        const query = { capitaine_id: userId };
+
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+       
+        // Fetch the documents from the database, limited and sorted
+        const equipes = await Equipe.find(query)
+            .limit(limit)
+            .sort({ _id: -1 });
+         
+        // Check if there's more data available
+        const moreDataAvailable = equipes.length === limit;
+        
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+//--------
+exports.getEquipesImIn = async (req, res) => {
+    try {
+        console.log(req.user); // Debug: Print user info to console
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        const userId = req.user._id; // Extract userId from request parameters
+
+        const limit = parseInt(req.query.limit) || 4; // Set the default limit
+        const query = { joueurs: { $in: [userId] } }; // Search for teams where userId is in the joueurs array
+
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, limited and sorted
+        const equipes = await Equipe.find(query)
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = equipes.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 
 //----------------------------
 exports.findAllEquipes = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const limit = parseInt(req.query.limit) || 7; // How many documents to return
         const query = {};
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) }
         }
         // Fetch the documents from the database
-        const equipes = await Equipe.find(query).sort({ _id: -1 }).limit(limit);
+        const equipes = await Equipe.find(query).populate({
+            path: 'capitaine_id', // Adjust this line according to your schema fields
+            select: 'nom telephone'    // Fields to retrieve
+        }).sort({ _id: -1 }) .limit(limit);
         // Determine if there's more data to fetch
         const moreDataAvailable = equipes.length === limit;
 
         // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : null;
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
 
         res.json({
             data: equipes,

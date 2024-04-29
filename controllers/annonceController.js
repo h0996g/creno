@@ -102,6 +102,7 @@ exports.deleteAnnonce = async (req, res, next) => {
 //----------------------------
 exports.getMyAnnoncesJoueur = async (req, res) => {
     try {
+
         const userId = req.user._id; // Extract userId from request parameters
         const limit = parseInt(req.query.limit) || 10; // Default limit to 10 documents
         const query = { joueur_id: userId };
@@ -244,7 +245,7 @@ exports.getAllAnnonces = async (req, res) => {
         const moreDataAvailable = annonces.length === limit;
 
         // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : null;
+        const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : '';
 
         res.json({
             data: annonces,
