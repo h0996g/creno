@@ -30,10 +30,23 @@ router.get('/joueurs', joueurController.getAllJoueurs);
 router.get('/joueurs/filter', joueurController.filterJoueurs);
 router.put('/joueurs/password', protect, joueurController.updatePassword);
 router.delete('/joueur/:id', joueurController.deleteJoueur);
+//--equipe joueur ydemandi 
 router.post('/joueur/rejoindre/:equipeId', protect, joueurController.demendeRejoindreEquipe);
 router.post('/joueur/annuler/:equipeId', protect, joueurController.annulerDemandeEquipe);
-router.post('/joueur/accepter/:equipeId/:joueurId', protect, joueurController.accepterRejoindreEquipe);
+//--- capitaine yaccepti yanuli damande te3 joueur
+router.post('/joueur/capitaine/accept/:equipeId/:joueurId', protect, joueurController.capitaineAcceptJoueur);
+router.post('/joueur/capitaine/refuser/:equipeId/:joueurId', protect, joueurController.capitainerefuserjoueur);
+//-- capitaine yinviti joueur w ynehi invitation 
+router.post('/joueur/capitaine/demande/:equipeId/:joueurId', protect, joueurController.capitainedemandeJoueur);
+router.post('/joueur/capitaine/annuler/:equipeId/:joueurId', protect, joueurController.capitaineannulerJoueur);
+//---ki yb3tuli naccepti wla refuser 
+router.post('/joueur/accepter/:equipeId', protect, joueurController.accepterRejoindreEquipe);
+router.post('/joueur/refuser/:equipeId', protect, joueurController.refuserRejoindreEquipe);
+//--- ki nquiti equipe wla capitaine ynhi joueur 
 router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.supprimerRejoindreEquipe);
+
+
+
 router.post('/joueur/recoverpassword', joueurController.recoverPassword);
 router.post('/joueurs/verifytoken', joueurController.verifyToken);
 router.post('/joueur/resetpassword', joueurController.resetPassword);
@@ -75,6 +88,7 @@ router.get('/equipe/:id', equipeController.findEquipeById)
 router.get('/equipe',  equipeController.findAllEquipes)
 router.get('/myequipe', protect, equipeController.getMyEquipes)
 router.get('/equipeimin', protect, equipeController.getEquipesImIn)
+router.get('/equipes/invite', protect, equipeController.getEquipesInvitedMe)
 router.get('/equipes/filter', equipeController.filterEquipes);
 router.post('/equipe/rejoindre/:equipeId/:tournoiId', protect, equipeController.rejoindreTournoi);
 router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.quitterTournoi);
