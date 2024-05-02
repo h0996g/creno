@@ -167,7 +167,7 @@ exports.getJoueurById = async (req, res) => {
 //-------------------------------------
 exports.getJoueurByUsername = async (req, res) => {
     try {
-        const username = req.params.username; // Get username from the request parameters
+        const  username  = req.params.username; // Get username from the request parameters
         const joueur = await Joueur.findOne({ username: username });
         if (!joueur) {
             return res.status(404).json({ message: 'Joueur not found' });
@@ -415,7 +415,7 @@ exports.capitainedemandeJoueur = async (req, res) => {
 
  
 
-        res.status(200).json({ message: 'Joueur joined team successfully' });
+        res.status(200).json(joueur);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
