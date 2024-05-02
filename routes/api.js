@@ -21,6 +21,7 @@ router.get('/', async (req, res) => {
 // ---------------------User---------------------------------------------
 
 
+router.get('/search/joueur', joueurController.searchJoueursByUsername)
 router.get('/joueur', joueurController.loginJoueur)
 router.get('/joueur/myinformation', protect, joueurController.getMyInformation)
 router.post('/loginjoueur', joueurController.loginJoueur)
