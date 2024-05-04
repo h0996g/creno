@@ -345,7 +345,7 @@ exports.capitaineAcceptJoueur = async (req, res) => {
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $push: { joueurs: joueurId } });
 
-        res.status(200).json({ message: 'Joueur joined team successfully' });
+        res.status(200).json(joueur);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

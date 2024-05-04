@@ -277,6 +277,11 @@ exports.getEquipesInvitedMe = async (req, res) => {
 };
 
 
+//------------------les demandes des joueurs -------------------------
+
+
+
+
 //----------------------------
 exports.filterEquipes = async (req, res) => {
     try {

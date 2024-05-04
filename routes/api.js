@@ -87,6 +87,7 @@ router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
 router.get('/equipe',  equipeController.findAllEquipes)
 router.get('/myequipe', protect, equipeController.getMyEquipes)
+
 router.get('/equipeimin', protect, equipeController.getEquipesImIn)
 router.get('/equipes/invite', protect, equipeController.getEquipesInvitedMe)
 router.get('/equipes/filter', equipeController.filterEquipes);
