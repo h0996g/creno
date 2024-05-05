@@ -11,7 +11,7 @@ const { ObjectId } = require('mongoose').Types;
 exports.createJoueur = async (req, res, next) => {
     try {
         console.log("---req body---", req.body);
-        const { username, email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom } = req.body;
+        const { username, email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune, prenom } = req.body;
 
         // Check for duplicate email or username
         const duplicate = await Joueur.findOne({
@@ -28,7 +28,7 @@ exports.createJoueur = async (req, res, next) => {
             return res.status(400).json({ status: false, message: message });
         }
 
-        const joueur = await JoueurServices.registerJoueur(username, email, mot_de_passe, nom, telephone, age, poste, wilaya, commune, photo, prenom);
+        const joueur = await JoueurServices.registerJoueur(username, email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune, prenom);
 
         let tokenData;
         tokenData = { _id: joueur._id, email: email, role: "joueur" };
@@ -173,6 +173,40 @@ exports.getJoueurByUsername = async (req, res) => {
             return res.status(404).json({ message: 'Joueur not found' });
         }
         res.json(joueur);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.searchJoueursByUsername = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const usernameSearch = req.query.username;
+        const regex = new RegExp(usernameSearch, 'i'); // 'i' for case insensitive
+
+        const query = {
+            username: { $regex: regex }
+        };
+
+        if (req.query.cursor) {
+            // Since we are using `$lt`, make sure the ID is ordered in descending order.
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database
+        const joueurs = await Joueur.find(query).sort({ _id: -1 }).limit(limit);
+
+        // Determine if there's more data to fetch
+        const moreDataAvailable = joueurs.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? joueurs[joueurs.length - 1]._id : '';
+
+        res.json({
+            data: joueurs,
+            moreDataAvailable,
+            nextCursor,
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

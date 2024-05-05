@@ -249,7 +249,7 @@ exports.payReservation = async (req, res) => {
 
         // Creating multiple reservations based on the 'duree'
         const startDay = new Date(reservation.jour);
-        for (let i = 1; i <= reservation.duree-1; i++) {
+        for (let i = 1; i <= reservation.duree - 1; i++) {
             const newDay = new Date(startDay);
             newDay.setDate(newDay.getDate() + 7 * i);
 

@@ -8,6 +8,7 @@ const tournoiController = require('../controllers/tournoiController')
 const annonceController = require('../controllers/annonceController')
 const tokenController = require('../controllers/tokenController')
 const pushNottificationController = require('../controllers/pushNottificationController')
+const fcmTokenController = require('../controllers/fcmTokenController')
 
 const { protect, isAdmin } = require('../handler/auth');
 
@@ -19,6 +20,8 @@ router.get('/', async (req, res) => {
 
 // ---------------------User---------------------------------------------
 
+
+router.get('/search/joueur', joueurController.searchJoueursByUsername)
 router.get('/joueur', joueurController.loginJoueur)
 router.get('/joueur/myinformation', protect, joueurController.getMyInformation)
 router.post('/loginjoueur', joueurController.loginJoueur)
@@ -52,6 +55,7 @@ router.post('/joueurs/verifytoken', joueurController.verifyToken);
 router.post('/joueur/resetpassword', joueurController.resetPassword);
 
 // ---------------------admin---------------------------------------------
+
 
 router.post('/loginadmin', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
@@ -101,6 +105,7 @@ router.post('/reservation/:idterrain', protect, reservationController.addReserva
 router.post('/reservationadmin/:idterrain', protect, isAdmin, reservationController.adminAddReservation);
 router.put('/reservation/:id', protect, reservationController.updateReservation);
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
+router.delete('/ReservationGroup/:groupId', protect, reservationController.deleteReservationGroup);
 router.get('/reservation/:id', reservationController.findReservationById);
 router.get('/myreservations/', protect, reservationController.getMyReservationJoueur);
 router.get('/myreservationswithother/:idterrain/:jour', protect, reservationController.getReservationsWithConditions);
@@ -131,5 +136,11 @@ router.get('/annonces/filter', annonceController.filterAnnonces);
 
 // -------------------------notification---------------------------------
 router.post('/notification', pushNottificationController.sendNotification);
+
+//-------------------------fcmToken-------------------------------------
+router.post('/addOrUpdateTokenJoueur', protect, fcmTokenController.addOrUpdateTokenJoueur)
+router.post('/removeTokenFcmJoueur', protect, fcmTokenController.removeTokenFcmJoueur)
+router.post('/addOrUpdateTokenAdmin', protect, isAdmin, fcmTokenController.addOrUpdateTokenAdmin)
+router.post('/removeTokenFcmAdmin', protect, isAdmin, fcmTokenController.removeTokenFcmAdmin)
 
 module.exports = router;

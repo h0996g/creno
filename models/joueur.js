@@ -96,7 +96,14 @@ const joueurSchema = new mongoose.Schema({
             delete ret.mot_de_passe;
         }
     }
-}, { timestamps: true })
+}, { timestamps: true });
+// joueurSchema.virtual('tokens', {
+//     ref: 'FcmToken',
+//     localField: '_id',
+//     foreignField: 'joueur_id'
+// });
+// joueurSchema.set('toJSON', { virtuals: true });
+// joueurSchema.set('toObject', { virtuals: true });
 
 
 joueurSchema.pre("save", async function () {

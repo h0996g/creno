@@ -1,5 +1,6 @@
 const Reservation = require('../models/reservation')
 const Terrain = require('../models/terrain')
+const { v4: uuidv4 } = require('uuid');
 const { ObjectId } = require('mongoose').Types;
 
 exports.addReservation = async (req, res) => {
@@ -24,43 +25,32 @@ exports.addReservation = async (req, res) => {
     }
 };
 exports.adminAddReservation = async (req, res) => {
-    // const joueurId = req.user._id; //! rj3to fl body bh admin li yb3to
-    const id_terrain = req.params.idterrain; // Assuming the terrain ID is passed in the route parameter
+    const id_terrain = req.params.idterrain;
     const etat = 'reserver';
-    const payement = true;
+    const payment = true;
     const { jour, heure_debut_temps, duree, joueur_id } = req.body;
+    const reservation_group_id = uuidv4(); // Generate a unique group ID for this series of reservations
 
     try {
-        const newReservation = new Reservation({
-            joueur_id,
-            terrain_id: id_terrain,
-            jour,
-            heure_debut_temps,
-            duree,
-            etat: etat, // is always reserver
-            payment: payement,  // is always true
-        });
-        await newReservation.save();
-        const startDay = new Date(jour);
-        for (let i = 1; i <= duree - 1; i++) {
-            const newDay = new Date(startDay);
+        for (let i = 0; i < duree; i++) {
+            const newDay = new Date(jour);
             newDay.setDate(newDay.getDate() + 7 * i);
 
             const newReservation = new Reservation({
+                joueur_id,
+                terrain_id: id_terrain,
                 jour: newDay,
-                heure_debut_temps: heure_debut_temps,
-                duree: duree,
-                etat: etat,
-                payment: payement,
-                joueur_id: joueur_id,
-                terrain_id: id_terrain
+                heure_debut_temps,
+                duree,
+                etat,
+                payment,
+                reservation_group_id  // Assign the group ID to each reservation
             });
 
             await newReservation.save();
         }
 
-
-        res.status(201).json(newReservation);
+        res.status(201).json({ message: 'Reservations created successfully with group ID: ' + reservation_group_id });
     } catch (error) {
         console.error('Error creating reservation:', error);
         res.status(500).json({ message: "Failed to create reservation.", error: error.message });
@@ -94,6 +84,21 @@ exports.deleteReservation = async (req, res) => {
         res.status(204).end();
     } catch (error) {
         res.json(error);
+    }
+};
+exports.deleteReservationGroup = async (req, res) => {
+    const groupId = req.params.groupId; // Assume the group ID is passed as a route parameter
+
+    try {
+
+        const deletedReservations = await Reservation.deleteMany({ reservation_group_id: groupId });
+        res.status(204).json({
+            message: 'All reservations in the group deleted successfully',
+            deletedCount: deletedReservations.deletedCount
+        });
+    } catch (error) {
+        console.error('Error deleting reservation group:', error);
+        res.status(500).json({ message: "Failed to delete reservation group.", error: error.message });
     }
 };
 //----------------------------

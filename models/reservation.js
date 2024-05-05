@@ -15,6 +15,8 @@ const reservationSchema = new mongoose.Schema({
     // la rservation est paye ou nn
     payment: { type: Boolean, default: false },
 
+    reservation_group_id: { type: String, required: false },
+
     joueur_id: { type: ObjectId, ref: 'Joueur', required: false },
 
     terrain_id: { type: ObjectId, ref: 'Terrain', required: false },
