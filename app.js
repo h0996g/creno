@@ -33,16 +33,23 @@ mongoose.connect('mongodb://127.0.0.1:27017/creno', { useNewUrlParser: true })
 //     req.io = io;
 //     next();
 // });
+// let liked = 0;
 io.on('connection', socket => {
     console.log('user connected');
     console.log('socket id', socket.id);
-    io.emit('terrain', 'terrain');
+    // io.emit('terrain', 'terrain');
 
-    socket.on('msg', (socket) => {
-        console.log('msg', socket)
+    // socket.on('msg', (socket) => {
+    //     console.log('msg', socket)
+    // });
+    // io.emit('likeupdate', liked);
 
+    // socket.on('liked', (socket) => {
+    //     liked++;
+    //     console.log('liked', liked)
+    //     io.emit('likeupdate', liked);
+    // });
 
-    });
     socket.on('disconnect', () => {
         console.log('socket disconnect ')
     });
