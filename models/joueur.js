@@ -154,6 +154,11 @@ joueurSchema.pre('deleteOne', async function (next) {
             { $pull: { attente_joueurs: joueurId } }
         );
 
+        await mongoose.model('Equipe').updateMany(
+            { attente_joueurs_demande: joueurId },
+            { $pull: { attente_joueurs_demande: joueurId } }
+        );
+
         await mongoose.model('Reservation').deleteMany({ joueur_id: joueurId });
 
 

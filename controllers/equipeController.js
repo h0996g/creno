@@ -3,25 +3,35 @@ const Tournoi = require('../models/tournoi');
 const { ObjectId } = require('mongoose').Types;
 
 //----------------------------
+
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
         const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
-        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id })
+
+        // Check if a team with the same name already exists
+        const existingEquipe = await Equipe.findOne({ nom });
+        if (existingEquipe) {
+            return res.status(409).json({ message: 'A team with this name already exists.' });
+        }
+
+        // If the team name does not exist, create the new team
+        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id });
         await createEquipe.save();
         res.status(201).json({ data: createEquipe });
     } catch (e) {
         res.status(500).json(e);
     }
 }
+
 //----------------------------
 exports.modifierEquipe = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
         const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
-        if (capitaine_id !== req.user._id.toString()) {
-            return res.status(403).json({ error: 'You are not authorized to modify this equipe.' });
-        }
+        // if (capitaine_id !== req.user._id.toString()) {
+        //     return res.status(403).json({ error: 'You are not authorized to modify this equipe.' });
+        // }
         const equipe = await Equipe.findByIdAndUpdate(id_Equipe, { nom, numero_joueurs, joueurs, wilaya, capitaine_id }, { new: true });
 
         if (!equipe) {
@@ -36,9 +46,9 @@ exports.modifierEquipe = async (req, res) => {
 //----------------------------
 exports.supprimerEquipe = async (req, res) => {
     try {
-        const id_Equipe = req.params.id;
+        const id = req.params.id;
 
-        const equipe = await Equipe.deleteOne(id_Equipe);
+        const equipe = await Equipe.deleteOne({_id: id});
         if (!equipe) {
             return res.status(404).json({ error: 'Equipe not found' });
         }
@@ -60,22 +70,48 @@ exports.findEquipeById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+//-------------------------------------
 
-//----------------------------
-exports.findAllEquipes = async (req, res) => {
+exports.getMyEquipes = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 3; // How many documents to return
-        const query = {};
-        if (req.query.cursor) {
-            query._id = { $lt: new ObjectId(req.query.cursor) }
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
         }
-        // Fetch the documents from the database
-        const equipes = await Equipe.find(query).sort({ _id: -1 }).limit(limit);
-        // Determine if there's more data to fetch
-        const moreDataAvailable = equipes.length === limit;
+        const userId = req.user._id; // Extract userId from request parameters
+        
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 4 documents, corrected the default value mentioned in comment
+        const query = { capitaine_id: userId };
 
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : null;
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, limited and sorted
+        const equipes = await Equipe.find(query)
+            .populate({
+                path: 'capitaine_id',
+                select: 'username nom telephone' // Selecting name and phone from capitaine
+            })
+            .populate({
+                path: 'joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs
+            })
+            .populate({
+                path: 'attente_joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+            })
+            .populate({
+                path: 'attente_joueurs_demande',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+            })
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = equipes.length === limit;
+        
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
 
         res.json({
             data: equipes,
@@ -86,6 +122,164 @@ exports.findAllEquipes = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+//---------------------------------------------------
+exports.getEquipesImIn = async (req, res) => {
+    try {
+        console.log(req.user); // Debug: Print user info to console
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        const userId = req.user._id; // Extract userId from request parameters
+
+        const limit = parseInt(req.query.limit) || 10; // Set the default limit
+        const query = { joueurs: { $in: [userId] } }; // Search for teams where userId is in the joueurs array
+
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, limited and sorted
+        const equipes = await Equipe.find(query)
+        .populate({
+            path: 'capitaine_id',
+            select: 'username nom telephone' // Selecting name and phone from capitaine
+        })
+        .populate({
+            path: 'joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs
+        })
+        .populate({
+            path: 'attente_joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })
+        .populate({
+            path: 'attente_joueurs_demande',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = equipes.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+//----------------------------
+exports.findAllEquipes = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 7; // How many documents to return
+        const query = {};
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) }
+        }
+        // Fetch the documents from the database
+        const equipes = await Equipe.find(query)
+        .populate({
+            path: 'capitaine_id',
+            select: 'username nom telephone' // Selecting name and phone from capitaine
+        })
+        .populate({
+            path: 'joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs
+        })
+        .populate({
+            path: 'attente_joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })
+        .populate({
+            path: 'attente_joueurs_demande',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })    // Fields to retrieve
+        .sort({ _id: -1 }) .limit(limit);
+        // Determine if there's more data to fetch
+        const moreDataAvailable = equipes.length === limit;
+
+        // Optionally, you can fetch the next cursor by extracting the _id of the last document
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}; 
+
+//--------------------- invitation des equipes---------------------
+
+exports.getEquipesInvitedMe = async (req, res) => {
+    try {
+        console.log(req.user); // Debug: Print user info to console
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        const userId = req.user._id; // Extract userId from request parameters
+
+        const limit = parseInt(req.query.limit) || 10; // Set the default limit
+        const query = { attente_joueurs: { $in: [userId] } }; // Search for teams where userId is in the joueurs array
+
+        // Apply cursor if present
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        // Fetch the documents from the database, limited and sorted
+        const equipes = await Equipe.find(query)
+        .populate({
+            path: 'capitaine_id',
+            select: 'username nom telephone' // Selecting name and phone from capitaine
+        })
+        .populate({
+            path: 'joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs
+        })
+        .populate({
+            path: 'attente_joueurs',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })
+        .populate({
+            path: 'attente_joueurs_demande',
+            select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+        })
+            .limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = equipes.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+        res.json({
+            data: equipes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+//------------------les demandes des joueurs -------------------------
+
+
 
 
 //----------------------------

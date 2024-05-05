@@ -16,8 +16,15 @@ const equipeSchema = new mongoose.Schema({
         ref: "Joueur"
 
     }],
-
+// les joueures li invitithum 
     attente_joueurs: [{
+
+        type: ObjectId, required: false,
+        ref: "Joueur"
+
+    }],
+    // les joueurs li demandaw ydkhlo 3ndi 
+    attente_joueurs_demande: [{
 
         type: ObjectId, required: false,
         ref: "Joueur"
