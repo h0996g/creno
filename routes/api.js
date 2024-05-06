@@ -89,7 +89,7 @@ router.post('/equipe', protect, equipeController.createEquipe)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
-router.get('/equipe',  equipeController.findAllEquipes)
+router.get('/equipe', equipeController.findAllEquipes)
 router.get('/myequipe', protect, equipeController.getMyEquipes)
 
 router.get('/equipeimin', protect, equipeController.getEquipesImIn)
@@ -135,7 +135,7 @@ router.get('/annonce', annonceController.getAllAnnonces);
 router.get('/annonces/filter', annonceController.filterAnnonces);
 
 // -------------------------notification---------------------------------
-router.post('/notification', pushNottificationController.sendNotification);
+router.post('/notification/:id', pushNottificationController.sendNotificationToAdmin);
 
 //-------------------------fcmToken-------------------------------------
 router.post('/addOrUpdateTokenJoueur', protect, fcmTokenController.addOrUpdateTokenJoueur)
