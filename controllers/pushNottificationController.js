@@ -1,21 +1,22 @@
 var admin = require("firebase-admin");
 var fcm = require("fcm-notification");
+const FcmToken = require('../models/fcm_token');
+
 var serviceAccount = require("../push-notification-key.json");
 const certPath = admin.credential.cert(serviceAccount);
 var FCM = new fcm(certPath);
-exports.sendNotification = async (req, res, next) => {
+exports.sendNotificationToAdmin = async (req, res, next) => {
     try {
-        let message = {
-            notification: {
-                title: "equipe",
-                body: "hi houssem"
-            },
-            data: {
-                key1: "value1",
-                key2: "value2"
+        const id = req.params.id;
+        const tokenFcm = await FcmToken.findOne({ admin_id: id });
+        const title = req.body.title;
+        const body = req.body.body;
 
-            },
-            token: req.body.fcm_token
+        const data = { key1: "value1", key2: "value2" };
+        let message = {
+            notification: { title: title, body: body },
+            data: data,
+            token: tokenFcm.token
         };
         FCM.send(message, function (err, response) {
             if (err) {
