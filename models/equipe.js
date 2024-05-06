@@ -53,6 +53,9 @@ const equipeSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 
+equipeSchema.path('joueurs').validate(function (value) {
+    return value.length <= this.numero_joueurs - 1;
+}, 'The number of joueurs cannot exceed numero_joueurs minus one');
 
 
 
@@ -68,6 +71,21 @@ equipeSchema.post('save', async function (doc, next) {
     } catch (error) {
         console.error('Error updating joueur with new equipe:', error);
     }
+});
+
+
+equipeSchema.pre('updateOne', async function (next) {
+    const update = this.getUpdate();
+    if (update.numero_joueurs !== undefined) {
+        // Get the current document
+        const doc = await this.model.findOne(this.getQuery());
+        if (doc.joueurs.length > update.numero_joueurs) {
+            return next(new Error('Cannot reduce numero_joueurs below the current number of joueurs'));
+            // Alternatively, you could adjust the joueurs array here:
+            // update.joueurs = doc.joueurs.slice(0, update.numero_joueurs);
+        }
+    }
+    next();
 });
 
 
