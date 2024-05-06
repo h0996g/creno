@@ -63,7 +63,7 @@ equipeSchema.post('save', async function (doc, next) {
         // Update the joueur document to push the equipe ID to both mes_equipes and equipes arrays
         await mongoose.model('Joueur').updateOne(
             { _id: doc.capitaine_id },
-            { $push: { mes_equipes: doc._id, equipes: doc._id } }
+            { $addToSet: { mes_equipes: doc._id, equipes: doc._id } }
         );
     } catch (error) {
         console.error('Error updating joueur with new equipe:', error);

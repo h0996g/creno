@@ -336,10 +336,10 @@ exports.demendeRejoindreEquipe = async (req, res) => {
 
 
         // Update joueur's equipes array
-        await Joueur.updateOne({ _id: joueurId }, { $push: { demande_equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $addToSet: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $push: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $addToSet: { attente_joueurs_demande: joueurId } });
 
         res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
@@ -373,11 +373,12 @@ exports.capitaineAcceptJoueur = async (req, res) => {
 
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
 
-        await Joueur.updateOne({ _id: joueurId }, { $push: { equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $addToSet: { equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $push: { joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $addToSet: { joueurs: joueurId } });
 
         res.status(200).json(joueur);
     } catch (error) {
@@ -442,10 +443,10 @@ exports.capitainedemandeJoueur = async (req, res) => {
 
 
         // Update joueur's equipes array
-        await Joueur.updateOne({ _id: joueurId }, { $push: { demande_equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $addToSet: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $push: { attente_joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $addToSet: { attente_joueurs: joueurId } });
 
  
 
@@ -548,11 +549,12 @@ exports.accepterRejoindreEquipe = async (req, res) => {
         // Update joueur's equipes array
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
-        await Joueur.updateOne({ _id: joueurId }, { $push: { equipes: equipeId } });
+        await Joueur.updateOne({ _id: joueurId }, { $addToSet: { equipes: equipeId } });
 
         // Update equipe's joueurs array
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
-        await Equipe.updateOne({ _id: equipeId }, { $push: { joueurs: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $addToSet: { joueurs: joueurId } });
 
         res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
