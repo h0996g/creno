@@ -50,10 +50,6 @@ const joueurSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-
-
-
-
     equipes: [{
 
         type: ObjectId, required: false,
@@ -134,11 +130,6 @@ joueurSchema.methods.compareMot_de_passe = async function (candidateMot_de_passe
     }
 };
 
-
-
-
-
-
 joueurSchema.pre('deleteOne', async function (next) {
     try {
         const joueurId = this.getQuery()._id;
@@ -174,10 +165,6 @@ joueurSchema.pre('deleteOne', async function (next) {
         console.log(error);
     }
 });
-
-
-
-
 
 const Joueur = mongoose.model('Joueur', joueurSchema)
 module.exports = Joueur   

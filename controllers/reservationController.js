@@ -2,6 +2,8 @@ const Reservation = require('../models/reservation')
 const Terrain = require('../models/terrain')
 const { v4: uuidv4 } = require('uuid');
 const { ObjectId } = require('mongoose').Types;
+const mongoose = require('mongoose');
+
 
 exports.addReservation = async (req, res) => {
     const joueurId = req.user._id;
@@ -24,6 +26,44 @@ exports.addReservation = async (req, res) => {
         res.status(500).json({ message: "Failed to create reservation.", error: error.message });
     }
 };
+exports.setReserveWithAdmin = async (req, res) => {
+    // const id_terrain = req.params.idterrain;
+    const etat = 'reserver';
+    const payment = true;
+    // const { jour, heure_debut_temps, duree, joueur_id } = req.body;
+
+    // const reservation_group_id = uuidv4(); // Generate a unique group ID for this series of reservations
+    const id = req.params.id;
+    const updatedReservation = await Reservation.findOneAndUpdate({ _id: id }, { etat: etat, payment: payment, reservation_group_id: id }, { new: true });
+    const reservation_group_id = updatedReservation.id;
+
+    try {
+        for (let i = 1; i < updatedReservation.duree; i++) {
+            const newDay = new Date(updatedReservation.jour);
+            newDay.setDate(newDay.getDate() + 7 * i);
+
+            const newReservation = new Reservation({
+                joueur_id: updatedReservation.joueur_id,
+                terrain_id: updatedReservation.terrain_id,
+                jour: newDay,
+                heure_debut_temps: updatedReservation.heure_debut_temps,
+                duree: updatedReservation.duree,
+                etat: updatedReservation.etat,
+                payment: updatedReservation.payment,
+                reservation_group_id // Assign the group ID to each reservation
+            });
+
+            await newReservation.save();
+        }
+
+        res.status(201).json({ message: 'Reservations created successfully with group ID: ' + reservation_group_id });
+    } catch (error) {
+        console.error('Error creating reservation:', error);
+        res.status(500).json({ message: "Failed to create reservation.", error: error.message });
+    }
+};
+
+
 exports.adminAddReservation = async (req, res) => {
     const id_terrain = req.params.idterrain;
     const etat = 'reserver';
@@ -56,6 +96,8 @@ exports.adminAddReservation = async (req, res) => {
         res.status(500).json({ message: "Failed to create reservation.", error: error.message });
     }
 };
+
+
 //----------------------------
 // Controller for updating a creneau
 exports.updateReservation = async (req, res, next) => {
@@ -90,7 +132,17 @@ exports.deleteReservationGroup = async (req, res) => {
     const groupId = req.params.groupId; // Assume the group ID is passed as a route parameter
 
     try {
-
+        const reservations = await Reservation.find({ reservation_group_id: groupId });
+        reservations.forEach(async (reservation) => {
+            await mongoose.model('Terrain').updateOne(
+                { reservations: reservation._id },
+                { $pull: { reservations: reservation._id } }
+            );
+            await mongoose.model('Joueur').updateOne(
+                { reservations: reservation._id },
+                { $pull: { reservations: reservation._id } }
+            );
+        });
         const deletedReservations = await Reservation.deleteMany({ reservation_group_id: groupId });
         res.status(204).json({
             message: 'All reservations in the group deleted successfully',
@@ -156,9 +208,6 @@ exports.filterReservations = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-
-
-
 };
 exports.getMyReservationJoueur = async (req, res) => {
     try {
@@ -200,21 +249,30 @@ exports.getReservationsWithConditions = async (req, res) => {
 
 exports.filterReservationsPagination = async (req, res) => {
     try {
+        const admin_id = req.user._id;
         const limit = parseInt(req.query.limit) || 20; // How many documents to return
         const filter = req.query; // Use the entire query object as the filter
-
         if (req.query.cursor) {
             filter._id = { $lt: new ObjectId(req.query.cursor) };
         }
+        const terrains = await Terrain.find({ admin_id: new ObjectId(admin_id) }).select('id');   // Fetch all terrain IDs for the current admin
+        const terrainIds = terrains.map(terrain => terrain.id); // Extract the IDs from the documents (3la jal bh y9der yjib ghir les reservation li kayna f terrain t3 admin brk  )
+        console.log('Terrain IDs:', terrainIds);
+        // filter.terrain_id = { $in: terrainIds };
 
-        // Fetch the documents from the database, sort by _id
-        const reservations = await Reservation.find(filter).sort({ _id: -1 }).limit(limit).populate([{
-            path: 'joueur_id',
-            select: 'username telephone'
-        }, {
+        if (terrainIds.includes((filter.terrain_id))) {
+            filter.terrain_id = (filter.terrain_id);
+        } else {
+            filter.terrain_id = { $in: terrainIds };
+        }
+        const reservations = await Reservation.find(filter).sort({ _id: -1 }).limit(limit).populate({
             path: 'terrain_id',
-            select: 'nom'
-        }]);
+            select: 'nom admin_id',
+        })
+            .populate({
+                path: 'joueur_id',
+                select: 'username telephone'
+            });
 
         // Determine if there's more data to fetch
         const moreDataAvailable = reservations.length === limit;
