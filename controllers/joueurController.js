@@ -167,7 +167,7 @@ exports.getJoueurById = async (req, res) => {
 //-------------------------------------
 exports.getJoueurByUsername = async (req, res) => {
     try {
-        const  username  = req.params.username; // Get username from the request parameters
+        const username = req.params.username; // Get username from the request parameters
         const joueur = await Joueur.findOne({ username: username });
         if (!joueur) {
             return res.status(404).json({ message: 'Joueur not found' });
@@ -180,7 +180,7 @@ exports.getJoueurByUsername = async (req, res) => {
 
 exports.searchJoueursByUsername = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 3; // How many documents to return
+        const limit = parseInt(req.query.limit) || 10; // How many documents to return
         const usernameSearch = req.query.username;
         const regex = new RegExp(usernameSearch, 'i'); // 'i' for case insensitive
 
@@ -413,7 +413,7 @@ exports.capitainerefuserjoueur = async (req, res) => {
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
 
- 
+
 
         res.status(200).json({ message: 'Joueur joined team successfully' });
     } catch (error) {
@@ -448,7 +448,7 @@ exports.capitainedemandeJoueur = async (req, res) => {
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $addToSet: { attente_joueurs: joueurId } });
 
- 
+
 
         res.status(200).json(joueur);
     } catch (error) {
@@ -481,7 +481,7 @@ exports.capitaineannulerJoueur = async (req, res) => {
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
 
- 
+
 
         res.status(200).json({ message: 'Joueur joined team successfully' });
     } catch (error) {
@@ -585,11 +585,11 @@ exports.refuserRejoindreEquipe = async (req, res) => {
         // Update joueur's equipes array
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
-       
+
 
         // Update equipe's joueurs array
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
-    
+
 
         res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
