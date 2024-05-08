@@ -64,6 +64,31 @@ reservationSchema.pre('deleteOne', async function (next) {
     }
 });
 
+reservationSchema.pre('deleteMany', async function (next) {
+    try {
+        // console.log('deleteMany');
+        // const filter = this.getFilter();
+        // console.log(filter);
+        const reservationId = this.getQuery().reservation_group_id;
+
+        // // // Update Terrain document
+        await mongoose.model('Terrain').updateMany(
+            { reservations: reservationId },
+            { $pull: { reservations: reservationId } }
+        );
+
+        // // Update Joueur documents in creneaus_finale array
+        await mongoose.model('Joueur').updateMany(
+            { reservations: reservationId },
+            { $pull: { reservations: reservationId } }
+        );
+
+
+
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 const Reservation = mongoose.model('Reservation', reservationSchema)
 module.exports = Reservation  

@@ -102,6 +102,7 @@ router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.qu
 // ---------------------Reservation---------------------------------------------
 
 router.post('/reservation/:idterrain', protect, reservationController.addReservation);
+router.post('/setreservewithadmin/:id', protect, isAdmin, reservationController.setReserveWithAdmin);
 router.post('/reservationadmin/:idterrain', protect, isAdmin, reservationController.adminAddReservation);
 router.put('/reservation/:id', protect, reservationController.updateReservation);
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
@@ -112,7 +113,7 @@ router.get('/myreservationswithother/:idterrain/:jour', protect, reservationCont
 router.get('/reservations', reservationController.findAllReservations);
 
 router.get('/reservations/filter', reservationController.filterReservations);
-router.get('/reservationspagination/filter', reservationController.filterReservationsPagination);
+router.get('/reservationspagination/filter', protect, isAdmin, reservationController.filterReservationsPagination);
 
 // -------------------------tournoi---------------------------------
 
@@ -135,12 +136,14 @@ router.get('/annonce', annonceController.getAllAnnonces);
 router.get('/annonces/filter', annonceController.filterAnnonces);
 
 // -------------------------notification---------------------------------
-router.post('/notification/:id', pushNottificationController.sendNotificationToAdmin);
+router.post('/notification/admin/:id', pushNottificationController.sendNotificationToAdmin);
+router.post('/notification/joueur/:id', pushNottificationController.sendNotificationToJoueur);
 
 //-------------------------fcmToken-------------------------------------
 router.post('/addOrUpdateTokenJoueur', protect, fcmTokenController.addOrUpdateTokenJoueur)
 router.post('/removeTokenFcmJoueur', protect, fcmTokenController.removeTokenFcmJoueur)
 router.post('/addOrUpdateTokenAdmin', protect, isAdmin, fcmTokenController.addOrUpdateTokenAdmin)
 router.post('/removeTokenFcmAdmin', protect, isAdmin, fcmTokenController.removeTokenFcmAdmin)
+
 
 module.exports = router;
