@@ -49,6 +49,7 @@ const equipeSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    commune: { type: String },
 
 }, { timestamps: true })
 

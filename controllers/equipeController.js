@@ -7,7 +7,7 @@ const { ObjectId } = require('mongoose').Types;
 exports.createEquipe = async (req, res) => {
     try {
         const id = req.user._id;
-        const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
+        const { nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id } = req.body;
 
         // Check if a team with the same name already exists
         const existingEquipe = await Equipe.findOne({ nom });
@@ -16,7 +16,7 @@ exports.createEquipe = async (req, res) => {
         }
 
         // If the team name does not exist, create the new team
-        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, capitaine_id: id });
+        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id });
         await createEquipe.save();
         res.status(201).json({ data: createEquipe });
     } catch (e) {
@@ -28,11 +28,11 @@ exports.createEquipe = async (req, res) => {
 exports.modifierEquipe = async (req, res) => {
     try {
         const id_Equipe = req.params.id;
-        const { nom, numero_joueurs, joueurs, wilaya, capitaine_id } = req.body;
+        const { nom, numero_joueurs, joueurs, wilaya, commune , capitaine_id } = req.body;
         // if (capitaine_id !== req.user._id.toString()) {
         //     return res.status(403).json({ error: 'You are not authorized to modify this equipe.' });
         // }
-        const equipe = await Equipe.findByIdAndUpdate(id_Equipe, { nom, numero_joueurs, joueurs, wilaya, capitaine_id }, { new: true });
+        const equipe = await Equipe.findByIdAndUpdate(id_Equipe, { nom, numero_joueurs, joueurs, wilaya, commune , capitaine_id }, { new: true });
 
         if (!equipe) {
             return res.status(404).json({ error: 'Equipe not found' });
