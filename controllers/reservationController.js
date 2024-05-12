@@ -289,3 +289,44 @@ exports.filterReservationsPagination = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.connectReservationsWithEquipe = async (req, res) => {
+    try {
+        const equipe_id1 = req.body.equipe_id1;
+        const equipe_id2 = req.body.equipe_id2;
+        const reservation_group_id = req.body.reservation_group_id;
+
+        // Update the reservations with the equipe and tournoi IDs
+        await Reservation.updateMany({ reservation_group_id }, { equipe_id1, equipe_id2 });
+
+        res.json({ message: 'Reservations connected to equipe successfully' });
+    } catch (error) {
+        console.error('Error connecting reservations to equipe:', error);
+        res.status(500).json({ message: "Failed to connect reservations to equipe.", error: error.message });
+    }
+}
+exports.getMyReservationJoueur = async (req, res) => {
+    try {
+        const joueur_id = req.user._id;
+        const filter = req.query;
+        const reservation = await Reservation.findOne({ joueur_id: joueur_id, ...filter }).populate({
+            path: 'equipe_id1',
+            select: 'nom numero_joueurs',
+            populate: [
+                { path: 'joueurs', select: 'username age poste' },
+                { path: 'capitaine_id', select: 'username' }
+            ]
+        })
+            .populate({
+                path: 'equipe_id2',
+                select: 'nom numero_joueurs',
+                populate: [
+                    { path: 'joueurs', select: 'username age poste' },
+                    { path: 'capitaine_id', select: 'username' }
+                ]
+            });
+        res.json(reservation);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}

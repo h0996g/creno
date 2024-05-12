@@ -3,7 +3,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 
 const terrainSchema = new mongoose.Schema({
-    nom: { type: String, required: false },
+    nom: { type: String, required: true },
     largeur: { type: Number, required: true },
     longeur: { type: Number, required: true },
     superficie: { type: Number, required: true },
@@ -26,7 +26,7 @@ const terrainSchema = new mongoose.Schema({
         day: {
             type: String,
             enum: ['All', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-           
+
         },
         hours: [{ type: String }] // Array of hours that are non-reservable
     }],

@@ -20,6 +20,9 @@ const reservationSchema = new mongoose.Schema({
     joueur_id: { type: ObjectId, ref: 'Joueur', required: false },
 
     terrain_id: { type: ObjectId, ref: 'Terrain', required: false },
+
+    equipe_id1: { type: ObjectId, ref: 'Equipe', required: false },
+    equipe_id2: { type: ObjectId, ref: 'Equipe', required: false },
 })
 
 reservationSchema.post('save', async function (doc, next) {
