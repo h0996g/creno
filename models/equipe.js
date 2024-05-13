@@ -11,12 +11,16 @@ const equipeSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    vertial: {
+        type: Boolean,
+        default: false
+    },
     joueurs: [{
         type: ObjectId, required: false,
         ref: "Joueur"
 
     }],
-// les joueures li invitithum 
+    // les joueures li invitithum 
     attente_joueurs: [{
 
         type: ObjectId, required: false,

@@ -2,7 +2,7 @@ const express = require('express');
 const joueurController = require('../controllers/joueurController');
 const adminController = require('../controllers/adminController');
 const terrainController = require('../controllers/terrainController')
-const equipeController = require('../controllers/equipeController')
+const equipeController = require('../controllers/equipeController.js')
 const reservationController = require('../controllers/reservationController')
 const tournoiController = require('../controllers/tournoiController')
 const annonceController = require('../controllers/annonceController')
@@ -86,6 +86,7 @@ router.get('/terrains/filter', terrainController.filterTerrains);
 
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
+router.post('/equipe/vertial', protect, equipeController.createEquipeCopyVertial)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
@@ -111,7 +112,7 @@ router.put('/reservation/:id', protect, reservationController.updateReservation)
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
 router.delete('/ReservationGroup/:groupId', protect, reservationController.deleteReservationGroup);
 router.get('/reservation/:id', reservationController.findReservationById);
-router.get('/myreservations/', protect, reservationController.getMyReservationJoueur);
+// router.get('/myreservations/', protect, reservationController.getMyReservationJoueur); 
 router.get('/myreservationswithother/:idterrain/:jour', protect, reservationController.getReservationsWithConditions);
 router.get('/reservations', reservationController.findAllReservations);
 

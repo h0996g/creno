@@ -2,6 +2,8 @@ const Equipe = require('../models/equipe');
 const Tournoi = require('../models/tournoi');
 const { ObjectId } = require('mongoose').Types;
 
+const { nanoid } = require('nanoid');
+
 //----------------------------
 
 exports.createEquipe = async (req, res) => {
@@ -409,3 +411,27 @@ exports.quitterTournoi = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+exports.createEquipeCopyVertial = async (req, res) => {
+    try {
+        const id = req.user._id;
+        const { nom, numero_joueurs, joueurs, wilaya, commune } = req.body;
+
+        // Check if a team with the same name already exists
+        const existingEquipe = await Equipe.findOne({ nom });
+        if (!existingEquipe) {
+            return res.status(409).json({ message: 'A team with this name not exists.' });
+        }
+
+        const nameVertial = nom + "/" + nanoid(5);
+        console.log(nameVertial);
+        const createEquipe = new Equipe({ nom: nameVertial, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id, vertial: true });
+        await createEquipe.save();
+        res.status(201).json(createEquipe);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json(e);
+
+    }
+}
