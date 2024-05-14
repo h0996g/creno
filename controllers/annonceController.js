@@ -6,8 +6,8 @@ const { ObjectId } = require('mongoose').Types;
 //----------------------------
 exports.addAnnonce = async (req, res) => {
     try {
-       
-        const { type, description, wilaya, commune,terrain_id } = req.body;
+
+        const { type, post_want, numero_joueurs, description, wilaya, commune, terrain_id } = req.body;
         const { role } = req.user; // Extracting user role from the authenticated user
 
         let admin_id;
@@ -21,6 +21,7 @@ exports.addAnnonce = async (req, res) => {
 
         const newAnnonceData = {
             type,
+            post_want, numero_joueurs,
             description,
             wilaya,
             commune,

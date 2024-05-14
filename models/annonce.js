@@ -1,22 +1,36 @@
 const mongoose = require('mongoose');
- const ObjectId = mongoose.Types.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 
 const annonceSchema = new mongoose.Schema({
     type: {
         type: String,
-        required: true
+        required: true,
+        enum: ['search joueur', 'search join equipe', 'other']
     },
+    numero_joueurs: {
+        type: Number,
+    },
+    post_want: [{
+        post: {
+            type: String,
+            enum: ['attaquant', 'defenseur', 'gardia', 'milieu']
+
+        },
+        find: {
+            type: Boolean,
+            default: false
+        }
+    }],
     description: {
         type: String,
         required: true
     },
+
     wilaya: { type: String },
     commune: { type: String },
-
-    terrain_id: { type: ObjectId, ref: 'Terrain',required: false },
-
-    joueur_id: { type: ObjectId, ref: 'Joueur',required: false },
-    admin_id: { type: ObjectId, ref: 'Admin',required: false }
+    terrain_id: { type: ObjectId, ref: 'Terrain', required: false },
+    joueur_id: { type: ObjectId, ref: 'Joueur', required: false },
+    admin_id: { type: ObjectId, ref: 'Admin', required: false }
 }, { timestamps: true })
 
 
@@ -26,7 +40,7 @@ const annonceSchema = new mongoose.Schema({
 
 
 
-annonceSchema.post('save', async function(doc, next) {
+annonceSchema.post('save', async function (doc, next) {
     try {
         // Check if the annonce has an admin_id
         if (doc.admin_id) {
@@ -55,7 +69,7 @@ annonceSchema.post('save', async function(doc, next) {
 
 
 
-annonceSchema.pre('deleteOne', async function(next) {
+annonceSchema.pre('deleteOne', async function (next) {
     try {
         const annonceId = this.getQuery()._id;
 
