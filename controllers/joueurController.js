@@ -4,6 +4,7 @@ const Token = require('../models/token')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
+const { spawn } =require('child_process');
 const { ObjectId } = require('mongoose').Types;
 
 
@@ -32,8 +33,9 @@ exports.createJoueur = async (req, res, next) => {
 
         let tokenData;
         tokenData = { _id: joueur._id, email: email, role: "joueur" };
-
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
+
+      
 
         res.json({ status: true, message: 'Joueur registered successfully', token: token, data: joueur });
 
@@ -71,11 +73,90 @@ exports.loginJoueur = async (req, res, next) => {
 
         let tokenData;
         tokenData = { _id: joueur._id, email: joueur.email, role: "joueur" };
-
-
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
-        res.status(200).json({ status: true, success: "Bien connecté", token: token, data: joueur });
+        const Age =joueur.age;
+        const Wilaya =joueur.wilaya;
+        const Commune =joueur.commune;
+        const Id =joueur._id;
+
+
+        const pythonProcess = spawn('python',['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune,Id]);
+//         let pythonOutput ;
+//   // Capture stdout data from Python script
+//   pythonProcess.stdout.on('data', (data) => {
+//     // console.log(data.toString());
+//      console.log(`stdout: ${data}`);
+//     // pythonOutput = data.toString(); 
+//     // Append stdout data to the output variable
+//      // Convert the Buffer object to a string
+//     const dataString = data.toString('utf-8');
+//     // Remove leading and trailing whitespace characters
+//     const trimmedData = dataString.trim();
+//     // Remove unnecessary characters from the string
+//     const cleanedData = trimmedData.replace('<Buffer ', '').replace('>', '');
+//     // Split the string into an array based on whitespace and comma
+//     const dataArray = cleanedData.split(/\s*,\s*/);
+//     // Now dataArray should be an array of strings
+//     console.log(dataArray);
+//     pythonOutput=cleanedData
+// });
+// let pythonOutput = []; // Initialize an empty array
+// // Capture stdout data from Python script
+// pythonProcess.stdout.on('data', (data) => {
+//     // Convert the Buffer object to a string
+//     const dataString = data.toString('utf-8');
+//     // Extract the content between square brackets
+//     const matches = dataString.match(/\[([^\]]+)\]/);
+//     // If matches are found
+//     if (matches && matches.length > 1) {
+//         // Split the matched content by comma and remove leading/trailing spaces
+//         const elements = matches[1].split(',').map(item => item.trim());
+//         // Add the elements to the pythonOutput array
+//         pythonOutput.push(...elements);
+//     }
+// });
+let pythonOutput = []; // Initialize an empty array
+// Capture stdout data from Python script
+pythonProcess.stdout.on('data', (data) => {
+    // Convert the Buffer object to a string
+    const dataString = data.toString('utf-8');
+    // Extract the content between square brackets
+    const matches = dataString.match(/\[([^\]]+)\]/);
+    // If matches are found
+    if (matches && matches.length > 1) {
+        // Split the matched content by comma and remove leading/trailing spaces
+        const elements = matches[1].split(',').map(item => item.trim());
+        // Remove single quotes from each element
+        const cleanedElements = elements.map(item => item.replace(/'/g, ''));
+        // Add the cleaned elements to the pythonOutput array
+        pythonOutput.push(...cleanedElements);
+    }
+});
+pythonProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+ // Handle any errors from Python script execution
+ pythonProcess.on('error', (error) => {
+    console.error(`Error executing Python script: ${error.message}`);
+});
+         // When the Python script execution is complete
+         pythonProcess.on('close', (code) => {
+            console.log(`Python script process exited with code ${code}`);
+            console.log(pythonOutput);
+            
+            res.status(200).json({
+                status: true,
+                success: 'Bien connecté',
+                 token: token,
+                data: joueur,
+                pythonOutput: pythonOutput
+            });
+        });
+    
+    
+
+        // res.status(200).json({ status: true, success: "Bien connecté", token: token, data: joueur });
     } catch (error) {
         console.log(error, 'err---->');
         next(error);
