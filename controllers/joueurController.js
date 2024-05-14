@@ -35,9 +35,59 @@ exports.createJoueur = async (req, res, next) => {
         tokenData = { _id: joueur._id, email: email, role: "joueur" };
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
-      
+        const Age =joueur.age;
+        const Wilaya =joueur.wilaya;
+        const Commune =joueur.commune;
+        const Id =joueur._id;
 
-        res.json({ status: true, message: 'Joueur registered successfully', token: token, data: joueur });
+  const pythonProcess = spawn('python',['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune,Id]);
+      
+  let pythonOutput = []; 
+  //njib data w nkhbiha f pythonoutput
+// Capture stdout data from Python script
+pythonProcess.stdout.on('data', (data) => {
+// Convert the Buffer object to a string
+const dataString = data.toString('utf-8');
+// Extract the content between square brackets
+const matches = dataString.match(/\[([^\]]+)\]/);
+// If matches are found
+if (matches && matches.length > 1) {
+  // Split the matched content by comma and remove leading/trailing spaces
+  const elements = matches[1].split(',').map(item => item.trim());
+  // Remove single quotes from each element
+  const cleanedElements = elements.map(item => item.replace(/'/g, ''));
+  // Add the cleaned elements to the pythonOutput array
+  pythonOutput.push(...cleanedElements);
+}
+});
+
+
+pythonProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+ // Handle any errors from Python script execution
+ pythonProcess.on('error', (error) => {
+    console.error(`Error executing Python script: ${error.message}`);
+});
+
+
+pythonProcess.on('close', (code) => {
+    console.log(`Python script process exited with code ${code}`);
+    console.log(pythonOutput);
+    
+
+    // resultat te3na
+    res.json({
+        status: true,
+        message: 'Joueur registered successfully',
+         token: token,
+        data: joueur,
+        pythonOutput: pythonOutput
+    });
+});
+
+
+        // res.json({ status: true, message: 'Joueur registered successfully', token: token, data: joueur });
 
     } catch (err) {
         console.log("---> err -->", err);
@@ -74,49 +124,18 @@ exports.loginJoueur = async (req, res, next) => {
         let tokenData;
         tokenData = { _id: joueur._id, email: joueur.email, role: "joueur" };
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
-
+// mn hna ybdew te3 python 
+//  les parm li ryh nb3thumlu
         const Age =joueur.age;
         const Wilaya =joueur.wilaya;
         const Commune =joueur.commune;
         const Id =joueur._id;
 
-
+// data set te3na
         const pythonProcess = spawn('python',['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune,Id]);
-//         let pythonOutput ;
-//   // Capture stdout data from Python script
-//   pythonProcess.stdout.on('data', (data) => {
-//     // console.log(data.toString());
-//      console.log(`stdout: ${data}`);
-//     // pythonOutput = data.toString(); 
-//     // Append stdout data to the output variable
-//      // Convert the Buffer object to a string
-//     const dataString = data.toString('utf-8');
-//     // Remove leading and trailing whitespace characters
-//     const trimmedData = dataString.trim();
-//     // Remove unnecessary characters from the string
-//     const cleanedData = trimmedData.replace('<Buffer ', '').replace('>', '');
-//     // Split the string into an array based on whitespace and comma
-//     const dataArray = cleanedData.split(/\s*,\s*/);
-//     // Now dataArray should be an array of strings
-//     console.log(dataArray);
-//     pythonOutput=cleanedData
-// });
-// let pythonOutput = []; // Initialize an empty array
-// // Capture stdout data from Python script
-// pythonProcess.stdout.on('data', (data) => {
-//     // Convert the Buffer object to a string
-//     const dataString = data.toString('utf-8');
-//     // Extract the content between square brackets
-//     const matches = dataString.match(/\[([^\]]+)\]/);
-//     // If matches are found
-//     if (matches && matches.length > 1) {
-//         // Split the matched content by comma and remove leading/trailing spaces
-//         const elements = matches[1].split(',').map(item => item.trim());
-//         // Add the elements to the pythonOutput array
-//         pythonOutput.push(...elements);
-//     }
-// });
-let pythonOutput = []; // Initialize an empty array
+
+        let pythonOutput = []; 
+        //njib data w nkhbiha f pythonoutput
 // Capture stdout data from Python script
 pythonProcess.stdout.on('data', (data) => {
     // Convert the Buffer object to a string
@@ -145,6 +164,8 @@ pythonProcess.stderr.on('data', (data) => {
             console.log(`Python script process exited with code ${code}`);
             console.log(pythonOutput);
             
+
+            // resultat te3na
             res.status(200).json({
                 status: true,
                 success: 'Bien connecté',

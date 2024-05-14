@@ -18,7 +18,7 @@ exports.createEquipe = async (req, res) => {
         }
 
         // If the team name does not exist, create the new team
-        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id });
+        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id , joueurs: [id] });
         await createEquipe.save();
         res.status(201).json({ data: createEquipe });
     } catch (e) {
@@ -236,6 +236,9 @@ exports.getEquipesImIn = async (req, res) => {
 //----------------------------
 exports.findAllEquipes = async (req, res) => {
     try {
+        // const idList = req.query.idList || [];
+        const idList = req.body.idList || [];
+        console.log(idList);
         const limit = parseInt(req.query.limit) || 7; // How many documents to return
         const query = {};
         if (req.query.cursor) {
@@ -260,6 +263,40 @@ exports.findAllEquipes = async (req, res) => {
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
             })    // Fields to retrieve
             .sort({ _id: -1 }).limit(limit);
+//  ani zedt ghit hed ster bch nwli nst3ml sys rec
+const sortedEquipes = [];
+const remainingEquipes = [];
+
+for (const equipe of equipes) {
+    let foundInList = false;
+    for (const id of idList) {
+        console.log(id);
+        console.log(equipe.capitaine_id.id.toString());
+        console.log("ok");
+
+        if (equipe.capitaine_id.id.toString() === id) {
+
+            sortedEquipes.push(equipe);
+            console.log(sortedEquipes);
+            foundInList = true;
+            break; // No need to check further if found
+        }
+    }
+    if (!foundInList) {
+        remainingEquipes.push(equipe);
+    }
+}
+sortedEquipes.sort((equipeA, equipeB) => {
+    const indexA = idList.findIndex(id => equipeA.capitaine_id.id.toString() === id);
+    const indexB = idList.findIndex(id => equipeB.capitaine_id.id.toString() === id);
+    
+    return indexA - indexB;
+});
+
+const reorderedEquipes = sortedEquipes.concat(remainingEquipes);
+
+
+
         // Determine if there's more data to fetch
         const moreDataAvailable = equipes.length === limit;
 
@@ -267,7 +304,7 @@ exports.findAllEquipes = async (req, res) => {
         const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
 
         res.json({
-            data: equipes,
+            data: reorderedEquipes,
             moreDataAvailable,
             nextCursor,
         });
