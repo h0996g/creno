@@ -28,6 +28,8 @@ const annonceSchema = new mongoose.Schema({
 
     wilaya: { type: String },
     commune: { type: String },
+    equipe_id: { type: ObjectId, ref: 'Equipe', required: false },
+    reservation_id: { type: ObjectId, ref: 'Reservation', required: false },
     terrain_id: { type: ObjectId, ref: 'Terrain', required: false },
     joueur_id: { type: ObjectId, ref: 'Joueur', required: false },
     admin_id: { type: ObjectId, ref: 'Admin', required: false }

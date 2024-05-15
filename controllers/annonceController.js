@@ -7,7 +7,7 @@ const { ObjectId } = require('mongoose').Types;
 exports.addAnnonce = async (req, res) => {
     try {
 
-        const { type, post_want, numero_joueurs, description, wilaya, commune, terrain_id } = req.body;
+        const { type, post_want, numero_joueurs, description, wilaya, commune, terrain_id, reservation_id } = req.body;
         const { role } = req.user; // Extracting user role from the authenticated user
 
         let admin_id;
@@ -27,7 +27,7 @@ exports.addAnnonce = async (req, res) => {
             commune,
             terrain_id,
             admin_id,
-            joueur_id
+            joueur_id, reservation_id
         };
 
         const newAnnonce = new Annonce(newAnnonceData);
@@ -172,7 +172,17 @@ exports.getMyAnnoncesAdmin = async (req, res) => {
 exports.getAnnonceById = async (req, res) => {
     try {
         const id = req.params.id;
-        const annonce = await Annonce.findById(id);
+        const annonce = await Annonce.findById(id).populate({
+            path: 'reservation_id',
+            select: 'heure_debut_temps jour duree',
+            populate: [
+                { path: 'equipe_id1', select: 'nom joueurs', populate: [{ path: 'joueurs', select: 'nom prenom telephone' }] },
+                { path: 'equipe_id2', select: 'nom joueurs', populate: [{ path: 'joueurs', select: 'nom prenom telephone' }] },
+            ],
+        }).populate({
+            path: 'terrain_id',
+            select: 'nom adresse coordonnee adresse',
+        });
         if (!annonce) {
             return res.status(404).json({ message: 'Annonce not found' });
         }
