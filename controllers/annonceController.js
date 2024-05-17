@@ -44,7 +44,7 @@ exports.addAnnonce = async (req, res) => {
 exports.updateAnnonce = async (req, res) => {
     try {
         const id = req.params.id;
-        const { type, description, wilaya, commune, terrain_id } = req.body;
+        const { type, post_want, numero_joueurs, description, wilaya, commune, terrain_id } = req.body;
         const { role, _id } = req.user; // Extract user role and ID from the authenticated user
 
         if (role === 'admin') {
@@ -56,7 +56,7 @@ exports.updateAnnonce = async (req, res) => {
             res.json(updatedAnnonce);
         } else if (role === 'joueur') {
             // Update Annonce if the user is a joueur
-            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, joueur_id: _id }, { type, description, wilaya, commune, terrain_id }, { new: true });
+            const updatedAnnonce = await Annonce.findOneAndUpdate({ _id: id, joueur_id: _id }, { post_want, numero_joueurs, description, wilaya, commune }, { new: true });
             if (!updatedAnnonce) {
                 return res.status(404).json({ message: 'Annonce not found or unauthorized' });
             }
@@ -182,6 +182,9 @@ exports.getAnnonceById = async (req, res) => {
         }).populate({
             path: 'terrain_id',
             select: 'nom adresse coordonnee adresse',
+        }).populate({
+            path: 'joueur_id',
+            select: 'username telephone'
         });
         if (!annonce) {
             return res.status(404).json({ message: 'Annonce not found' });

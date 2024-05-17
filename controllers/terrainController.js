@@ -144,6 +144,71 @@ exports.findAllTerrains = async (req, res, next) => {
 
 //----------------------------
 
+exports.searchMyTerrains = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: 'User not authenticated' });
+        }
+        const admin_id = req.user._id; // Extracting admin ID from the authenticated user
+        const nom = req.query.nom;
+        const regex = new RegExp(nom, 'i');
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 4 documents, corrected the default value mentioned in comment
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        const terrains = await Terrain.find({ admin_id, nom: { $regex: regex } }).populate({
+            path: 'admin_id nom wilaya commune adresse',
+            select: 'nom wilaya telephone'
+        }).limit(limit)
+            .sort({ _id: -1 });
+        // Check if there's more data available
+        const moreDataAvailable = terrains.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : '';
+
+        res.json({
+            data: terrains,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+
+exports.searchTerrains = async (req, res, next) => {
+    try {
+        const nom = req.query.nom;
+        const regex = new RegExp(nom, 'i');
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 4 documents, corrected the default value mentioned in comment
+        const query = { nom: { $regex: regex } }
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        const terrains = await Terrain.find(query).sort({ _id: -1 }).limit(limit).populate({
+            path: 'admin_id nom wilaya commune adresse',
+            select: 'nom wilaya telephone'
+        }).limit(limit)
+            .sort({ _id: -1 });
+
+        // Check if there's more data available
+        const moreDataAvailable = terrains.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? terrains[terrains.length - 1]._id : '';
+        res.json({
+            data: terrains,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+
+    }
+}
 
 exports.filterTerrains = async (req, res) => {
     try {
