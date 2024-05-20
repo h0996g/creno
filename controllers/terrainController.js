@@ -237,3 +237,20 @@ exports.filterTerrains = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.removePhoto = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const photo = req.body.photo;
+        const terrain = await Terrain.findById(id);
+        if (!terrain) {
+            return res.status(404).json({ message: 'Terrain not found' });
+        }
+        terrain.photos = terrain.photos.filter(p => p !== photo);
+        await terrain.save();
+        res.json('Photo removed successfully');
+
+    } catch (error) {
+        res.json(error);
+    }
+};

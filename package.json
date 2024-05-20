@@ -16,6 +16,7 @@
     "nodemailer": "^6.9.13",
     "socket.io": "^4.7.5",
     "socket.io-client": "^2.5.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "uuidv4": "^6.2.13"
   }
 }

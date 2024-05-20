@@ -842,3 +842,52 @@ exports.resetPassword = async (req, res) => {
         return res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
+
+exports.getAllMyDemandes = async (req, res) => {
+    try {
+        const joueurId = req.user._id;
+        const joueur = await Joueur.findById(joueurId);
+
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 10 documents
+        const query = { attente_joueurs_demande: { $elemMatch: { joueur: joueurId } } };
+
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        const demandes = await Equipe.find(query).populate({
+            path: 'capitaine_id',
+            select: 'username nom telephone' // Selecting name and phone from capitaine
+        })
+            .populate({
+                path: 'joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs
+            })
+            .populate({
+                path: 'attente_joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+            })
+            .populate({
+                path: 'attente_joueurs_demande',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
+            }).sort({ _id: -1 }).limit(limit);
+        const moreDataAvailable = demandes.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? demandes[demandes.length - 1]._id : '';
+
+        res.json({
+            data: demandes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}; 
