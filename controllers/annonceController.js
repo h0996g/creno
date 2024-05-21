@@ -185,6 +185,9 @@ exports.getAnnonceById = async (req, res) => {
         }).populate({
             path: 'joueur_id',
             select: 'username telephone'
+        }).populate({
+            path: 'admin_id',
+            select: 'nom telephone'
         });
         if (!annonce) {
             return res.status(404).json({ message: 'Annonce not found' });
