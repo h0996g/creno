@@ -29,10 +29,14 @@ const equipeSchema = new mongoose.Schema({
     }],
     // les joueurs li demandaw ydkhlo 3ndi 
     attente_joueurs_demande: [{
+        joueur: {
+            type: ObjectId, required: false,
+            ref: "Joueur"
 
-        type: ObjectId, required: false,
-        ref: "Joueur"
-
+        }, post: {
+            type: String,
+            enum: ['attaquant', 'defenseur', 'gardia', 'milieu']
+        }
     }],
 
     capitaine_id: {

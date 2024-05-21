@@ -18,7 +18,7 @@ exports.createEquipe = async (req, res) => {
         }
 
         // If the team name does not exist, create the new team
-        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id , joueurs: [id] });
+        const createEquipe = new Equipe({ nom, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id, joueurs: [id] });
         await createEquipe.save();
         res.status(201).json({ data: createEquipe });
     } catch (e) {
@@ -106,6 +106,10 @@ exports.searchMyEquipes = async (req, res) => {
             .populate({
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
             })
             .limit(limit)
             .sort({ _id: -1 });
@@ -156,6 +160,10 @@ exports.searchEquipes = async (req, res) => {
             .populate({
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
             })
             .limit(limit)
             .sort({ _id: -1 });
@@ -212,6 +220,10 @@ exports.getEquipesImIn = async (req, res) => {
             .populate({
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
             })
             .limit(limit)
             .sort({ _id: -1 });
@@ -261,39 +273,43 @@ exports.findAllEquipes = async (req, res) => {
             .populate({
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
             })    // Fields to retrieve
             .sort({ _id: -1 }).limit(limit);
-//  ani zedt ghit hed ster bch nwli nst3ml sys rec
-const sortedEquipes = [];
-const remainingEquipes = [];
+        //  ani zedt ghit hed ster bch nwli nst3ml sys rec
+        const sortedEquipes = [];
+        const remainingEquipes = [];
 
-for (const equipe of equipes) {
-    let foundInList = false;
-    for (const id of idList) {
-        console.log(id);
-        console.log(equipe.capitaine_id.id.toString());
-        console.log("ok");
+        for (const equipe of equipes) {
+            let foundInList = false;
+            for (const id of idList) {
+                console.log(id);
+                console.log(equipe.capitaine_id.id.toString());
+                console.log("ok");
 
-        if (equipe.capitaine_id.id.toString() === id) {
+                if (equipe.capitaine_id.id.toString() === id) {
 
-            sortedEquipes.push(equipe);
-            console.log(sortedEquipes);
-            foundInList = true;
-            break; // No need to check further if found
+                    sortedEquipes.push(equipe);
+                    console.log(sortedEquipes);
+                    foundInList = true;
+                    break; // No need to check further if found
+                }
+            }
+            if (!foundInList) {
+                remainingEquipes.push(equipe);
+            }
         }
-    }
-    if (!foundInList) {
-        remainingEquipes.push(equipe);
-    }
-}
-sortedEquipes.sort((equipeA, equipeB) => {
-    const indexA = idList.findIndex(id => equipeA.capitaine_id.id.toString() === id);
-    const indexB = idList.findIndex(id => equipeB.capitaine_id.id.toString() === id);
-    
-    return indexA - indexB;
-});
+        sortedEquipes.sort((equipeA, equipeB) => {
+            const indexA = idList.findIndex(id => equipeA.capitaine_id.id.toString() === id);
+            const indexB = idList.findIndex(id => equipeB.capitaine_id.id.toString() === id);
 
-const reorderedEquipes = sortedEquipes.concat(remainingEquipes);
+            return indexA - indexB;
+        });
+
+        const reorderedEquipes = sortedEquipes.concat(remainingEquipes);
 
 
 
@@ -348,6 +364,10 @@ exports.getEquipesInvitedMe = async (req, res) => {
             .populate({
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
             })
             .limit(limit)
             .sort({ _id: -1 });
@@ -371,7 +391,55 @@ exports.getEquipesInvitedMe = async (req, res) => {
 
 //------------------les demandes des joueurs -------------------------
 
+// exports.getEquipesDemandedMe = async (req, res) => {
+//     try {
 
+//         const userId = req.user._id; // Extract userId from request parameters
+
+//         const limit = parseInt(req.query.limit) || 10; // Set the default limit
+//         const query = { attente_joueurs_demande: { $in: [userId] } }; // Search for teams where userId is in the joueurs array
+
+//         // Apply cursor if present
+//         if (req.query.cursor) {
+//             query._id = { $lt: new ObjectId(req.query.cursor) };
+//         }
+
+//         // Fetch the documents from the database, limited and sorted
+//         const equipes = await Equipe.find(query)
+//             .populate({
+//                 path: 'capitaine_id',
+//                 select: 'username nom telephone' // Selecting name and phone from capitaine
+//             })
+//             .populate({
+//                 path: 'joueurs',
+//                 select: 'username nom telephone' // Selecting name and phone from joueurs
+//             })
+//             .populate({
+//                 path: 'attente_joueurs',
+//                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+//             })
+//             .populate({
+//                 path: 'attente_joueurs_demande',
+//                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+//             })
+//             .limit(limit)
+//             .sort({ _id: -1 });
+
+//         // Check if there's more data available
+//         const moreDataAvailable = equipes.length === limit;
+
+//         // Determine the next cursor
+//         const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+
+//         res.json({
+//             data: equipes,
+//             moreDataAvailable,
+//             nextCursor,
+//         });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// }
 
 
 //----------------------------

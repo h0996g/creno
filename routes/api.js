@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
 
 
 router.get('/search/joueur', joueurController.searchJoueursByUsername)
+router.get('/joueur/demandes', protect, joueurController.getAllMyDemandes)
 router.get('/joueur', joueurController.loginJoueur)
 router.get('/joueur/myinformation', protect, joueurController.getMyInformation)
 router.post('/loginjoueur', joueurController.loginJoueur)
@@ -79,10 +80,15 @@ router.post('/admin/resetpassword', adminController.resetPassword);
 router.post('/terrain', protect, isAdmin, terrainController.addTerrain);
 router.put('/terrain/:id', protect, terrainController.updateTerrain);
 router.delete('/terrain/:id', protect, terrainController.deleteTerrain);
+router.post('/terrain/:id/photo', protect, terrainController.removePhoto);
 router.get('/terrain/:id', terrainController.findTerrainById);
 router.get('/terrains', terrainController.findAllTerrains);
 router.get('/myterrains/', protect, terrainController.findMyTerrains);
 router.get('/terrains/filter', terrainController.filterTerrains);
+router.get('/search/terrain', protect, terrainController.searchTerrains);
+router.get('/search/myterrain', protect, terrainController.searchMyTerrains);
+
+
 
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
@@ -96,6 +102,7 @@ router.get('/searchequipe', protect, equipeController.searchEquipes)
 
 router.get('/equipeimin', protect, equipeController.getEquipesImIn)
 router.get('/equipes/invite', protect, equipeController.getEquipesInvitedMe)
+// router.get('/equipes/demande', protect, equipeController.getEquipesDemandedMe)
 router.get('/equipes/filter', equipeController.filterEquipes);
 router.post('/equipe/rejoindre/:equipeId/:tournoiId', protect, equipeController.rejoindreTournoi);
 router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.quitterTournoi);

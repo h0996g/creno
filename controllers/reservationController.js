@@ -1,6 +1,6 @@
 const Reservation = require('../models/reservation')
 const Terrain = require('../models/terrain')
-// const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const { ObjectId } = require('mongoose').Types;
 const mongoose = require('mongoose');
 
@@ -103,6 +103,7 @@ exports.adminAddReservation = async (req, res) => {
 // Controller for updating a creneau
 exports.updateReservation = async (req, res, next) => {
     try {
+
         const id = req.params.id;
         const ReservationDataToUpdate = req.body;
         const updatedReservation = await Reservation.findOneAndUpdate({ _id: id }, ReservationDataToUpdate, { new: true });
@@ -333,6 +334,9 @@ exports.getMyReservationJoueur = async (req, res) => {
                     { path: 'capitaine_id', select: 'username' }
                 ]
             });
+        if (reservation == null) {
+            return res.status(404).json({ message: 'reservation not found' });
+        }
         res.json(reservation);
     } catch (error) {
         res.json({ message: error.message });

@@ -4,7 +4,7 @@ const Token = require('../models/token')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
-const { spawn } =require('child_process');
+const { spawn } = require('child_process');
 const { ObjectId } = require('mongoose').Types;
 
 
@@ -35,56 +35,56 @@ exports.createJoueur = async (req, res, next) => {
         tokenData = { _id: joueur._id, email: email, role: "joueur" };
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
 
-        const Age =joueur.age;
-        const Wilaya =joueur.wilaya;
-        const Commune =joueur.commune;
-        const Id =joueur._id;
+        const Age = joueur.age;
+        const Wilaya = joueur.wilaya;
+        const Commune = joueur.commune;
+        const Id = joueur._id;
 
-  const pythonProcess = spawn('python',['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune,Id]);
-      
-  let pythonOutput = []; 
-  //njib data w nkhbiha f pythonoutput
-// Capture stdout data from Python script
-pythonProcess.stdout.on('data', (data) => {
-// Convert the Buffer object to a string
-const dataString = data.toString('utf-8');
-// Extract the content between square brackets
-const matches = dataString.match(/\[([^\]]+)\]/);
-// If matches are found
-if (matches && matches.length > 1) {
-  // Split the matched content by comma and remove leading/trailing spaces
-  const elements = matches[1].split(',').map(item => item.trim());
-  // Remove single quotes from each element
-  const cleanedElements = elements.map(item => item.replace(/'/g, ''));
-  // Add the cleaned elements to the pythonOutput array
-  pythonOutput.push(...cleanedElements);
-}
-});
+        const pythonProcess = spawn('python', ['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
 
-
-pythonProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
- // Handle any errors from Python script execution
- pythonProcess.on('error', (error) => {
-    console.error(`Error executing Python script: ${error.message}`);
-});
+        let pythonOutput = [];
+        //njib data w nkhbiha f pythonoutput
+        // Capture stdout data from Python script
+        pythonProcess.stdout.on('data', (data) => {
+            // Convert the Buffer object to a string
+            const dataString = data.toString('utf-8');
+            // Extract the content between square brackets
+            const matches = dataString.match(/\[([^\]]+)\]/);
+            // If matches are found
+            if (matches && matches.length > 1) {
+                // Split the matched content by comma and remove leading/trailing spaces
+                const elements = matches[1].split(',').map(item => item.trim());
+                // Remove single quotes from each element
+                const cleanedElements = elements.map(item => item.replace(/'/g, ''));
+                // Add the cleaned elements to the pythonOutput array
+                pythonOutput.push(...cleanedElements);
+            }
+        });
 
 
-pythonProcess.on('close', (code) => {
-    console.log(`Python script process exited with code ${code}`);
-    console.log(pythonOutput);
-    
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+        // Handle any errors from Python script execution
+        pythonProcess.on('error', (error) => {
+            console.error(`Error executing Python script: ${error.message}`);
+        });
 
-    // resultat te3na
-    res.json({
-        status: true,
-        message: 'Joueur registered successfully',
-         token: token,
-        data: joueur,
-        pythonOutput: pythonOutput
-    });
-});
+
+        pythonProcess.on('close', (code) => {
+            console.log(`Python script process exited with code ${code}`);
+            console.log(pythonOutput);
+
+
+            // resultat te3na
+            res.json({
+                status: true,
+                message: 'Joueur registered successfully',
+                token: token,
+                data: joueur,
+                pythonOutput: pythonOutput
+            });
+        });
 
 
         // res.json({ status: true, message: 'Joueur registered successfully', token: token, data: joueur });
@@ -124,58 +124,58 @@ exports.loginJoueur = async (req, res, next) => {
         let tokenData;
         tokenData = { _id: joueur._id, email: joueur.email, role: "joueur" };
         const token = await JoueurServices.generateAccessToken(tokenData, "365d")
-// mn hna ybdew te3 python 
-//  les parm li ryh nb3thumlu
-        const Age =joueur.age;
-        const Wilaya =joueur.wilaya;
-        const Commune =joueur.commune;
-        const Id =joueur._id;
+        // mn hna ybdew te3 python 
+        //  les parm li ryh nb3thumlu
+        const Age = joueur.age;
+        const Wilaya = joueur.wilaya;
+        const Commune = joueur.commune;
+        const Id = joueur._id;
 
-// data set te3na
-        const pythonProcess = spawn('python',['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune,Id]);
+        // data set te3na
+        const pythonProcess = spawn('python', ['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
 
-        let pythonOutput = []; 
+        let pythonOutput = [];
         //njib data w nkhbiha f pythonoutput
-// Capture stdout data from Python script
-pythonProcess.stdout.on('data', (data) => {
-    // Convert the Buffer object to a string
-    const dataString = data.toString('utf-8');
-    // Extract the content between square brackets
-    const matches = dataString.match(/\[([^\]]+)\]/);
-    // If matches are found
-    if (matches && matches.length > 1) {
-        // Split the matched content by comma and remove leading/trailing spaces
-        const elements = matches[1].split(',').map(item => item.trim());
-        // Remove single quotes from each element
-        const cleanedElements = elements.map(item => item.replace(/'/g, ''));
-        // Add the cleaned elements to the pythonOutput array
-        pythonOutput.push(...cleanedElements);
-    }
-});
-pythonProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
- // Handle any errors from Python script execution
- pythonProcess.on('error', (error) => {
-    console.error(`Error executing Python script: ${error.message}`);
-});
-         // When the Python script execution is complete
-         pythonProcess.on('close', (code) => {
+        // Capture stdout data from Python script
+        pythonProcess.stdout.on('data', (data) => {
+            // Convert the Buffer object to a string
+            const dataString = data.toString('utf-8');
+            // Extract the content between square brackets
+            const matches = dataString.match(/\[([^\]]+)\]/);
+            // If matches are found
+            if (matches && matches.length > 1) {
+                // Split the matched content by comma and remove leading/trailing spaces
+                const elements = matches[1].split(',').map(item => item.trim());
+                // Remove single quotes from each element
+                const cleanedElements = elements.map(item => item.replace(/'/g, ''));
+                // Add the cleaned elements to the pythonOutput array
+                pythonOutput.push(...cleanedElements);
+            }
+        });
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+        // Handle any errors from Python script execution
+        pythonProcess.on('error', (error) => {
+            console.error(`Error executing Python script: ${error.message}`);
+        });
+        // When the Python script execution is complete
+        pythonProcess.on('close', (code) => {
             console.log(`Python script process exited with code ${code}`);
             console.log(pythonOutput);
-            
+
 
             // resultat te3na
             res.status(200).json({
                 status: true,
                 success: 'Bien connecté',
-                 token: token,
+                token: token,
                 data: joueur,
                 pythonOutput: pythonOutput
             });
         });
-    
-    
+
+
 
         // res.status(200).json({ status: true, success: "Bien connecté", token: token, data: joueur });
     } catch (error) {
@@ -421,9 +421,7 @@ exports.demendeRejoindreEquipe = async (req, res) => {
     try {
         const { equipeId } = req.params;
         const joueurId = req.user._id;
-
-
-
+        const post = req.body.post;
         const equipe = await Equipe.findById(equipeId);
         if (!equipe) {
             return res.status(404).json({ message: 'equipe not found' });
@@ -434,15 +432,17 @@ exports.demendeRejoindreEquipe = async (req, res) => {
         if (!joueur) {
             return res.status(404).json({ message: 'Joueur not found' });
         }
-
-
-
         // Update joueur's equipes array
         await Joueur.updateOne({ _id: joueurId }, { $addToSet: { demande_equipes: equipeId } });
-
-        // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $addToSet: { attente_joueurs_demande: joueurId } });
-
+        const alreadyInAttente = equipe.attente_joueurs_demande.some(demande => demande.joueur.equals(joueurId));
+        if (!alreadyInAttente) {
+            // Add the joueur to the attente_joueurs_demande array if not already present
+            await Equipe.updateOne(
+                { _id: equipeId },
+                { $push: { attente_joueurs_demande: { joueur: joueurId, post: post } } }
+            );
+        }
+        // await Equipe.updateOne({ _id: equipeId }, { $addToSet: { attente_joueurs_demande: { joueur: joueurId, post: post } } });
         res.status(200).json({ message: 'Joueur asked to join equipe successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -454,10 +454,11 @@ exports.demendeRejoindreEquipe = async (req, res) => {
 exports.capitaineAcceptJoueur = async (req, res) => {
     try {
         const { equipeId, joueurId } = req.params;
+        // const post = req.body.post;
 
 
-
-        const equipe = await Equipe.findById(equipeId);
+        // i want to find equipe with specifique post in attente_joueurs_demande
+        const equipe = await Equipe.findOne({ _id: equipeId, "attente_joueurs_demande.joueur": joueurId, });
         if (!equipe) {
             return res.status(404).json({ message: 'equipe not found' });
         }
@@ -474,7 +475,7 @@ exports.capitaineAcceptJoueur = async (req, res) => {
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: { joueur: joueurId } } });
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
 
         await Joueur.updateOne({ _id: joueurId }, { $addToSet: { equipes: equipeId } });
@@ -513,7 +514,9 @@ exports.capitainerefuserjoueur = async (req, res) => {
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        //! await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: { joueur: joueurId } } });
+
 
 
 
@@ -618,7 +621,8 @@ exports.annulerDemandeEquipe = async (req, res) => {
         await Joueur.updateOne({ _id: joueurId }, { $pull: { demande_equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        // await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: { joueur: joueurId } } });
 
 
 
@@ -654,7 +658,8 @@ exports.accepterRejoindreEquipe = async (req, res) => {
         await Joueur.updateOne({ _id: joueurId }, { $addToSet: { equipes: equipeId } });
 
         // Update equipe's joueurs array
-        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        // await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: joueurId } });
+        await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs_demande: { joueur: joueurId } } });
         await Equipe.updateOne({ _id: equipeId }, { $pull: { attente_joueurs: joueurId } });
         await Equipe.updateOne({ _id: equipeId }, { $addToSet: { joueurs: joueurId } });
 
@@ -837,3 +842,52 @@ exports.resetPassword = async (req, res) => {
         return res.status(500).json({ status: false, message: 'Internal server error' });
     }
 };
+
+exports.getAllMyDemandes = async (req, res) => {
+    try {
+        const joueurId = req.user._id;
+        const joueur = await Joueur.findById(joueurId);
+
+        if (!joueur) {
+            return res.status(404).json({ message: 'Joueur not found' });
+        }
+        const limit = parseInt(req.query.limit) || 10; // Default limit to 10 documents
+        const query = { attente_joueurs_demande: { $elemMatch: { joueur: joueurId } } };
+
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+        const demandes = await Equipe.find(query).populate({
+            path: 'capitaine_id',
+            select: 'username nom telephone' // Selecting name and phone from capitaine
+        })
+            .populate({
+                path: 'joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs
+            })
+            .populate({
+                path: 'attente_joueurs',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+            })
+            .populate({
+                path: 'attente_joueurs_demande',
+                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                , populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
+                }
+            }).sort({ _id: -1 }).limit(limit);
+        const moreDataAvailable = demandes.length === limit;
+
+        // Determine the next cursor
+        const nextCursor = moreDataAvailable ? demandes[demandes.length - 1]._id : '';
+
+        res.json({
+            data: demandes,
+            moreDataAvailable,
+            nextCursor,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}; 

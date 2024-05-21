@@ -10,3 +10,5 @@ annonce kifkif
 
 
 fl foreign key joueur_id n9dro nradoha tol userName mdm unique  
+
+capitane accepte mch ay joueur
