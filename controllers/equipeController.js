@@ -81,10 +81,13 @@ exports.searchMyEquipes = async (req, res) => {
         }
         const userId = req.user._id; // Extract userId from request parameters
         const nom = req.query.nom;
+        const vertial = req.query.vertial;
         const regex = new RegExp(nom, 'i');
         const limit = parseInt(req.query.limit) || 10; // Default limit to 4 documents, corrected the default value mentioned in comment
-        const query = { capitaine_id: userId, nom: { $regex: regex } }; // Search for teams where userId is the capitaine_id
-
+        const query = { capitaine_id: userId, vertial: false, nom: { $regex: regex } }; // Search for teams where userId is the capitaine_id
+        if (vertial === 'true') {
+            query.vertial = true;
+        }
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) };
         }
