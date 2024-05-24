@@ -234,6 +234,9 @@ exports.getEquipesImIn = async (req, res) => {
 
 
 //----------------------------
+
+
+
 exports.findAllEquipes = async (req, res) => {
     try {
         // const idList = req.query.idList || [];
@@ -262,7 +265,8 @@ exports.findAllEquipes = async (req, res) => {
                 path: 'attente_joueurs_demande',
                 select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
             })    // Fields to retrieve
-            .sort({ _id: -1 }).limit(limit);
+            .sort({ _id: -1 })
+            .limit(limit);
 //  ani zedt ghit hed ster bch nwli nst3ml sys rec
 const sortedEquipes = [];
 const remainingEquipes = [];
@@ -298,10 +302,10 @@ const reorderedEquipes = sortedEquipes.concat(remainingEquipes);
 
 
         // Determine if there's more data to fetch
-        const moreDataAvailable = equipes.length === limit;
+        const moreDataAvailable = reorderedEquipes.length === limit;
 
         // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
+        const nextCursor = moreDataAvailable ? reorderedEquipes[reorderedEquipes.length - 1]._id : '';
 
         res.json({
             data: reorderedEquipes,
