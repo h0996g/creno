@@ -323,6 +323,7 @@ exports.getMyReservationJoueur = async (req, res) => {
             select: 'nom numero_joueurs wilaya commune',
             populate: [
                 { path: 'joueurs', select: 'username age poste' },
+                { path: 'attente_joueurs', select: 'username age poste' },
                 { path: 'capitaine_id', select: 'username' }
             ]
         })
