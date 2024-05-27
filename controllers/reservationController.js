@@ -313,7 +313,7 @@ exports.connectReservationsWithEquipe = async (req, res) => {
 }
 
 
-
+//get just one 
 exports.getMyReservationJoueur = async (req, res) => {
     try {
         const joueur_id = req.user._id;
@@ -323,6 +323,7 @@ exports.getMyReservationJoueur = async (req, res) => {
             select: 'nom numero_joueurs wilaya commune',
             populate: [
                 { path: 'joueurs', select: 'username age poste' },
+                { path: 'attente_joueurs', select: 'username age poste' },
                 { path: 'capitaine_id', select: 'username' }
             ]
         })
@@ -343,3 +344,16 @@ exports.getMyReservationJoueur = async (req, res) => {
     }
 }
 
+
+exports.deleteDemandeByJouer = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const deletedReservation = await Reservation.deleteOne({ _id: id, joueur_id: req.user._id, etat: 'demander' });
+        if (!deletedReservation) {
+            return res.status(404).json({ message: 'Creneau not found or unauthorized' });
+        }
+        res.status(204).end();
+    } catch (error) {
+        res.json(error);
+    }
+};
