@@ -117,8 +117,13 @@ router.post('/reservation/:idterrain', protect, reservationController.addReserva
 router.post('/reservation/set/admin/:id', protect, isAdmin, reservationController.setReserveWithAdmin);
 router.post('/reservation/admin/:idterrain', protect, isAdmin, reservationController.adminAddReservation);
 router.put('/reservation/:id', protect, reservationController.updateReservation);
+
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
-router.delete('/Reservation/groupe/:groupId', protect, reservationController.deleteReservationGroup);
+router.delete('/Reservation/groupe/:groupId', protect, isAdmin ,reservationController.deleteReservationGroup);
+
+router.delete('/reservation/:id', protect, isAdmin, reservationController.deleteReservation);
+router.delete('/reservation/demander/:id', protect, reservationController.deleteDemandeByJouer);
+
 router.get('/reservation/:id', reservationController.findReservationById);
 // router.get('/myreservations/', protect, reservationController.getMyReservationJoueur); 
 router.get('/reservations/with/other/:idterrain/:jour', protect, reservationController.getReservationsWithConditions);
