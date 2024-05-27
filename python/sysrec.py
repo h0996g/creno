@@ -135,7 +135,7 @@ def find_similar_users(data, new_user, threshold=0.6):
 
 
 def main():
-    filepath = 'C:\\Users\\dell\\Downloads\\boulboul.xlsx'
+    filepath = 'C:\\Users\\dell\\Downloads\\crenodataset.xlsx'
     try:
         data = load_user_data(filepath)
         Age = int(sys.argv[1])
@@ -186,7 +186,7 @@ def main():
         print(f"The file was not found at {filepath}")
     except Exception as e:
         print(f"An error occurred: {e}")
-    data = preprocess_data(data)  # Preprocess to ensure consistent data types and handle missing values
+    # data = preprocess_data(data)  # Preprocess to ensure consistent data types and handle missing values
         
     
 
