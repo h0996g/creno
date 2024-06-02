@@ -6,7 +6,7 @@ const mongoose = require('mongoose');//installer le module mongoose (avant vous 
 const apiRouter = require('./routes/api');
 require('./jobs/jobs.js');
 require('dotenv').config()
-
+const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
 const server = require('http').createServer(app);
@@ -17,8 +17,8 @@ app.use(bodyParser.json());
 
 // Connexion à la base de données MongoDB
 mongoose.set('strictQuery', true);
-
-mongoose.connect('mongodb://127.0.0.1:27017/creno', { useNewUrlParser: true })
+// mongodb://127.0.0.1:27017/creno
+mongoose.connect(process.env.MongoURI, { useNewUrlParser: true })
     .then(() => {
         console.log('Connexion réussie à la base de données');
 
