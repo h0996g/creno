@@ -45,6 +45,22 @@ exports.modifierEquipe = async (req, res) => {
         res.json(e);
     }
 }
+
+
+exports.updateJoueursEquipe = async (req, res) => {
+    try {
+        const id_Equipe = req.params.id;
+        const { joueurs, attente_joueurs } = req.body;
+        const equipe = await Equipe.findByIdAndUpdate(id_Equipe, { joueurs, attente_joueurs }, { new: true });
+        if (!equipe) {
+            return res.status(404).json({ error: 'Equipe not found' });
+        } else {
+            res.json(equipe);
+        }
+    } catch (e) {
+        res.json(e);
+    }
+}
 //----------------------------
 exports.supprimerEquipe = async (req, res) => {
     try {
@@ -100,18 +116,19 @@ exports.searchMyEquipes = async (req, res) => {
             })
             .populate({
                 path: 'joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs
             })
             .populate({
                 path: 'attente_joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                select: 'username nom telephone photo', // Selecting name and phone from joueurs in waiting
+
             })
             .populate({
                 path: 'attente_joueurs_demande',
-                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs in waiting
                 , populate: {
                     path: 'joueur',
-                    select: 'username nom telephone'
+                    select: 'username nom telephone photo'
                 }
             })
             .limit(limit)
@@ -154,7 +171,7 @@ exports.searchEquipes = async (req, res) => {
             })
             .populate({
                 path: 'joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs
             })
             .populate({
                 path: 'attente_joueurs',
@@ -197,10 +214,13 @@ exports.getEquipesImIn = async (req, res) => {
             return res.status(401).json({ message: 'User not authenticated' });
         }
         const userId = req.user._id; // Extract userId from request parameters
+        const vertial = req.query.vertial;
 
         const limit = parseInt(req.query.limit) || 10; // Set the default limit
-        const query = { joueurs: { $in: [userId] } }; // Search for teams where userId is in the joueurs array
-
+        const query = { joueurs: { $in: [userId] }, vertial: false }; // Search for teams where userId is in the joueurs array
+        if (vertial === 'true') {
+            query.vertial = true;
+        }
         // Apply cursor if present
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) };
@@ -255,7 +275,12 @@ exports.findAllEquipes = async (req, res) => {
         const idList = req.body.idList || [];
         console.log(idList);
         const limit = parseInt(req.query.limit) || 7; // How many documents to return
-        const query = {};
+        const vertial = req.query.vertial;
+
+        const query = { vertial: false };
+        if (vertial === 'true') {
+            query.vertial = true;
+        }
         if (req.query.cursor) {
             query._id = { $lt: new ObjectId(req.query.cursor) }
         }
@@ -524,7 +549,7 @@ exports.quitterTournoi = async (req, res) => {
 exports.createEquipeCopyVertial = async (req, res) => {
     try {
         const id = req.user._id;
-        const { nom, numero_joueurs, joueurs, wilaya, commune } = req.body;
+        const { nom, numero_joueurs, joueurs, wilaya, commune, attente_joueurs } = req.body;
 
         // Check if a team with the same name already exists
         const existingEquipe = await Equipe.findOne({ nom });
@@ -534,7 +559,7 @@ exports.createEquipeCopyVertial = async (req, res) => {
 
         const nameVertial = nom + "/" + nanoid(5);
         console.log(nameVertial);
-        const createEquipe = new Equipe({ nom: nameVertial, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id, vertial: true });
+        const createEquipe = new Equipe({ nom: nameVertial, numero_joueurs, joueurs, wilaya, commune, capitaine_id: id, vertial: true, attente_joueurs });
         await createEquipe.save();
         res.status(201).json(createEquipe);
     } catch (e) {

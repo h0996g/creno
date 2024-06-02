@@ -95,6 +95,7 @@ router.get('/search/myterrain', protect, terrainController.searchMyTerrains);
 router.post('/equipe', protect, equipeController.createEquipe)
 router.post('/equipe/vertial', protect, equipeController.createEquipeCopyVertial)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
+router.put('/equipe/joueurs/:id', protect, equipeController.updateJoueursEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
 router.get('/equipe', equipeController.findAllEquipes)
@@ -111,8 +112,14 @@ router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.qu
 
 // ---------------------Reservation---------------------------------------------
 
+
+//router.get('/reservation/myreservation', protect, reservationController.getMyReservationJoueur);
+router.get('/reservation/other', protect, reservationController.getOtherReservationJoueur);
+//router.put('/reservation/connequipe/', protect, reservationController.connectReservationsWithEquipe);
+
 router.get('/reservation/my', protect, reservationController.getMyReservationJoueur);
 router.put('/reservation/connected/equipe', protect, reservationController.connectReservationsWithEquipe);
+
 router.post('/reservation/:idterrain', protect, reservationController.addReservation);
 router.post('/reservation/set/admin/:id', protect, isAdmin, reservationController.setReserveWithAdmin);
 router.post('/reservation/admin/:idterrain', protect, isAdmin, reservationController.adminAddReservation);

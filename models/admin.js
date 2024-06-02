@@ -33,7 +33,7 @@ const adminSchema = new mongoose.Schema({
         type: String,
         // required: true
     },
- 
+
 
 
 
@@ -66,7 +66,7 @@ const adminSchema = new mongoose.Schema({
 
 // Pre-save hook to hash password
 adminSchema.pre("save", async function () {
-    
+
     var admin = this;
     if (!admin.isModified("mot_de_passe")) {
         return;

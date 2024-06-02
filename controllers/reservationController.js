@@ -320,7 +320,36 @@ exports.getMyReservationJoueur = async (req, res) => {
         const filter = req.query;
         const reservation = await Reservation.findOne({ joueur_id: joueur_id, ...filter }).populate({
             path: 'equipe_id1',
-            select: 'nom numero_joueurs wilaya commune',
+            select: 'nom numero_joueurs wilaya commune vertial',
+            populate: [
+                { path: 'joueurs', select: 'username age poste' },
+                { path: 'attente_joueurs', select: 'username age poste' },
+                { path: 'capitaine_id', select: 'username' }
+            ]
+        })
+            .populate({
+                path: 'equipe_id2',
+                select: 'nom numero_joueurs wilaya commune',
+                populate: [
+                    { path: 'joueurs', select: 'username age poste' },
+                    { path: 'capitaine_id', select: 'username' }
+                ]
+            });
+        if (reservation == null) {
+            return res.status(404).json({ message: 'reservation not found' });
+        }
+        res.json(reservation);
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+}
+exports.getOtherReservationJoueur = async (req, res) => {
+    try {
+        // const joueur_id = req.user._id;
+        const filter = req.query;
+        const reservation = await Reservation.findOne(filter).populate({
+            path: 'equipe_id1',
+            select: 'nom numero_joueurs wilaya commune vertial',
             populate: [
                 { path: 'joueurs', select: 'username age poste' },
                 { path: 'attente_joueurs', select: 'username age poste' },

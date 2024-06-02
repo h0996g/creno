@@ -176,7 +176,7 @@ exports.getAnnonceById = async (req, res) => {
             path: 'reservation_id',
             select: 'heure_debut_temps jour duree',
             populate: [
-                { path: 'equipe_id1', select: 'nom joueurs', populate: [{ path: 'joueurs', select: 'nom prenom telephone' }] },
+                { path: 'equipe_id1', select: 'nom joueurs capitaine_id', populate: [{ path: 'joueurs', select: 'nom prenom telephone' }] },
                 { path: 'equipe_id2', select: 'nom joueurs', populate: [{ path: 'joueurs', select: 'nom prenom telephone' }] },
             ],
         }).populate({
