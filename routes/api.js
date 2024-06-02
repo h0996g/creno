@@ -13,7 +13,7 @@ const fcmTokenController = require('../controllers/fcmTokenController')
 const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
     res.json({ message: 'hello' })
 
 })
@@ -23,12 +23,12 @@ router.get('/', async (req, res) => {
 
 
 // router.get('/joueur', joueurController.loginJoueur)
-router.get('/joueur/information', protect, joueurController.getMyInformation)
+router.get('/joueurs/information', protect, joueurController.getMyInformation)
 router.post('/joueur/login', joueurController.loginJoueur)
 router.post('/joueur', joueurController.createJoueur)
 router.put('/joueur', protect, joueurController.updateJoueur);
 router.get('/joueur/:id', joueurController.getJoueurById);
-router.get('/joueur/username/:username', joueurController.getJoueurByUsername);
+router.get('/joueurs/username/:username', joueurController.getJoueurByUsername);
 router.get('/joueurs', joueurController.getAllJoueurs);
 // router.get('/joueurs/filter', joueurController.filterJoueurs);
 router.put('/joueurs/password', protect, joueurController.updatePassword);
@@ -48,8 +48,8 @@ router.post('/joueur/refuser/:equipeId', protect, joueurController.refuserRejoin
 //--- ki nquiti equipe wla capitaine ynhi joueur 
 router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.supprimerRejoindreEquipe);
 
-router.get('/joueur/search', joueurController.searchJoueursByUsername)
-router.get('/joueur/demandes', protect, joueurController.getAllMyDemandes)
+router.get('/joueurs/search', joueurController.searchJoueursByUsername)
+router.get('/joueurs/demandes', protect, joueurController.getAllMyDemandes)
 
 router.post('/joueur/recoverpassword', joueurController.recoverPassword);
 router.post('/joueurs/verifytoken', joueurController.verifyToken);
@@ -60,7 +60,7 @@ router.post('/joueur/resetpassword', joueurController.resetPassword);
 
 router.post('/admin/login', adminController.loginAdmin)
 router.post('/admin', adminController.createAdmin)
-router.get('/admin/information', protect, isAdmin, adminController.getMyInformation)
+router.get('/admins/information', protect, isAdmin, adminController.getMyInformation)
 router.put('/admin', protect, adminController.updateAdmin);
 router.get('/admin/:id', adminController.getAdminById);
 // router.get('/admins', adminController.getAllAdmins);
@@ -93,16 +93,16 @@ router.get('/search/myterrain', protect, terrainController.searchMyTerrains);
 
 // ---------------------Equipe---------------------------------------------
 router.post('/equipe', protect, equipeController.createEquipe)
-router.post('/equipe/vertial', protect, equipeController.createEquipeCopyVertial)
+router.post('/equipes/vertial', protect, equipeController.createEquipeCopyVertial)
 router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.put('/equipe/joueurs/:id', protect, equipeController.updateJoueursEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
 router.get('/equipe', equipeController.findAllEquipes)
-router.get('/equipe/my', protect, equipeController.searchMyEquipes)
-router.get('/equipe/search', protect, equipeController.searchEquipes)
+router.get('/equipes/search', protect, equipeController.searchEquipes)
+router.get('/equipes/my', protect, equipeController.searchMyEquipes)
 
-router.get('/equipe/imin', protect, equipeController.getEquipesImIn)
+router.get('/equipes/imin', protect, equipeController.getEquipesImIn)
 router.get('/equipes/invite', protect, equipeController.getEquipesInvitedMe)
 // router.get('/equipes/demande', protect, equipeController.getEquipesDemandedMe)
 router.get('/equipes/filter', equipeController.filterEquipes);
@@ -114,10 +114,10 @@ router.post('/equipe/quitter/:equipeId/:tournoiId', protect, equipeController.qu
 
 
 //router.get('/reservation/myreservation', protect, reservationController.getMyReservationJoueur);
-router.get('/reservation/other', protect, reservationController.getOtherReservationJoueur);
+router.get('/reservations/other', protect, reservationController.getOtherReservationJoueur);
 //router.put('/reservation/connequipe/', protect, reservationController.connectReservationsWithEquipe);
 
-router.get('/reservation/my', protect, reservationController.getMyReservationJoueur);
+router.get('/reservations/my', protect, reservationController.getMyReservationJoueur);
 router.put('/reservation/connected/equipe', protect, reservationController.connectReservationsWithEquipe);
 
 router.post('/reservation/:idterrain', protect, reservationController.addReservation);
@@ -126,7 +126,7 @@ router.post('/reservation/admin/:idterrain', protect, isAdmin, reservationContro
 router.put('/reservation/:id', protect, reservationController.updateReservation);
 
 router.delete('/reservation/:id', protect, reservationController.deleteReservation);
-router.delete('/Reservation/groupe/:groupId', protect, isAdmin ,reservationController.deleteReservationGroup);
+router.delete('/Reservation/groupe/:groupId', protect, isAdmin, reservationController.deleteReservationGroup);
 
 router.delete('/reservation/:id', protect, isAdmin, reservationController.deleteReservation);
 router.delete('/reservation/demander/:id', protect, reservationController.deleteDemandeByJouer);
@@ -141,12 +141,12 @@ router.get('/reservations/pagination/filter', protect, isAdmin, reservationContr
 
 // -------------------------tournoi---------------------------------
 
-router.post('/tournoi', protect, tournoiController.addTournoi);
-router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
-router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
-router.get('/tournoi/:id', tournoiController.findTournoiById);
-router.get('/tournois', tournoiController.findAllTournois);
-router.get('/tournois/filter', tournoiController.filterTournois);
+// router.post('/tournoi', protect, tournoiController.addTournoi);
+// router.put('/tournoi/:id', protect, tournoiController.updateTournoi);
+// router.delete('/tournoi/:id', protect, tournoiController.deleteTournoi);
+// router.get('/tournoi/:id', tournoiController.findTournoiById);
+// router.get('/tournois', tournoiController.findAllTournois);
+// router.get('/tournois/filter', tournoiController.filterTournois);
 
 //----------------------annonce----------------------------
 
