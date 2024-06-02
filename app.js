@@ -63,6 +63,6 @@ app.use('/api', apiRouter);
 // app.listen(3000, () => {
 //     console.log('Server started on port 3000');
 // });
-server.listen(PORT, () => {
-    console.log('Socket server started on port 3000');
+app.listen(PORT, () => {
+    console.log('server started on port 3000');
 });
