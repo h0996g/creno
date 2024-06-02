@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const options = { /* ... */ };
+// const options = { /* ... */ };
 const mongoose = require('mongoose');//installer le module mongoose (avant vous devez installer et configurer Mongodb)
 const apiRouter = require('./routes/api');
 require('./jobs/jobs.js');
@@ -9,8 +9,8 @@ require('dotenv').config()
 const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(cors());
-const server = require('http').createServer(app);
-const io = require('socket.io')(server, options);
+// const server = require('http').createServer(app);
+// const io = require('socket.io')(server, options);
 
 
 app.use(bodyParser.json());
@@ -34,26 +34,26 @@ mongoose.connect(process.env.MongoURI, { useNewUrlParser: true })
 //     next();
 // });
 // let liked = 0;
-io.on('connection', socket => {
-    console.log('user connected');
-    console.log('socket id', socket.id);
-    // io.emit('terrain', 'terrain');
+// io.on('connection', socket => {
+//     console.log('user connected');
+//     console.log('socket id', socket.id);
+//     // io.emit('terrain', 'terrain');
 
-    // socket.on('msg', (socket) => {
-    //     console.log('msg', socket)
-    // });
-    // io.emit('likeupdate', liked);
+//     // socket.on('msg', (socket) => {
+//     //     console.log('msg', socket)
+//     // });
+//     // io.emit('likeupdate', liked);
 
-    // socket.on('liked', (socket) => {
-    //     liked++;
-    //     console.log('liked', liked)
-    //     io.emit('likeupdate', liked);
-    // });
+//     // socket.on('liked', (socket) => {
+//     //     liked++;
+//     //     console.log('liked', liked)
+//     //     io.emit('likeupdate', liked);
+//     // });
 
-    socket.on('disconnect', () => {
-        console.log('socket disconnect ')
-    });
-});
+//     socket.on('disconnect', () => {
+//         console.log('socket disconnect ')
+//     });
+// });
 
 
 
@@ -63,6 +63,6 @@ app.use('/api', apiRouter);
 // app.listen(3000, () => {
 //     console.log('Server started on port 3000');
 // });
-server.listen(3000, () => {
+server.listen(PORT, () => {
     console.log('Socket server started on port 3000');
 });
