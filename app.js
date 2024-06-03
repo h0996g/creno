@@ -18,7 +18,11 @@ app.use(bodyParser.json());
 // Connexion à la base de données MongoDB
 mongoose.set('strictQuery', true);
 // mongodb://127.0.0.1:27017/creno
-mongoose.connect(process.env.MongoURI, { useNewUrlParser: true })
+mongoose.connect(
+    // process.env.MongoURI
+    "mongodb://127.0.0.1:27017/creno"
+
+    , { useNewUrlParser: true })
     .then(() => {
         console.log('Connexion réussie à la base de données');
 
