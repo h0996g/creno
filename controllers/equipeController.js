@@ -230,15 +230,15 @@ exports.getEquipesImIn = async (req, res) => {
         const equipes = await Equipe.find(query)
             .populate({
                 path: 'capitaine_id',
-                select: 'username nom telephone' // Selecting name and phone from capitaine
+                select: 'username nom telephone photo' // Selecting name and phone from capitaine
             })
             .populate({
                 path: 'joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs
             })
             .populate({
                 path: 'attente_joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs in waiting
             })
             .populate({
                 path: 'attente_joueurs_demande',
@@ -288,15 +288,15 @@ exports.findAllEquipes = async (req, res) => {
         const equipes = await Equipe.find(query)
             .populate({
                 path: 'capitaine_id',
-                select: 'username nom telephone' // Selecting name and phone from capitaine
+                select: 'username nom telephone photo' // Selecting name and phone from capitaine
             })
             .populate({
                 path: 'joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs
             })
             .populate({
                 path: 'attente_joueurs',
-                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
+                select: 'username nom telephone photo' // Selecting name and phone from joueurs in waiting
             })
             .populate({
                 path: 'attente_joueurs_demande',
