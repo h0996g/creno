@@ -5,7 +5,8 @@ const annonceSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ['search joueur', 'search join equipe', 'other']
+        enum: ['search joueur', 'search join equipe', 'Concernant le timing',
+            'Perte de propriété', 'other']
     },
     numero_joueurs: {
         type: Number,
