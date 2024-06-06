@@ -1,0 +1,109 @@
+[
+  
+        {
+          "username": "joueur4",
+          "email": "joueur4@example.com",
+          "mot_de_passe": "password4",
+          "nom": "Nom4",
+          "telephone": "789123456",
+          "age": 27,
+          "poste": "Gardien",
+          "wilaya": "22 - Sidi Bel Abbès",
+          "photo": "photo4.jpg",
+          "commune": "Sfisef",
+          "prenom": "Prenom4"
+        },
+        {
+          "username": "joueur5",
+          "email": "joueur5@example.com",
+          "mot_de_passe": "password5",
+          "nom": "Nom5",
+          "telephone": "321654987",
+          "age": 24,
+          "poste": "Défenseur",
+          "wilaya": "23 - Annaba",
+          "photo": "photo5.jpg",
+          "commune": "Seraidi",
+          "prenom": "Prenom5"
+        },
+        {
+          "username": "joueur6",
+          "email": "joueur6@example.com",
+          "mot_de_passe": "password6",
+          "nom": "Nom6",
+          "telephone": "147258369",
+          "age": 29,
+          "poste": "Milieu",
+          "wilaya": "24 - Guelma",
+          "photo": "photo6.jpg",
+          "commune": "Hammam Debagh",
+          "prenom": "Prenom6"
+        },
+        {
+          "username": "joueur7",
+          "email": "joueur7@example.com",
+          "mot_de_passe": "password7",
+          "nom": "Nom7",
+          "telephone": "963852741",
+          "age": 26,
+          "poste": "Attaquant",
+          "wilaya": "26 - Médéa",
+          "photo": "photo7.jpg",
+          "commune": "Ksar El Boukhari",
+          "prenom": "Prenom7"
+        },
+        {
+          "username": "joueur8",
+          "email": "joueur8@example.com",
+          "mot_de_passe": "password8",
+          "nom": "Nom8",
+          "telephone": "741852963",
+          "age": 23,
+          "poste": "Défenseur",
+          "wilaya": "27 - Mostaganem",
+          "photo": "photo8.jpg",
+          "commune": "Ain Tedeles",
+          "prenom": "Prenom8"
+        },
+        {
+            "username": "joueur9",
+            "email": "joueur9@example.com",
+            "mot_de_passe": "password9",
+            "nom": "Benali",
+            "telephone": "123456789",
+            "age": 26,
+            "poste": "Milieu",
+            "wilaya": "25 - Constantine",
+            "photo": "photo9.jpg",
+            "commune": "Constantine",
+            "prenom": "Riad"
+          },
+          {
+            "username": "joueur12",
+            "email": "joueur12@example.com",
+            "mot_de_passe": "password12",
+            "nom": "Medjoudj",
+            "telephone": "789123456",
+            "age": 25,
+            "poste": "Gardien",
+            "wilaya": "25 - Constantine",
+            "photo": "photo12.jpg", 
+            "commune": "Didouche Mourad",
+            "prenom": "Abdelkader"
+          },
+          {
+            "username": "joueur13",
+            "email": "joueur13@example.com",
+            "mot_de_passe": "password13",
+            "nom": "Bounedjah",
+            "telephone": "321654987",
+            "age": 27,
+            "poste": "Attaquant",
+            "wilaya": "25 - Constantine",
+            "photo": "photo13.jpg",
+            "commune": "Hamma Bouziane",
+            "prenom": "Baghdad"
+          }    
+      
+  ]
+  

@@ -56,7 +56,7 @@ def preprocess_data(data):
 
 
 
-def find_similar_users(data, new_user, threshold=0.6):
+def find_similar_users(data, new_user, threshold=0.2):
 
     ##### Hadi tani Pre-Traitement { Normalization } ############################################################################
     numeric_features = ['age']
@@ -135,7 +135,7 @@ def find_similar_users(data, new_user, threshold=0.6):
 
 
 def main():
-    filepath = 'C:\\Users\\dell\\Downloads\\crenodataset.xlsx'
+    filepath = 'C:\\Users\\asus\\Desktop\\other\\PROJET\\PFE_Creno\\crenoNode\\python\\crenodataset.xlsx'
     try:
         data = load_user_data(filepath)
         Age = int(sys.argv[1])
