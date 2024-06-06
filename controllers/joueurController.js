@@ -4,8 +4,94 @@ const Token = require('../models/token')
 const JoueurServices = require('../services/joueur.service')
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
+const sampleData = require('./sample_joueurs.json');
 const { spawn } = require('child_process');
 const { ObjectId } = require('mongoose').Types;
+
+
+
+
+
+
+
+
+exports.createJoueursVertically = async (req, res, next) => {
+    try {
+        // Read sample data from JSON file
+        // const sampleData = JSON.parse(fs.readFileSync('sample_joueurs.json'));
+
+        for (const joueurData of sampleData) {
+            const { username, email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune, prenom } = joueurData;
+
+            // Check for duplicate email or username
+            const duplicate = await Joueur.findOne({
+                $or: [{ email: email }, { username: username }]
+            });
+
+            if (duplicate) {
+                console.log(`Skipping duplicate joueur: ${username}`);
+                continue;
+            }
+
+            const joueur = await JoueurServices.registerJoueur(username, email, mot_de_passe, nom, telephone, age, poste, wilaya, photo, commune, prenom);
+
+            let tokenData;
+            tokenData = { _id: joueur._id, email: email, role: "joueur" };
+            const token = await JoueurServices.generateAccessToken(tokenData, "365d");
+
+            const Age = joueur.age;
+            const Wilaya = joueur.wilaya;
+            const Commune = joueur.commune;
+            const Id = joueur._id;
+
+            const pythonProcess = spawn('python', ['C:\\Users\\asus\\Desktop\\other\\PROJET\\PFE_Creno\\crenoNode\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
+
+            let pythonOutput = [];
+
+            pythonProcess.stdout.on('data', (data) => {
+                const dataString = data.toString('utf-8');
+                const matches = dataString.match(/\[([^\]]+)\]/);
+                if (matches && matches.length > 1) {
+                    const elements = matches[1].split(',').map(item => item.trim());
+                    const cleanedElements = elements.map(item => item.replace(/'/g, ''));
+                    pythonOutput.push(...cleanedElements);
+                }
+            });
+
+            pythonProcess.stderr.on('data', (data) => {
+                console.error(`stderr: ${data}`);
+            });
+
+            pythonProcess.on('error', (error) => {
+                console.error(`Error executing Python script: ${error.message}`);
+            });
+
+            await new Promise((resolve) => {
+                pythonProcess.on('close', (code) => {
+                    console.log(`Python script process exited with code ${code}`);
+                    console.log(pythonOutput);
+                    resolve();
+                });
+            });
+        }
+
+        res.json({
+            status: true,
+            message: 'Joueurs created successfully'
+        });
+    } catch (err) {
+        console.log("---> err -->", err);
+        next(err);
+    }
+};
+
+
+
+
+
+
+
+
 
 
 //----------------------------
@@ -40,7 +126,7 @@ exports.createJoueur = async (req, res, next) => {
         const Commune = joueur.commune;
         const Id = joueur._id;
 
-        const pythonProcess = spawn('python', ['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
+        const pythonProcess = spawn('python', ['C:\\Users\\asus\\Desktop\\other\\PROJET\\PFE_Creno\\crenoNode\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
 
         let pythonOutput = [];
         //njib data w nkhbiha f pythonoutput
@@ -132,7 +218,7 @@ exports.loginJoueur = async (req, res, next) => {
         const Id = joueur._id;
 
         // data set te3na
-        const pythonProcess = spawn('python', ['C:\\Users\\dell\\Desktop\\creno\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
+        const pythonProcess = spawn('python', ['C:\\Users\\asus\\Desktop\\other\\PROJET\\PFE_Creno\\crenoNode\\python\\sysrec.py', Age, Wilaya, Commune, Id]);
 
         let pythonOutput = [];
         //njib data w nkhbiha f pythonoutput

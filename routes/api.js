@@ -1,4 +1,5 @@
 const express = require('express');
+const geoJsonController = require('../controllers/geojsonController.js');
 const joueurController = require('../controllers/joueurController');
 const adminController = require('../controllers/adminController');
 const terrainController = require('../controllers/terrainController')
@@ -9,14 +10,16 @@ const annonceController = require('../controllers/annonceController')
 const tokenController = require('../controllers/tokenController')
 const pushNottificationController = require('../controllers/pushNottificationController')
 const fcmTokenController = require('../controllers/fcmTokenController')
-
 const { protect, isAdmin } = require('../handler/auth');
 
 const router = express.Router();
 router.get('/', (req, res) => {
     res.json({ message: 'hello' })
-
 })
+
+// 
+router.get('/convert-coordinates', geoJsonController.convertCoordinates);
+router.post('/joueurs/create-vertically', joueurController.createJoueursVertically);
 
 // ---------------------User---------------------------------------------
 
