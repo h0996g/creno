@@ -368,32 +368,47 @@ exports.getJoueurByUsername = async (req, res) => {
 
 exports.searchJoueursByUsername = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 10; // How many documents to return
+        const idList = req.body.idList || [];
+        const limit = parseInt(req.query.limit) || 4;
+        const page = parseInt(req.query.page) || 1;
         const usernameSearch = req.query.username;
-        const regex = new RegExp(usernameSearch, 'i'); // 'i' for case insensitive
+        const regex = new RegExp(usernameSearch, 'i');
 
         const query = {
             username: { $regex: regex }
         };
 
-        if (req.query.cursor) {
-            // Since we are using `$lt`, make sure the ID is ordered in descending order.
-            query._id = { $lt: new ObjectId(req.query.cursor) };
+        // Fetch the priority joueurs whose _id is present in idList
+        const priorityJoueurs = await Joueur.find({
+            ...query,
+            _id: { $in: idList.map(id => new ObjectId(id)) }
+        }).sort({ _id: -1 }).limit(limit).skip((page - 1) * limit);
+
+        // Calculate the remaining limit
+        const remainingLimit = limit - priorityJoueurs.length;
+
+        // Fetch the remaining joueurs if the limit is not reached
+        let remainingJoueurs = [];
+        if (remainingLimit > 0) {
+            remainingJoueurs = await Joueur.find({
+                ...query,
+                _id: { $nin: idList.map(id => new ObjectId(id)) }
+            }).sort({ _id: -1 }).limit(remainingLimit).skip((page - 1) * limit);
         }
 
-        // Fetch the documents from the database
-        const joueurs = await Joueur.find(query).sort({ _id: -1 }).limit(limit);
+        // Combine the priority joueurs and remaining joueurs
+        const joueurs = [...priorityJoueurs, ...remainingJoueurs];
 
-        // Determine if there's more data to fetch
-        const moreDataAvailable = joueurs.length === limit;
-
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
-        const nextCursor = moreDataAvailable ? joueurs[joueurs.length - 1]._id : '';
+        // Check if more data is available
+        const totalCount = await Joueur.countDocuments(query);
+        const moreDataAvailable = page * limit < totalCount;
 
         res.json({
             data: joueurs,
             moreDataAvailable,
-            nextCursor,
+            totalCount,
+            currentPage: page,
+            totalPages: Math.ceil(totalCount / limit),
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

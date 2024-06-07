@@ -244,7 +244,7 @@ exports.getAnnonceById = async (req, res) => {
 exports.getAllAnnonces = async (req, res) => {
     try {
         const idList = req.body.idList || [];
-        const limit = parseInt(req.query.limit) || 50;
+        const limit = parseInt(req.query.limit) || 100;
         const createur = req.query.createur;
         console.log(createur);
 

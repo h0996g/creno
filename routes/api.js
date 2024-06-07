@@ -51,7 +51,7 @@ router.post('/joueur/refuser/:equipeId', protect, joueurController.refuserRejoin
 //--- ki nquiti equipe wla capitaine ynhi joueur 
 router.post('/joueur/supprimer/:equipeId/:joueurId', protect, joueurController.supprimerRejoindreEquipe);
 
-router.get('/joueurs/search', joueurController.searchJoueursByUsername)
+router.post('/joueurs/search', joueurController.searchJoueursByUsername)
 router.get('/joueurs/demandes', protect, joueurController.getAllMyDemandes)
 
 router.post('/joueur/recoverpassword', joueurController.recoverPassword);
