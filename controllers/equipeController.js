@@ -272,7 +272,6 @@ exports.getEquipesImIn = async (req, res) => {
 exports.findAllEquipes = async (req, res) => {
     try {
         const idList = req.body.idList || [];
-        console.log(idList);
         const limit = parseInt(req.query.limit) || 7;
         const vertial = req.query.vertial;
 
@@ -312,36 +311,40 @@ exports.findAllEquipes = async (req, res) => {
             .sort({ _id: -1 })
             .limit(limit);
 
-        // Calculate the remaining limit after fetching priority equipes
+        // Calculate the remaining limit
         const remainingLimit = limit - priorityEquipes.length;
 
-        // Fetch the remaining equipes
-        const remainingEquipes = await Equipe.find({
-            ...query,
-            capitaine_id: { $nin: idList.map(id => new ObjectId(id)) }
-        })
-            .populate({
-                path: 'capitaine_id',
-                select: 'username nom telephone photo'
+        // Fetch the remaining equipes if the limit is not reached
+        let remainingEquipes = [];
+        // If there's still limit remaining, fetch the remaining equipes
+        if (remainingLimit > 0) {
+            remainingEquipes = await Equipe.find({
+                ...query,
+                capitaine_id: { $nin: idList.map(id => new ObjectId(id)) }
             })
-            .populate({
-                path: 'joueurs',
-                select: 'username nom telephone photo'
-            })
-            .populate({
-                path: 'attente_joueurs',
-                select: 'username nom telephone photo'
-            })
-            .populate({
-                path: 'attente_joueurs_demande',
-                select: 'username nom telephone',
-                populate: {
-                    path: 'joueur',
-                    select: 'username nom telephone'
-                }
-            })
-            .sort({ _id: -1 })
-            .limit(remainingLimit);
+                .populate({
+                    path: 'capitaine_id',
+                    select: 'username nom telephone photo'
+                })
+                .populate({
+                    path: 'joueurs',
+                    select: 'username nom telephone photo'
+                })
+                .populate({
+                    path: 'attente_joueurs',
+                    select: 'username nom telephone photo'
+                })
+                .populate({
+                    path: 'attente_joueurs_demande',
+                    select: 'username nom telephone',
+                    populate: {
+                        path: 'joueur',
+                        select: 'username nom telephone'
+                    }
+                })
+                .sort({ _id: -1 })
+                .limit(remainingLimit);
+        }
 
         // Combine the priority equipes and remaining equipes
         const equipes = [...priorityEquipes, ...remainingEquipes];
@@ -358,6 +361,7 @@ exports.findAllEquipes = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 //--------------------- invitation des equipes---------------------
