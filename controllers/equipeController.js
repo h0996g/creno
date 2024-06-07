@@ -271,10 +271,9 @@ exports.getEquipesImIn = async (req, res) => {
 //----------------------------
 exports.findAllEquipes = async (req, res) => {
     try {
-        // const idList = req.query.idList || [];
         const idList = req.body.idList || [];
         console.log(idList);
-        const limit = parseInt(req.query.limit) || 7; // How many documents to return
+        const limit = parseInt(req.query.limit) || 7;
         const vertial = req.query.vertial;
 
         const query = { vertial: false };
@@ -282,73 +281,76 @@ exports.findAllEquipes = async (req, res) => {
             query.vertial = true;
         }
         if (req.query.cursor) {
-            query._id = { $lt: new ObjectId(req.query.cursor) }
+            query._id = { $lt: new ObjectId(req.query.cursor) };
         }
-        // Fetch the documents from the database
-        const equipes = await Equipe.find(query)
+
+        // Fetch the equipes whose capitaine_id is present in idList
+        const priorityEquipes = await Equipe.find({
+            ...query,
+            capitaine_id: { $in: idList.map(id => new ObjectId(id)) }
+        })
             .populate({
                 path: 'capitaine_id',
-                select: 'username nom telephone photo' // Selecting name and phone from capitaine
+                select: 'username nom telephone photo'
             })
             .populate({
                 path: 'joueurs',
-                select: 'username nom telephone photo' // Selecting name and phone from joueurs
+                select: 'username nom telephone photo'
             })
             .populate({
                 path: 'attente_joueurs',
-                select: 'username nom telephone photo' // Selecting name and phone from joueurs in waiting
+                select: 'username nom telephone photo'
             })
             .populate({
                 path: 'attente_joueurs_demande',
-                select: 'username nom telephone' // Selecting name and phone from joueurs in waiting
-                , populate: {
+                select: 'username nom telephone',
+                populate: {
                     path: 'joueur',
                     select: 'username nom telephone'
                 }
-            })    // Fields to retrieve
-            .sort({ _id: -1 }).limit(limit);
-        //  ani zedt ghit hed ster bch nwli nst3ml sys rec
-        const sortedEquipes = [];
-        const remainingEquipes = [];
+            })
+            .sort({ _id: -1 })
+            .limit(limit);
 
-        for (const equipe of equipes) {
-            let foundInList = false;
-            for (const id of idList) {
-                console.log(id);
-                console.log(equipe.capitaine_id.id.toString());
-                console.log("ok");
+        // Calculate the remaining limit after fetching priority equipes
+        const remainingLimit = limit - priorityEquipes.length;
 
-                if (equipe.capitaine_id.id.toString() === id) {
-
-                    sortedEquipes.push(equipe);
-                    console.log(sortedEquipes);
-                    foundInList = true;
-                    break; // No need to check further if found
+        // Fetch the remaining equipes
+        const remainingEquipes = await Equipe.find({
+            ...query,
+            capitaine_id: { $nin: idList.map(id => new ObjectId(id)) }
+        })
+            .populate({
+                path: 'capitaine_id',
+                select: 'username nom telephone photo'
+            })
+            .populate({
+                path: 'joueurs',
+                select: 'username nom telephone photo'
+            })
+            .populate({
+                path: 'attente_joueurs',
+                select: 'username nom telephone photo'
+            })
+            .populate({
+                path: 'attente_joueurs_demande',
+                select: 'username nom telephone',
+                populate: {
+                    path: 'joueur',
+                    select: 'username nom telephone'
                 }
-            }
-            if (!foundInList) {
-                remainingEquipes.push(equipe);
-            }
-        }
-        sortedEquipes.sort((equipeA, equipeB) => {
-            const indexA = idList.findIndex(id => equipeA.capitaine_id.id.toString() === id);
-            const indexB = idList.findIndex(id => equipeB.capitaine_id.id.toString() === id);
+            })
+            .sort({ _id: -1 })
+            .limit(remainingLimit);
 
-            return indexA - indexB;
-        });
+        // Combine the priority equipes and remaining equipes
+        const equipes = [...priorityEquipes, ...remainingEquipes];
 
-        const reorderedEquipes = sortedEquipes.concat(remainingEquipes);
-
-
-
-        // Determine if there's more data to fetch
         const moreDataAvailable = equipes.length === limit;
-
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
         const nextCursor = moreDataAvailable ? equipes[equipes.length - 1]._id : '';
 
         res.json({
-            data: reorderedEquipes,
+            data: equipes,
             moreDataAvailable,
             nextCursor,
         });
@@ -356,6 +358,7 @@ exports.findAllEquipes = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 //--------------------- invitation des equipes---------------------
 
