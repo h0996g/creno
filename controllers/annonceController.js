@@ -243,25 +243,71 @@ exports.getAnnonceById = async (req, res) => {
 
 exports.getAllAnnonces = async (req, res) => {
     try {
-        const limit = parseInt(req.query.limit) || 6; // How many documents to return
-        const query = {};
-        if (req.query.cursor) {
-            query._id = { $lt: new ObjectId(req.query.cursor) }
+        const idList = req.body.idList || [];
+        const limit = parseInt(req.query.limit) || 50;
+        const createur = req.query.createur;
+        console.log(createur);
+
+        let query = {};
+        if (createur == 'joueur') {
+            query.joueur_id = { $exists: true };
+        } else if (createur == 'admin') {
+            query.admin_id = { $exists: true };
         }
 
-        // Fetch the documents from the database with population of related fields
-        const annonces = await Annonce.find(query)
-            .populate({
-                path: 'admin_id joueur_id', // Adjust this line according to your schema fields
-                select: 'nom telephone'    // Fields to retrieve
+        if (req.query.cursor) {
+            query._id = { $lt: new ObjectId(req.query.cursor) };
+        }
+
+        let annonces = [];
+
+        if (createur == 'joueur') {
+            console.log('dkhol Jou')
+            // Fetch the priority annonces whose joueur_id is present in idList
+            const priorityAnnonces = await Annonce.find({
+                ...query,
+                joueur_id: { $in: idList.map(id => new ObjectId(id)) }
             })
-            .sort({ _id: -1 })
-            .limit(limit);
+                .populate({
+                    path: 'joueur_id',
+                    select: 'nom telephone'
+                })
+                .sort({ _id: -1 })
+                .limit(limit);
 
-        // Determine if there's more data to fetch
+            // Calculate the remaining limit
+            const remainingLimit = limit - priorityAnnonces.length;
+
+            // Fetch the remaining annonces if the limit is not reached
+            let remainingAnnonces = [];
+            if (remainingLimit > 0) {
+                remainingAnnonces = await Annonce.find({
+                    ...query,
+                    joueur_id: { $nin: idList.map(id => new ObjectId(id)), $exists: true }
+                })
+                    .populate({
+                        path: 'joueur_id',
+                        select: 'nom telephone'
+                    })
+                    .sort({ _id: -1 })
+                    .limit(remainingLimit);
+            }
+
+            // Combine the priority annonces and remaining annonces
+            annonces = [...priorityAnnonces, ...remainingAnnonces];
+        } else if (createur == 'admin') {
+            console.log('dkhoool ad');
+            // Fetch the annonces normally when createur is 'admin'
+            annonces = await Annonce.find(query)
+                .populate({
+                    path: 'admin_id',
+                    select: 'nom telephone'
+                })
+                .sort({ _id: -1 })
+                .limit(limit);
+        }
+
         const moreDataAvailable = annonces.length === limit;
-
-        // Optionally, you can fetch the next cursor by extracting the _id of the last document
         const nextCursor = moreDataAvailable ? annonces[annonces.length - 1]._id : '';
 
         res.json({
@@ -273,6 +319,8 @@ exports.getAllAnnonces = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
 
 
 

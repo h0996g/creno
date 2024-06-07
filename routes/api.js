@@ -101,7 +101,7 @@ router.put('/equipe/:id', protect, equipeController.modifierEquipe)
 router.put('/equipe/joueurs/:id', protect, equipeController.updateJoueursEquipe)
 router.delete('/equipe/:id', protect, equipeController.supprimerEquipe)
 router.get('/equipe/:id', equipeController.findEquipeById)
-router.get('/equipe', equipeController.findAllEquipes)
+router.post('/equipes', equipeController.findAllEquipes)
 router.get('/equipes/search', protect, equipeController.searchEquipes)
 router.get('/equipes/my', protect, equipeController.searchMyEquipes)
 
@@ -159,7 +159,7 @@ router.delete('/annonce/:id', protect, annonceController.deleteAnnonce);
 router.get('/annonces/my/joueur', protect, annonceController.getMyAnnoncesJoueur);
 router.get('/annonces/my/admin', protect, annonceController.getMyAnnoncesAdmin);
 router.get('/annonce/:id', annonceController.getAnnonceById);
-router.get('/annonce', annonceController.getAllAnnonces);
+router.post('/annonces', annonceController.getAllAnnonces);
 router.get('/annonces/filter', annonceController.filterAnnonces);
 
 // -------------------------notification---------------------------------

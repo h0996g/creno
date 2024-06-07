@@ -272,7 +272,7 @@ exports.getEquipesImIn = async (req, res) => {
 exports.findAllEquipes = async (req, res) => {
     try {
         const idList = req.body.idList || [];
-        const limit = parseInt(req.query.limit) || 7;
+        const limit = parseInt(req.query.limit) || 50;
         const vertial = req.query.vertial;
 
         const query = { vertial: false };
