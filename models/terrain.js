@@ -6,7 +6,7 @@ const terrainSchema = new mongoose.Schema({
     nom: { type: String, required: true, unique: true },
     largeur: { type: Number, required: true },
     longeur: { type: Number, required: true },
-    superficie: { type: Number, required: true },
+    superficie: { type: Number, },
     wilaya: { type: String, required: false },
     commune: { type: String, required: false },
     adresse: { type: String, required: true },
