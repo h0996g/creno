@@ -37,7 +37,16 @@ exports.setReserveWithAdmin = async (req, res) => {
     const id = req.params.id;
     const updatedReservation = await Reservation.findOneAndUpdate({ _id: id }, { etat: etat, payment: payment, reservation_group_id: id }, { new: true });
     const reservation_group_id = updatedReservation.id;
-
+    await Reservation.updateMany(
+        {
+            _id: { $ne: id },  // Exclude the current reservation
+            jour: updatedReservation.jour,
+            heure_debut_temps: updatedReservation.heure_debut_temps,
+            terrain_id: updatedReservation.terrain_id,
+            etat: { $ne: 'annuler' }  // Only update if they are not already cancelled
+        },
+        { etat: 'annuler' }
+    );
     try {
         for (let i = 1; i < updatedReservation.duree; i++) {
             const newDay = new Date(updatedReservation.jour);

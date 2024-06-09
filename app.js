@@ -19,8 +19,8 @@ app.use(bodyParser.json());
 mongoose.set('strictQuery', true);
 // mongodb://127.0.0.1:27017/creno
 mongoose.connect(
-    // process.env.MongoURI
-    "mongodb://127.0.0.1:27017/creno"
+    process.env.MongoURI
+    // "mongodb://127.0.0.1:27017/creno"
 
     , { useNewUrlParser: true })
     .then(() => {
