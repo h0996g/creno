@@ -11,7 +11,7 @@ exports.sendNotificationToAdmin = async (req, res, next) => {
         const { title, body, path } = req.body;
 
         // const data = { key1: "value1", key2: "value2" };
-        const data = { screen: 'mzl' };
+        const data = { screen: 'fetchReservationsAdmin' };
 
         // Find all FCM tokens associated with the admin ID
         const fcmTokens = await FcmToken.find({ admin_id: adminId });
@@ -55,7 +55,7 @@ exports.sendNotificationToJoueur = async (req, res, next) => {
         const userId = req.params.id;
         const { title, body } = req.body;
 
-        const data = { screen: "mzl" };
+        const data = { screen: "getEquipeInvite" };
 
         // Find all FCM tokens associated with the user ID
         const fcmTokens = await FcmToken.find({ joueur_id: userId });

@@ -10,9 +10,6 @@ import sys
 # -------------------------------------
 
 
-
-
-
 def sanitizeString(value):
     value = value.replace(" ", "");
     value = value.split("-")[-1]
@@ -21,10 +18,11 @@ def sanitizeString(value):
 def load_user_data(filepath):
     ## Load exel data fi object ismo data type ta3o DataFrame.
     data = pd.read_excel(filepath, header=0)  # Use the first row as the header
+
     # Reset user IDs to start from 1
     data['user_id'] = range(1, len(data) + 1)
-
-    data['wilaya'] = data['wilaya'].apply(sanitizeString)
+    # remove redundency in wilaya and commune
+    # data['wilaya'] = data['wilaya'].apply(sanitizeString)
 
     
     # Check if 'past_interaction' column exists in the DataFrame
@@ -138,6 +136,7 @@ def main():
     filepath = 'C:\\Users\\asus\\Desktop\\other\\PROJET\\PFE_Creno\\crenoNode\\python\\crenodataset.xlsx'
     try:
         data = load_user_data(filepath)
+
         Age = int(sys.argv[1])
         Wilaya = sys.argv[2]
         Commune = sys.argv[3]
@@ -176,6 +175,9 @@ def main():
         else :   
             new_user_df = pd.DataFrame([printable_new_user])
             new_user_df = preprocess_data(new_user_df)
+            # TODO sanatize
+            new_user_df['wilaya'] = new_user_df['wilaya'].apply(sanitizeString)
+
             data = pd.concat([data, new_user_df], ignore_index=True)
             data.to_excel(filepath, index=False)
 

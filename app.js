@@ -1,13 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-// const options = { /* ... */ };
 const mongoose = require('mongoose');//installer le module mongoose (avant vous devez installer et configurer Mongodb)
 const apiRouter = require('./routes/api');
+
+// const options = { /* ... */ };
 require('./jobs/jobs.js');
 require('dotenv').config()
+
+
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+
+
 app.use(cors());
 // const server = require('http').createServer(app);
 // const io = require('socket.io')(server, options);
